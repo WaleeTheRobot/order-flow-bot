@@ -1,5 +1,7 @@
 # OrderFlowBot
 
+![Order Flow Bot](./screenshot.png)
+
 One day when I'm not lazy and have time I may come back to this, but things seem to work. Just don't use any of the strategies.
 
 A bot used for trading order flow. OrderFlowBot can be used to add existing strategies for automated trading or semi-automated trading. You can also include indicators so you can view the indicators while turning on the strategy. It uses the volumetric data and **requires the lifetime NinjaTrader license**. However, you update the code to remove the volumetric data and use it with whatever you want.
