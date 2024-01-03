@@ -11,10 +11,10 @@ namespace NinjaTrader.NinjaScript.Strategies
             Print(string.Format("Bar Number: {0}", dataBar.BarNumber));
             Print(string.Format("Bar Type: {0}", dataBar.BarType));
 
-            Print(string.Format("High: {0}", dataBar.Prices.High));
-            Print(string.Format("Low: {0}", dataBar.Prices.Low));
-            Print(string.Format("Open: {0}", dataBar.Prices.Open));
-            Print(string.Format("Close: {0}", dataBar.Prices.Close));
+            //Print(string.Format("High: {0}", dataBar.Prices.High));
+            //Print(string.Format("Low: {0}", dataBar.Prices.Low));
+            //Print(string.Format("Open: {0}", dataBar.Prices.Open));
+            //Print(string.Format("Close: {0}", dataBar.Prices.Close));
 
             Print(string.Format("Volume: {0}", dataBar.Volumes.Volume));
             Print(string.Format("BuyingVolume: {0}", dataBar.Volumes.BuyingVolume));
@@ -37,6 +37,13 @@ namespace NinjaTrader.NinjaScript.Strategies
             Print(string.Format("Valid Bid Ratio: {0}", dataBar.Ratios.HasValidBidExhaustionRatio));
             Print(string.Format("Ask Ratio: {0}", dataBar.Ratios.AskRatio));
             Print(string.Format("Valid Ask Ratio: {0}", dataBar.Ratios.HasValidAskExhaustionRatio));
+
+            Print(string.Format("Pre Bid Ratio: {0}", previousdataBar.Ratios.BidRatio));
+            Print(string.Format("Pre Valid Ex Bid Ratio: {0}", previousdataBar.Ratios.HasValidBidExhaustionRatio));
+            Print(string.Format("Pre Valid Abs Bid Ratio: {0}", previousdataBar.Ratios.HasValidBidAbsorptionRatio));
+            Print(string.Format("Pre Ask Ratio: {0}", previousdataBar.Ratios.AskRatio));
+            Print(string.Format("Pre Valid Ex Ask Ratio: {0}", previousdataBar.Ratios.HasValidAskExhaustionRatio));
+            Print(string.Format("Pre Valid Abs Ask Ratio: {0}", previousdataBar.Ratios.HasValidAskAbsorptionRatio));
 
             Print(string.Format("Delta: {0}", dataBar.Deltas.Delta));
             Print(string.Format("Min Delta: {0}", dataBar.Deltas.MinDelta));

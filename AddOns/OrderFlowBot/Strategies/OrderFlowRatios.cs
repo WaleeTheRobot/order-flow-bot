@@ -21,6 +21,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 
         public override void CheckStrategy()
         {
+            _previousDataBar = dataBars.Bars.Last();
+
             List<OrderFlowBotDataBar> previousBars = new List<OrderFlowBotDataBar>();
             previousBars = GetLastNBars(3);
 
@@ -47,9 +49,13 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 
         public override void CheckLong()
         {
-            _previousDataBar = dataBars.Bars.Last();
 
-            if (IsValidMaxMinDeltaRatio() && IsValidBidRatio() && IsBullishBar())
+            /*if (IsOutOfValueArea() && IsValidMaxMinDeltaRatio() && IsValidBidRatio() && IsBullishBar())
+            {
+                ValidStrategyDirection = Direction.Long;
+            }*/
+
+            if (PreviousBarHasValidBidRatio() && IsBullishBar())
             {
                 ValidStrategyDirection = Direction.Long;
             }
@@ -57,22 +63,37 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 
         public override void CheckShort()
         {
-            _previousDataBar = dataBars.Bars.Last();
-
-            if (IsValidMinMaxDeltaRatio() && IsValidAskRatio() && IsBearishBar())
+            if (PreviousBarHasValidAskRatio() && IsBearishBar())
             {
                 ValidStrategyDirection = Direction.Short;
             }
+
+            /*if (IsOutOfValueArea() && IsValidMinMaxDeltaRatio() && IsValidAskRatio() && IsBearishBar())
+            {
+                ValidStrategyDirection = Direction.Short;
+            }*/
         }
 
-        private bool IsBelowAutoVolumeProfileVAH()
+        private bool PreviousBarHasValidBidRatio()
         {
-            return dataBars.Bar.Prices.Close > _previousDataBar.AutoVolumeProfile.ValueAreaHigh;
+            return _previousDataBar.BarType == BarType.Bullish && (_previousDataBar.Ratios.HasValidBidExhaustionRatio || _previousDataBar.Ratios.HasValidBidAbsorptionRatio);
         }
 
-        private bool IsBelowAutoVolumeProfileVAL()
+        private bool PreviousBarHasValidAskRatio()
         {
-            return dataBars.Bar.Prices.Close < _previousDataBar.AutoVolumeProfile.ValueAreaLow;
+            return _previousDataBar.BarType == BarType.Bearish && (_previousDataBar.Ratios.HasValidAskExhaustionRatio || _previousDataBar.Ratios.HasValidAskAbsorptionRatio);
+        }
+
+        private bool IsOutOfValueArea()
+        {
+            double close = dataBars.Bar.Prices.Close;
+
+            return close > _previousDataBar.AutoVolumeProfile.ValueAreaHigh || close < _previousDataBar.AutoVolumeProfile.ValueAreaLow;
+        }
+
+        private bool HasValidVolumeProfile()
+        {
+            return (_previousDataBar.AutoVolumeProfile.ValueAreaHigh - _previousDataBar.AutoVolumeProfile.ValueAreaLow) > 4;
         }
 
         private bool IsValidMinMaxDeltaRatio()
@@ -85,7 +106,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 
             bool validMinDelta = minDelta < _totalPreviousMinDeltas + (_totalPreviousMinDeltas * .25);
 
-            // 1 return ratio > 5 && minDelta < previousMinDelta && deltaPercentage < -10;
+            //return ratio > 5 && minDelta < previousMinDelta && deltaPercentage < -10;
             // 2
             return ratio > 5 && deltaPercentage < -10 && validMinDelta;
         }
@@ -100,7 +121,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 
             bool validMaxDelta = maxDelta < _totalPreviousMaxDeltas + (_totalPreviousMaxDeltas * .25);
 
-            // 1 return ratio > 5 && maxDelta > previousMaxDelta && deltaPercentage > 10;
+            //return ratio > 5 && maxDelta > previousMaxDelta && deltaPercentage > 10;
             // 2
             return ratio > 5 && deltaPercentage > 10 && validMaxDelta;
         }
