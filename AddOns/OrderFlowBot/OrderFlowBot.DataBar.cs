@@ -9,7 +9,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
     public partial class OrderFlowBot : Strategy
     {
-        private OrderFlowBotDataBar GetDataBar(int barsAgo, bool populateAutoVolumeProfile = false)
+        private OrderFlowBotDataBar GetDataBar(int barsAgo)
         {
             OrderFlowBotDataBar dataBar = new OrderFlowBotDataBar();
             NinjaTrader.NinjaScript.BarsTypes.VolumetricBarsType volumetricBar = Bars.BarsSeries.BarsType as NinjaTrader.NinjaScript.BarsTypes.VolumetricBarsType;
@@ -18,12 +18,13 @@ namespace NinjaTrader.NinjaScript.Strategies
             PopulateBasic(dataBar, barsAgo);
             PopulatePrices(dataBar, barsAgo);
             PopulateVolumeAndImbalances(dataBar, volumetricBar, barsAgo);
-            PopulateVolumeProfile(dataBar);
             PopulateDeltas(dataBar, volumetricBar, barsAgo);
 
             // Lets do this only before adding it to OrderFlowDataBars list
-            if (populateAutoVolumeProfile)
+            if (AutoVolumeProfileEnabled)
             {
+                // No need to calculate if we aren't using it
+                PopulateVolumeProfile(dataBar);
                 PopulateAutoVolumeProfile(dataBar);
             }
 

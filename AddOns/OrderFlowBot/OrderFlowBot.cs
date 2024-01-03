@@ -17,13 +17,13 @@ namespace NinjaTrader.NinjaScript.Strategies
     {
         public const string GROUP_NAME_STRATEGY = "Order Flow Bot";
         public const string GROUP_NAME_DATA_BAR = "Data Bar";
-        public const string GROUP_NAME_AUTO_VOLULME_PROFILE = "Auto Volume Profile";
+        public const string GROUP_NAME_INDICATORS = "Indicators";
         public const string GROUP_NAME_TESTING = "Order Flow Bot Testing";
     }
 
     [Gui.CategoryOrder(GroupConstants.GROUP_NAME_STRATEGY, 1)]
     [Gui.CategoryOrder(GroupConstants.GROUP_NAME_DATA_BAR, 2)]
-    [Gui.CategoryOrder(GroupConstants.GROUP_NAME_AUTO_VOLULME_PROFILE, 3)]
+    [Gui.CategoryOrder(GroupConstants.GROUP_NAME_INDICATORS, 3)]
     public partial class OrderFlowBot : Strategy
     {
         #region Variables
@@ -96,11 +96,19 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         #endregion
 
-        #region AutoVolumeProfile Properties
+        #region Indicators Properties
 
         [NinjaScriptProperty]
-        [Display(Name = "Auto Volume Profile Look Back Bars", Description = "The look back bars for auto volume profile.", Order = 0, GroupName = GroupConstants.GROUP_NAME_AUTO_VOLULME_PROFILE)]
+        [Display(Name = "Auto Volume Profile Enabled", Description = "Enable the auto volume profile.", Order = 0, GroupName = GroupConstants.GROUP_NAME_INDICATORS)]
+        public bool AutoVolumeProfileEnabled { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Auto Volume Profile Look Back Bars", Description = "The look back bars for auto volume profile.", Order = 1, GroupName = GroupConstants.GROUP_NAME_INDICATORS)]
         public int AutoVolumeProfileLookBackBars { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Ratios Enabled", Description = "Enable Ratios.", Order = 2, GroupName = GroupConstants.GROUP_NAME_INDICATORS)]
+        public bool RatiosEnabled { get; set; }
 
         #endregion
 
@@ -128,13 +136,13 @@ namespace NinjaTrader.NinjaScript.Strategies
                 IsInstantiatedOnEachOptimizationIteration = true;
 
                 // Backtesting based on default settings
-                Slippage = 4;
+                Slippage = 2;
                 IncludeCommission = true;
 
                 // OrderFlowBot
                 Quantity = 1;
                 Target = 12;
-                Stop = 6;
+                Stop = 12;
                 BackTestingEnabled = false;
 
                 // DataBar
@@ -146,8 +154,10 @@ namespace NinjaTrader.NinjaScript.Strategies
                 ValidExhaustionRatio = 15;
                 ValidAbsorptionRatio = 1.4;
 
-                // AutoVolumeProfile
+                // Indicators
+                AutoVolumeProfileEnabled = false;
                 AutoVolumeProfileLookBackBars = 4;
+                RatiosEnabled = true;
             }
             else if (State == State.Configure)
             {
@@ -160,6 +170,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     StackedImbalance = StackedImbalance,
                     ValidExhaustionRatio = ValidExhaustionRatio,
                     ValidAbsorptionRatio = ValidAbsorptionRatio,
+                    AutoVolumeProfileEnabled = AutoVolumeProfileEnabled,
                     AutoVolumeProfileLookBackBars = AutoVolumeProfileLookBackBars,
                 };
 
@@ -175,13 +186,19 @@ namespace NinjaTrader.NinjaScript.Strategies
                 ControlPanelSetStateDataLoaded();
 
                 // Indicators
-                _autoVolumeProfile = AutoVolumeProfile();
-                _autoVolumeProfile.InitializeWith(_dataBars);
-                AddChartIndicator(_autoVolumeProfile);
+                if (AutoVolumeProfileEnabled)
+                {
+                    _autoVolumeProfile = AutoVolumeProfile();
+                    _autoVolumeProfile.InitializeWith(_dataBars);
+                    AddChartIndicator(_autoVolumeProfile);
+                }
 
-                _ratios = Ratios();
-                _ratios.InitializeWith(_dataBars);
-                AddChartIndicator(_ratios);
+                if (RatiosEnabled)
+                {
+                    _ratios = Ratios();
+                    _ratios.InitializeWith(_dataBars);
+                    AddChartIndicator(_ratios);
+                }
             }
             else if (State == State.Terminated)
             {
@@ -227,7 +244,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (IsFirstTickOfBar)
             {
                 // Get previous bar since we can miss the top or bottom of the bar in the data
-                _dataBars.Bars.Add(GetDataBar(1, true));
+                _dataBars.Bars.Add(GetDataBar(1));
 
                 // PrintDataBar(_dataBars.Bars.Last());
             }
