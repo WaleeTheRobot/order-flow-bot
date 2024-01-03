@@ -7,7 +7,6 @@ using NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies;
 using NinjaTrader.NinjaScript.Indicators;
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 #endregion
 
 //This namespace holds Strategies in this folder and is required. Do not change it. 
@@ -289,7 +288,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 _entryLong = true;
                 _entryName = _orderFlowBotState.ValidStrategy.ToString();
 
-                PrintDataBar(_dataBars.Bar, _dataBars.Bars.Last());
+                // PrintDataBar(_dataBars.Bar, _dataBars.Bars.Last());
 
                 return;
             }
@@ -299,7 +298,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 _entryShort = true;
                 _entryName = _orderFlowBotState.ValidStrategy.ToString();
 
-                PrintDataBar(_dataBars.Bar, _dataBars.Bars.Last());
+                // PrintDataBar(_dataBars.Bar, _dataBars.Bars.Last());
 
                 return;
             }
