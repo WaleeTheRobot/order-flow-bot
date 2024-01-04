@@ -1,5 +1,6 @@
 ﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar;
 using NinjaTrader.NinjaScript.AddOns.OrderFlowBot;
+using System.Linq;
 
 namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 {
@@ -17,6 +18,15 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 
         public override void CheckStrategy()
         {
+            if (dataBars.Bars.Count > OrderFlowBotProperties.LookBackBars)
+            {
+                _previousDataBar = dataBars.Bars.Last();
+            }
+            else
+            {
+                return;
+            }
+
             if (IsValidLongDirection() && ValidStrategyDirection == Direction.Flat)
             {
                 CheckLong();
