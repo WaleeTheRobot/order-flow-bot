@@ -9,5 +9,6 @@
         public double DeltaPercentage { get; set; }
         public double MinMaxDeltaRatio { get; set; }
         public double MaxMinDeltaRatio { get; set; }
+        public double DeltaChange { get; set; }
     }
 }

@@ -52,6 +52,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             Print(string.Format("Delta Percentage: {0}", dataBar.Deltas.DeltaPercentage));
             Print(string.Format("MinMax Delta %: {0}", dataBar.Deltas.MinMaxDeltaRatio));
             Print(string.Format("MaxMin Delta %: {0}", dataBar.Deltas.MaxMinDeltaRatio));
+            Print(string.Format("Delta Change: {0}", dataBar.Deltas.DeltaChange));
 
             Print("Bid Stacked Imbalances");
             Print("[");

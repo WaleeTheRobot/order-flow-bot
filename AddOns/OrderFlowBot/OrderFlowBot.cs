@@ -140,8 +140,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 
                 // OrderFlowBot
                 Quantity = 1;
-                Target = 12;
-                Stop = 12;
+                Target = 16;
+                Stop = 16;
                 BackTestingEnabled = false;
 
                 // DataBar
@@ -237,7 +237,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         protected override void OnBarUpdate()
         {
             // Include all look back bars
-            if (CurrentBar < AutoVolumeProfileLookBackBars)
+            if (CurrentBar < LookBackBars)
                 return;
 
             if (IsFirstTickOfBar)
@@ -288,7 +288,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 _entryLong = true;
                 _entryName = _orderFlowBotState.ValidStrategy.ToString();
 
-                // PrintDataBar(_dataBars.Bar, _dataBars.Bars.Last());
+                //PrintDataBar(_dataBars.Bar, _dataBars.Bars.Last());
 
                 return;
             }
@@ -298,7 +298,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 _entryShort = true;
                 _entryName = _orderFlowBotState.ValidStrategy.ToString();
 
-                // PrintDataBar(_dataBars.Bar, _dataBars.Bars.Last());
+                //PrintDataBar(_dataBars.Bar, _dataBars.Bars.Last());
 
                 return;
             }

@@ -110,6 +110,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
             dataBar.Deltas.MinMaxDeltaRatio = CalculateRatio(Math.Abs(minDelta), Math.Abs(maxDelta));
             dataBar.Deltas.MaxMinDeltaRatio = CalculateRatio(Math.Abs(maxDelta), Math.Abs(minDelta));
+            dataBar.Deltas.DeltaChange = volumetricBar.Volumes[CurrentBar - barsAgo].BarDelta - volumetricBar.Volumes[CurrentBar - barsAgo - 1].BarDelta;
         }
 
         private double CalculateRatio(double numerator, double denominator)
