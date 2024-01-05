@@ -77,7 +77,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
 
             dataBar.Volumes.BidAskVolumes = bidAskVolumeList;
-            dataBar.Imbalances.SetStackedImbalances(bidAskVolumeList, dataBar.Volumes.ValidBidAskVolumes());
+            dataBar.Imbalances.SetImbalances(bidAskVolumeList, dataBar.Volumes.ValidBidAskVolumes());
             dataBar.Ratios.SetRatios(bidAskVolumeList, dataBar.Volumes.ValidBidAskVolumes());
         }
 

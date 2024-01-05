@@ -10,6 +10,8 @@ namespace OrderFlowBotTestFiles.Files.Dependencies
 
     public class Imbalances
     {
+        public List<ImbalancePrice> BidImbalances { get; set; }
+        public List<ImbalancePrice> AskImbalances { get; set; }
         public List<ImbalancePrice> BidStackedImbalances { get; set; }
         public List<ImbalancePrice> AskStackedImbalances { get; set; }
         public bool HasBidStackedImbalances { get; set; }
@@ -17,6 +19,8 @@ namespace OrderFlowBotTestFiles.Files.Dependencies
 
         public Imbalances()
         {
+            AskImbalances = new List<ImbalancePrice>();
+            BidImbalances = new List<ImbalancePrice>();
             AskStackedImbalances = new List<ImbalancePrice>();
             BidStackedImbalances = new List<ImbalancePrice>();
         }
@@ -37,7 +41,7 @@ namespace OrderFlowBotTestFiles.Files.Dependencies
                 return bid >= imbalanceRatio;
             }
 
-            return bid / ask >= imbalanceRatio;
+            return (double)bid / ask >= imbalanceRatio;
         }
 
         private bool IsValidAskImbalance(List<BidAskVolume> bidAskVolumes, int index, long validBidVolume, long validAskVolume, double imbalanceRatio)
@@ -56,10 +60,10 @@ namespace OrderFlowBotTestFiles.Files.Dependencies
                 return ask >= imbalanceRatio;
             }
 
-            return ask / bid >= imbalanceRatio;
+            return (double)ask / bid >= imbalanceRatio;
         }
 
-        public void SetStackedImbalances(List<BidAskVolume> bidAskVolumes, bool validBidAskVolumes)
+        public void SetImbalances(List<BidAskVolume> bidAskVolumes, bool validBidAskVolumes)
         {
             if (!validBidAskVolumes)
                 return;
@@ -67,10 +71,6 @@ namespace OrderFlowBotTestFiles.Files.Dependencies
             double imbalanceRatio = OrderFlowBotProperties.ImbalanceRatio;
             long validBidVolume = OrderFlowBotProperties.ValidBidVolume;
             long validAskVolume = OrderFlowBotProperties.ValidAskVolume;
-            int stackedImbalance = OrderFlowBotProperties.StackedImbalance;
-
-            int totalBidStackedImbalance = 0;
-            int totalAskStackedImbalance = 0;
 
             List<ImbalancePrice> askImbalancePriceList = new List<ImbalancePrice>();
             List<ImbalancePrice> bidImbalancePriceList = new List<ImbalancePrice>();
@@ -84,20 +84,11 @@ namespace OrderFlowBotTestFiles.Files.Dependencies
 
                     if (isValidAskImbalance)
                     {
-                        totalAskStackedImbalance++;
-
                         askImbalancePriceList.Add(new ImbalancePrice
                         {
                             Price = bidAskVolumes[i].Price,
                             Volume = bidAskVolumes[i].AskVolume
                         });
-
-                        return;
-                    }
-
-                    if (totalAskStackedImbalance <= stackedImbalance)
-                    {
-                        totalAskStackedImbalance = 0;
                     }
                 }
                 // This is low of bar. Can calculate bid, but not ask.
@@ -107,20 +98,11 @@ namespace OrderFlowBotTestFiles.Files.Dependencies
 
                     if (isValidBidImbalance)
                     {
-                        totalBidStackedImbalance++;
-
                         bidImbalancePriceList.Add(new ImbalancePrice
                         {
                             Price = bidAskVolumes[i].Price,
                             Volume = bidAskVolumes[i].BidVolume
                         });
-
-                        return;
-                    }
-
-                    if (totalBidStackedImbalance <= stackedImbalance)
-                    {
-                        totalBidStackedImbalance = 0;
                     }
                 }
                 else
@@ -130,46 +112,65 @@ namespace OrderFlowBotTestFiles.Files.Dependencies
 
                     if (isValidAskImbalance)
                     {
-                        totalAskStackedImbalance++;
-
                         askImbalancePriceList.Add(new ImbalancePrice
                         {
                             Price = bidAskVolumes[i].Price,
                             Volume = bidAskVolumes[i].AskVolume
                         });
                     }
-                    else
-                    {
-                        if (totalAskStackedImbalance <= stackedImbalance)
-                        {
-                            totalAskStackedImbalance = 0;
-                        }
-                    }
 
                     if (isValidBidImbalance)
                     {
-                        totalBidStackedImbalance++;
-
                         bidImbalancePriceList.Add(new ImbalancePrice
                         {
                             Price = bidAskVolumes[i].Price,
                             Volume = bidAskVolumes[i].BidVolume
                         });
                     }
-                    else
-                    {
-                        if (totalBidStackedImbalance <= stackedImbalance)
-                        {
-                            totalBidStackedImbalance = 0;
-                        }
-                    }
                 }
             }
 
-            this.HasBidStackedImbalances = totalBidStackedImbalance >= stackedImbalance;
-            this.HasAskStackedImbalances = totalAskStackedImbalance >= stackedImbalance;
-            this.BidStackedImbalances = bidImbalancePriceList;
-            this.AskStackedImbalances = askImbalancePriceList;
+            SetStackedImbalances(bidImbalancePriceList, askImbalancePriceList);
+
+            this.BidImbalances = bidImbalancePriceList;
+            this.AskImbalances = askImbalancePriceList;
+        }
+
+        private void SetStackedImbalances(List<ImbalancePrice> bidImbalancePriceList, List<ImbalancePrice> askImbalancePriceList)
+        {
+            int stackedImbalance = OrderFlowBotProperties.StackedImbalance;
+            double tickSize = OrderFlowBotProperties.TickSize;
+
+            ProcessStackedImbalances(bidImbalancePriceList, stackedImbalance, tickSize, isBid: true);
+            ProcessStackedImbalances(askImbalancePriceList, stackedImbalance, tickSize, isBid: false);
+        }
+
+        private void ProcessStackedImbalances(List<ImbalancePrice> imbalancePriceList, int stackedImbalance, double tickSize, bool isBid)
+        {
+            List<ImbalancePrice> tempImbalanceList = new List<ImbalancePrice>();
+
+            for (int i = 0; i < imbalancePriceList.Count; i++)
+            {
+                tempImbalanceList.Add(imbalancePriceList[i]);
+
+                bool isLastItem = (i == imbalancePriceList.Count - 1);
+                bool isNextItemWithinTickSize = !isLastItem && Math.Abs(imbalancePriceList[i + 1].Price - imbalancePriceList[i].Price) <= tickSize;
+
+                if (!isNextItemWithinTickSize || isLastItem)
+                {
+                    if (tempImbalanceList.Count >= stackedImbalance)
+                    {
+                        if (isBid)
+                            this.BidStackedImbalances.AddRange(tempImbalanceList);
+                        else
+                            this.AskStackedImbalances.AddRange(tempImbalanceList);
+                    }
+                    tempImbalanceList.Clear();
+                }
+            }
+
+            this.HasBidStackedImbalances = BidStackedImbalances.Count > 0;
+            this.HasAskStackedImbalances = AskStackedImbalances.Count > 0;
         }
     }
 }

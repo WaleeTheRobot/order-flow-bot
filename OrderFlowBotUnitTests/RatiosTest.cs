@@ -34,26 +34,26 @@ namespace OrderFlowBotUnitTests
             Assert.Equal(150, dataBar.Ratios.BidRatio);
         }
 
-        [Fact(DisplayName = "HasBidAskRatio should be valid")]
+        [Fact(DisplayName = "HasValid Ask/Bid Exhuastion Ratios should be valid")]
         public void HasBidAskRatioValid()
         {
             OrderFlowBotDataBar dataBar = new OrderFlowBotDataBar();
             dataBar.Volumes.BidAskVolumes = _data.GetValidBidAskRatio();
             dataBar.Ratios.SetRatios(_data.GetValidBidAskRatio(), true);
 
-            Assert.True(dataBar.Ratios.HasValidAskRatio);
-            Assert.True(dataBar.Ratios.HasValidBidRatio);
+            Assert.True(dataBar.Ratios.HasValidAskExhaustionRatio);
+            Assert.True(dataBar.Ratios.HasValidBidExhaustionRatio);
         }
 
-        [Fact(DisplayName = "HasBidAskRatio should be invalid")]
+        [Fact(DisplayName = "HasValid Ask/Bid Exhuastion Ratios should be invalid")]
         public void HasBidAskRatioInvalid()
         {
             OrderFlowBotDataBar dataBar = new OrderFlowBotDataBar();
             dataBar.Volumes.BidAskVolumes = _data.GetInValidBidAskRatio();
             dataBar.Ratios.SetRatios(_data.GetInValidBidAskRatio(), false);
 
-            Assert.False(dataBar.Ratios.HasValidAskRatio);
-            Assert.False(dataBar.Ratios.HasValidBidRatio);
+            Assert.False(dataBar.Ratios.HasValidAskExhaustionRatio);
+            Assert.False(dataBar.Ratios.HasValidBidExhaustionRatio);
         }
     }
 }

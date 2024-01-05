@@ -6,8 +6,10 @@ namespace OrderFlowBotTestFiles.Files.Dependencies
     {
         public double AskRatio { get; set; }
         public double BidRatio { get; set; }
-        public bool HasValidAskRatio { get; set; }
-        public bool HasValidBidRatio { get; set; }
+        public bool HasValidAskExhaustionRatio { get; set; }
+        public bool HasValidBidExhaustionRatio { get; set; }
+        public bool HasValidAskAbsorptionRatio { get; set; }
+        public bool HasValidBidAbsorptionRatio { get; set; }
 
         public void SetRatios(List<BidAskVolume> bidAskVolumes, bool validBidAskVolumes)
         {
@@ -17,12 +19,14 @@ namespace OrderFlowBotTestFiles.Files.Dependencies
             double secondBottomBid, bottomBid;
             GetBottomBidVolumes(bidAskVolumes, out secondBottomBid, out bottomBid);
             BidRatio = CalculateRatio(secondBottomBid, bottomBid);
-            HasValidBidRatio = IsValidRatio(BidRatio);
+            HasValidBidExhaustionRatio = IsValidExhaustedRatio(BidRatio);
+            HasValidBidAbsorptionRatio = IsValidAbsorptionRatio(BidRatio);
 
             double topAsk, secondTopAsk;
             GetTopAskVolumes(bidAskVolumes, out topAsk, out secondTopAsk);
             AskRatio = CalculateRatio(secondTopAsk, topAsk);
-            HasValidAskRatio = IsValidRatio(AskRatio);
+            HasValidAskExhaustionRatio = IsValidExhaustedRatio(AskRatio);
+            HasValidAskAbsorptionRatio = IsValidAbsorptionRatio(AskRatio);
         }
 
         private void GetBottomBidVolumes(List<BidAskVolume> bidAskVolumes, out double secondBottomBid, out double bottomBid)
@@ -52,9 +56,14 @@ namespace OrderFlowBotTestFiles.Files.Dependencies
             return Math.Round(numerator / denominator, 2);
         }
 
-        private bool IsValidRatio(double ratio)
+        private bool IsValidExhaustedRatio(double ratio)
         {
-            return ratio > OrderFlowBotProperties.ValidRatio;
+            return ratio > OrderFlowBotProperties.ValidExhaustionRatio;
+        }
+
+        private bool IsValidAbsorptionRatio(double ratio)
+        {
+            return ratio < OrderFlowBotProperties.ValidAbsorptionRatio;
         }
     }
 }

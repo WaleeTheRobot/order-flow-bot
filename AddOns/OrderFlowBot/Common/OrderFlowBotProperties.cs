@@ -2,6 +2,8 @@
 {
     public struct OrderFlowBotPropertiesConfig
     {
+        public double TickSize { get; set; }
+
         // DataBar
         public int LookBackBars { get; set; }
         public double ImbalanceRatio { get; set; }
@@ -19,6 +21,8 @@
 
     public static class OrderFlowBotProperties
     {
+        public static double TickSize { get; private set; }
+
         // DataBar
         public static int LookBackBars { get; private set; }
         public static double ImbalanceRatio { get; private set; }
@@ -35,6 +39,8 @@
 
         public static void Initialize(OrderFlowBotPropertiesConfig config)
         {
+            TickSize = config.TickSize;
+
             LookBackBars = config.LookBackBars;
             ImbalanceRatio = config.ImbalanceRatio;
             StackedImbalance = config.StackedImbalance;

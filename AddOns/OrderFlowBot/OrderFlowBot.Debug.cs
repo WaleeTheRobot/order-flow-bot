@@ -54,16 +54,16 @@ namespace NinjaTrader.NinjaScript.Strategies
             Print(string.Format("MaxMin Delta %: {0}", dataBar.Deltas.MaxMinDeltaRatio));
             Print(string.Format("Delta Change: {0}", dataBar.Deltas.DeltaChange));
 
-            Print("Bid Stacked Imbalances");
+            Print("Bid Imbalances");
             Print("[");
-            foreach (var kvp in dataBar.Imbalances.BidStackedImbalances)
+            foreach (var kvp in dataBar.Imbalances.BidImbalances)
             {
                 Print(string.Format("{0} : {1}", kvp.Price, kvp.Volume));
             }
             Print("]");
-            Print("Ask Stacked Imbalances");
+            Print("Ask Imbalances");
             Print("[");
-            foreach (var kvp in dataBar.Imbalances.AskStackedImbalances)
+            foreach (var kvp in dataBar.Imbalances.AskImbalances)
             {
                 Print(string.Format("{0} : {1}", kvp.Price, kvp.Volume));
             }

@@ -7,6 +7,7 @@ using NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies;
 using NinjaTrader.NinjaScript.Indicators;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 #endregion
 
 //This namespace holds Strategies in this folder and is required. Do not change it. 
@@ -162,6 +163,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             {
                 OrderFlowBotPropertiesConfig config = new OrderFlowBotPropertiesConfig
                 {
+                    TickSize = TickSize,
                     LookBackBars = LookBackBars,
                     ImbalanceRatio = ImbalanceRatio,
                     ValidBidVolume = ValidBidVolume,
@@ -245,7 +247,10 @@ namespace NinjaTrader.NinjaScript.Strategies
                 // Get previous bar since we can miss the top or bottom of the bar in the data
                 _dataBars.Bars.Add(GetDataBar(1));
 
-                // PrintDataBar(_dataBars.Bars.Last());
+                if (_dataBars.Bars.Last().Volumes.Volume == 3446 || _dataBars.Bars.Last().Volumes.Volume == 6283)
+                {
+                    PrintDataBar(_dataBars.Bars.Last(), _dataBars.Bars.Last());
+                }
             }
 
             _dataBars.Bar = GetDataBar(0);
