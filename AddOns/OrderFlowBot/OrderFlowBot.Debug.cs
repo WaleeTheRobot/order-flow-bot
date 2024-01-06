@@ -14,7 +14,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             //Print(string.Format("High: {0}", dataBar.Prices.High));
             //Print(string.Format("Low: {0}", dataBar.Prices.Low));
             //Print(string.Format("Open: {0}", dataBar.Prices.Open));
-            //Print(string.Format("Close: {0}", dataBar.Prices.Close));
+            Print(string.Format("Close: {0}", dataBar.Prices.Close));
 
             Print(string.Format("Volume: {0}", dataBar.Volumes.Volume));
             Print(string.Format("BuyingVolume: {0}", dataBar.Volumes.BuyingVolume));
@@ -37,6 +37,10 @@ namespace NinjaTrader.NinjaScript.Strategies
             Print(string.Format("Valid Bid Ratio: {0}", dataBar.Ratios.HasValidBidExhaustionRatio));
             Print(string.Format("Ask Ratio: {0}", dataBar.Ratios.AskRatio));
             Print(string.Format("Valid Ask Ratio: {0}", dataBar.Ratios.HasValidAskExhaustionRatio));
+            Print(string.Format("Last Valid Bid Ratio Price: {0}", dataBar.Ratios.LastValidBidRatioPrice));
+            Print(string.Format("Last Valid Ask Ratio Price: {0}", dataBar.Ratios.LastValidAskRatioPrice));
+            Print(string.Format("Last Valid Bid Ratio Volume: {0}", dataBar.Ratios.LastValidBidRatioVolume));
+            Print(string.Format("Last Valid Ask Ratio Volume: {0}", dataBar.Ratios.LastValidAskRatioVolume));
 
             Print(string.Format("Pre Bid Ratio: {0}", previousdataBar.Ratios.BidRatio));
             Print(string.Format("Pre Valid Ex Bid Ratio: {0}", previousdataBar.Ratios.HasValidBidExhaustionRatio));

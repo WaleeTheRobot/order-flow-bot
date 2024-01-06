@@ -7,7 +7,6 @@ using NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies;
 using NinjaTrader.NinjaScript.Indicators;
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 #endregion
 
 //This namespace holds Strategies in this folder and is required. Do not change it. 
@@ -61,6 +60,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         [NinjaScriptProperty]
         [Display(Name = "Back Testing Enabled", Description = "Enable this to back test all strategies and directions.", Order = 3, GroupName = GroupConstants.GROUP_NAME_STRATEGY)]
         public bool BackTestingEnabled { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Manage Opened Positions Enabled", Description = "Enable this to managed open positions.", Order = 4, GroupName = GroupConstants.GROUP_NAME_STRATEGY)]
+        public bool ManageOpenedPositionsEnabled { get; set; }
 
         #endregion
 
@@ -144,6 +147,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Target = 16;
                 Stop = 16;
                 BackTestingEnabled = false;
+                ManageOpenedPositionsEnabled = true;
 
                 // DataBar
                 LookBackBars = 4;
@@ -245,15 +249,10 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (IsFirstTickOfBar)
             {
                 // Get previous bar since we can miss the top or bottom of the bar in the data
-                _dataBars.Bars.Add(GetDataBar(1));
-
-                if (_dataBars.Bars.Last().Volumes.Volume == 3446 || _dataBars.Bars.Last().Volumes.Volume == 6283)
-                {
-                    PrintDataBar(_dataBars.Bars.Last(), _dataBars.Bars.Last());
-                }
+                _dataBars.Bars.Add(GetDataBar(_dataBars.Bars, 1));
             }
 
-            _dataBars.Bar = GetDataBar(0);
+            _dataBars.Bar = GetDataBar(_dataBars.Bars, 0);
 
             if (Position.MarketPosition == MarketPosition.Flat)
             {
@@ -275,6 +274,26 @@ namespace NinjaTrader.NinjaScript.Strategies
                     EnterShort(Quantity, _entryName);
 
                     _lastTradeBarNumber = _dataBars.Bar.BarNumber;
+                }
+            }
+
+            if (Position.MarketPosition == MarketPosition.Long && ManageOpenedPositionsEnabled)
+            {
+                // Update logic for managing positions
+                // Exit position if current or future bar becomes bearish and has stacked imbalances
+                if (_dataBars.Bar.BarType == BarType.Bearish && _dataBars.Bar.Imbalances.HasBidStackedImbalances)
+                {
+                    ExitLong();
+                }
+            }
+
+            if (Position.MarketPosition == MarketPosition.Short && ManageOpenedPositionsEnabled)
+            {
+                // Update logic for managing positions
+                // Exit position if current or future bar becomes bullish and has stacked imbalances
+                if (_dataBars.Bar.BarType == BarType.Bullish && _dataBars.Bar.Imbalances.HasAskStackedImbalances)
+                {
+                    ExitShort();
                 }
             }
         }

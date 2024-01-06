@@ -9,7 +9,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
     public partial class OrderFlowBot : Strategy
     {
-        private OrderFlowBotDataBar GetDataBar(int barsAgo)
+        private OrderFlowBotDataBar GetDataBar(List<OrderFlowBotDataBar> dataBars, int barsAgo)
         {
             OrderFlowBotDataBar dataBar = new OrderFlowBotDataBar();
             NinjaTrader.NinjaScript.BarsTypes.VolumetricBarsType volumetricBar = Bars.BarsSeries.BarsType as NinjaTrader.NinjaScript.BarsTypes.VolumetricBarsType;
@@ -17,7 +17,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
             PopulateBasic(dataBar, barsAgo);
             PopulatePrices(dataBar, barsAgo);
-            PopulateVolumeAndImbalances(dataBar, volumetricBar, barsAgo);
+            PopulateVolumeAndImbalances(dataBars, dataBar, volumetricBar, barsAgo);
             PopulateDeltas(dataBar, volumetricBar, barsAgo);
 
             // Lets do this only before adding it to OrderFlowDataBars list
@@ -46,7 +46,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             dataBar.SetBarType();
         }
 
-        private void PopulateVolumeAndImbalances(OrderFlowBotDataBar dataBar, NinjaTrader.NinjaScript.BarsTypes.VolumetricBarsType volumetricBar, int barsAgo)
+        private void PopulateVolumeAndImbalances(List<OrderFlowBotDataBar> dataBars, OrderFlowBotDataBar dataBar, NinjaTrader.NinjaScript.BarsTypes.VolumetricBarsType volumetricBar, int barsAgo)
         {
             double high = dataBar.Prices.High;
             double low = dataBar.Prices.Low;
@@ -78,7 +78,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 
             dataBar.Volumes.BidAskVolumes = bidAskVolumeList;
             dataBar.Imbalances.SetImbalances(bidAskVolumeList, dataBar.Volumes.ValidBidAskVolumes());
-            dataBar.Ratios.SetRatios(bidAskVolumeList, dataBar.Volumes.ValidBidAskVolumes());
+            dataBar.Ratios.SetLastRatioPrices(dataBars);
+            dataBar.Ratios.SetRatios(bidAskVolumeList, dataBar.Volumes.ValidBidAskVolumes(), dataBar.BarType);
         }
 
         private void PopulateVolumeProfile(OrderFlowBotDataBar dataBar)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NinjaTrader.NinjaScript.AddOns.OrderFlowBot;
+using System;
 using System.Collections.Generic;
 
 namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies
@@ -11,8 +12,14 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies
         public bool HasValidBidExhaustionRatio { get; set; }
         public bool HasValidAskAbsorptionRatio { get; set; }
         public bool HasValidBidAbsorptionRatio { get; set; }
+        public double LastValidAskRatioPrice { get; set; }
+        public double LastValidBidRatioPrice { get; set; }
 
-        public void SetRatios(List<BidAskVolume> bidAskVolumes, bool validBidAskVolumes)
+        public double LastValidAskRatioVolume { get; set; }
+        public double LastValidBidRatioVolume { get; set; }
+
+
+        public void SetRatios(List<BidAskVolume> bidAskVolumes, bool validBidAskVolumes, BarType dataBarType)
         {
             if (!validBidAskVolumes)
                 return;
@@ -20,15 +27,48 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies
             double secondBottomBid, bottomBid;
             GetBottomBidVolumes(bidAskVolumes, out secondBottomBid, out bottomBid);
             BidRatio = CalculateRatio(secondBottomBid, bottomBid);
-            HasValidBidExhaustionRatio = IsValidExhaustedRatio(BidRatio);
-            HasValidBidAbsorptionRatio = IsValidAbsorptionRatio(BidRatio);
+            HasValidBidExhaustionRatio = IsValidExhaustedRatio(BidRatio) && dataBarType == BarType.Bullish;
+            HasValidBidAbsorptionRatio = IsValidAbsorptionRatio(BidRatio) && dataBarType == BarType.Bullish;
 
             double topAsk, secondTopAsk;
             GetTopAskVolumes(bidAskVolumes, out topAsk, out secondTopAsk);
             AskRatio = CalculateRatio(secondTopAsk, topAsk);
-            HasValidAskExhaustionRatio = IsValidExhaustedRatio(AskRatio);
-            HasValidAskAbsorptionRatio = IsValidAbsorptionRatio(AskRatio);
+            HasValidAskExhaustionRatio = IsValidExhaustedRatio(AskRatio) && dataBarType == BarType.Bearish;
+            HasValidAskAbsorptionRatio = IsValidAbsorptionRatio(AskRatio) && dataBarType == BarType.Bearish;
         }
+
+        public void SetLastRatioPrices(List<OrderFlowBotDataBar> dataBars)
+        {
+            double lastBidPrice = 0;
+            double lastAskPrice = 0;
+
+
+            for (int i = dataBars.Count - 2; i >= 0; i--)
+            {
+                var dataBar = dataBars[i];
+
+                if ((lastAskPrice == 0) && (dataBar.Ratios.HasValidAskExhaustionRatio || dataBar.Ratios.HasValidAskAbsorptionRatio))
+                {
+                    lastAskPrice = dataBar.Prices.High;
+                    this.LastValidAskRatioVolume = dataBar.Volumes.Volume;
+                }
+
+                if ((lastBidPrice == 0) && (dataBar.Ratios.HasValidBidExhaustionRatio || dataBar.Ratios.HasValidBidAbsorptionRatio))
+                {
+                    lastBidPrice = dataBar.Prices.Low;
+                    this.LastValidBidRatioVolume = dataBar.Volumes.Volume;
+                }
+
+                if (lastBidPrice != 0 && lastAskPrice != 0)
+                {
+                    break;
+                }
+            }
+
+            this.LastValidBidRatioPrice = lastBidPrice;
+            this.LastValidAskRatioPrice = lastAskPrice;
+        }
+
 
         private void GetBottomBidVolumes(List<BidAskVolume> bidAskVolumes, out double secondBottomBid, out double bottomBid)
         {
