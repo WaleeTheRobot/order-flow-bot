@@ -43,7 +43,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies
             double lastAskPrice = 0;
 
 
-            for (int i = dataBars.Count - 2; i >= 0; i--)
+            for (int i = dataBars.Count - 1; i >= 0; i--)
             {
                 var dataBar = dataBars[i];
 
