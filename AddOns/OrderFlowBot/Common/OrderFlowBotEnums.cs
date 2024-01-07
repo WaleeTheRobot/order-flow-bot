@@ -18,6 +18,6 @@
     public enum OrderFlowBotStrategy
     {
         None,
-        Ratios
+        StackedImbalances
     }
 }

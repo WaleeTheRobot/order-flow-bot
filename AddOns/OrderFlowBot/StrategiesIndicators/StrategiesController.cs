@@ -1,26 +1,52 @@
 ﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar;
+using System;
 using System.Collections.Generic;
 
-namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
+namespace NinjaTrader.Custom.AddOns.OrderFlowBot.StrategiesIndicators.Strategies
 {
     public class StrategiesController
     {
         private readonly OrderFlowBotState _orderFlowBotState;
         private readonly OrderFlowBotDataBars _dataBars;
+        private readonly StrategiesIndicatorsConfig _strategiesIndicatorsConfig;
         private readonly List<IStrategyInterface> _strategies;
 
-        public StrategiesController(OrderFlowBotState orderFlowBotState, OrderFlowBotDataBars dataBars)
+        public StrategiesController(OrderFlowBotState orderFlowBotState, OrderFlowBotDataBars dataBars, StrategiesIndicatorsConfig strategiesIndicatorsConfig)
         {
             _orderFlowBotState = orderFlowBotState;
             _dataBars = dataBars;
-            _strategies = new List<IStrategyInterface>
-            {
-                new OrderFlowRatios(_orderFlowBotState, _dataBars, OrderFlowBotStrategy.Ratios)
-            };
+            _strategiesIndicatorsConfig = strategiesIndicatorsConfig;
+            _strategies = new List<IStrategyInterface>();
+
+            InitializeStrategies();
 
             if (_orderFlowBotState.BackTestingEnabled)
             {
                 EnableBackTesting();
+            }
+        }
+
+        private void InitializeStrategies()
+        {
+            // Dynamically creates the strategies based on the name in the config.
+            foreach (var strategyConfig in _strategiesIndicatorsConfig.StrategiesIndicatorsConfigList)
+            {
+                if (strategyConfig.IsStrategy)
+                {
+                    string fullClassName = $"{this.GetType().Namespace}.{strategyConfig.Name}";
+
+                    Type strategyType = Type.GetType(fullClassName);
+
+                    if (strategyType != null && typeof(IStrategyInterface).IsAssignableFrom(strategyType))
+                    {
+                        var strategyInstance = (IStrategyInterface)Activator.CreateInstance(strategyType, _orderFlowBotState, _dataBars, strategyConfig.Name);
+
+                        if (strategyInstance != null)
+                        {
+                            _strategies.Add(strategyInstance);
+                        }
+                    }
+                }
             }
         }
 
@@ -74,7 +100,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
         // Set all strategies false
         public void ResetStrategies()
         {
-            _orderFlowBotState.ValidStrategy = OrderFlowBotStrategy.None;
+            _orderFlowBotState.ValidStrategy = "None";
 
             foreach (var strategy in _strategies)
             {
@@ -82,7 +108,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
             }
         }
 
-        public void AddSelectedStrategy(OrderFlowBotStrategy strategy)
+        public void AddSelectedStrategy(string strategy)
         {
             if (!_orderFlowBotState.SelectedStrategies.Contains(strategy))
             {
@@ -90,7 +116,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
             }
         }
 
-        public void RemoveSelectedStrategy(OrderFlowBotStrategy strategy)
+        public void RemoveSelectedStrategy(string strategy)
         {
             _orderFlowBotState.SelectedStrategies.Remove(strategy);
         }

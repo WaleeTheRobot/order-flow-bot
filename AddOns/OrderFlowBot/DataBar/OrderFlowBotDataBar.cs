@@ -1,5 +1,4 @@
 ﻿using NinjaTrader.Custom.AddOns;
-using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies;
 
 namespace NinjaTrader.NinjaScript.AddOns.OrderFlowBot
@@ -9,7 +8,6 @@ namespace NinjaTrader.NinjaScript.AddOns.OrderFlowBot
         public BarType BarType { get; set; }
         public int Time { get; set; }
         public int BarNumber { get; set; }
-        public OrderFlowBotVolumeProfile AutoVolumeProfile { get; set; }
 
         public Prices Prices { get; set; }
         public Ratios Ratios { get; set; }
@@ -19,8 +17,6 @@ namespace NinjaTrader.NinjaScript.AddOns.OrderFlowBot
 
         public OrderFlowBotDataBar()
         {
-            AutoVolumeProfile = new OrderFlowBotVolumeProfile();
-
             Prices = new Prices();
             Ratios = new Ratios();
             Volumes = new Volumes();

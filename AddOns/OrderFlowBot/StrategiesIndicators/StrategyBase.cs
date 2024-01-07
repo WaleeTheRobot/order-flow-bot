@@ -1,24 +1,20 @@
 ﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar;
-using NinjaTrader.NinjaScript.AddOns.OrderFlowBot;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
-namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
+namespace NinjaTrader.Custom.AddOns.OrderFlowBot.StrategiesIndicators.Strategies
 {
     public abstract class StrategyBase : IStrategyInterface
     {
         protected readonly OrderFlowBotState orderFlowBotState;
         protected readonly OrderFlowBotDataBars dataBars;
-        public abstract OrderFlowBotStrategy Name { get; set; }
+        public abstract string Name { get; set; }
         public abstract Direction ValidStrategyDirection { get; set; }
 
-        protected StrategyBase(OrderFlowBotState orderFlowBotState, OrderFlowBotDataBars dataBars, OrderFlowBotStrategy name)
+        protected StrategyBase(OrderFlowBotState orderFlowBotState, OrderFlowBotDataBars dataBars, string name)
         {
             this.orderFlowBotState = orderFlowBotState;
             this.dataBars = dataBars;
-            this.Name = name;
-            this.ValidStrategyDirection = Direction.Flat;
+            Name = name;
+            ValidStrategyDirection = Direction.Flat;
         }
 
         public virtual void CheckStrategy()
@@ -46,14 +42,6 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
         protected bool IsValidShortDirection()
         {
             return orderFlowBotState.SelectedTradeDirection == Direction.Short || orderFlowBotState.SelectedTradeDirection == Direction.Any;
-        }
-
-        protected List<OrderFlowBotDataBar> GetLastNBars(int n)
-        {
-            if (dataBars.Bars == null)
-                return new List<OrderFlowBotDataBar>();
-
-            return dataBars.Bars.Skip(Math.Max(0, dataBars.Bars.Count - n)).ToList();
         }
     }
 }

@@ -34,8 +34,6 @@ namespace NinjaTrader.NinjaScript.Strategies
         // Labels
         private const string LONG_BUTTON_LABEL = "Long";
         private const string SHORT_BUTTON_LABEL = "Short";
-        private const string AUTO_TRADE_BUTTON_LABEL = "Auto Trade";
-        private const string RATIOS_BUTTON_LABEL = "Order Flow Ratios";
 
         #endregion
 
@@ -71,6 +69,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                     {
                         SetButtonBackground(false, buttonLabel);
                     }
+
+                    UpdateSelectedTradeDirection();
+                    PrintOutput("Strategies Disabled");
                 }));
             }
         }
@@ -97,10 +98,22 @@ namespace NinjaTrader.NinjaScript.Strategies
             _buttonMap = new Dictionary<string, ButtonInfo>
             {
                 { LONG_BUTTON_LABEL, new ButtonInfo(LongButtonClick, false) },
-                { SHORT_BUTTON_LABEL, new ButtonInfo(ShortButtonClick, false) },
-                { AUTO_TRADE_BUTTON_LABEL, new ButtonInfo(AutoTradeButtonClick, false) },
-                { RATIOS_BUTTON_LABEL, new ButtonInfo(RatiosClick, false) },
+                { SHORT_BUTTON_LABEL, new ButtonInfo(ShortButtonClick, false) }
             };
+
+            // Dynamically add buttons for each strategy with event handler
+            foreach (var strategyIndicator in _strategiesIndicatorsConfig.StrategiesIndicatorsConfigList)
+            {
+                string buttonLabel = strategyIndicator.ButtonLabel;
+
+                if (!string.IsNullOrEmpty(buttonLabel))
+                {
+                    _buttonMap.Add(buttonLabel, new ButtonInfo(
+                        (sender, e) => StrategyButtonClick(buttonLabel, strategyIndicator.Name),
+                        false
+                    ));
+                }
+            }
         }
 
         private void CreateButtons()
@@ -134,15 +147,6 @@ namespace NinjaTrader.NinjaScript.Strategies
                 _orderFlowBotDirectionGrid.Children.Add(button);
 
                 index++;
-            }
-        }
-
-        private void SetAllButtonsInactive()
-        {
-            foreach (var item in _buttonMap)
-            {
-                ButtonInfo info = item.Value;
-                info.IsActive = false;
             }
         }
 
@@ -227,58 +231,31 @@ namespace NinjaTrader.NinjaScript.Strategies
             DirectionButtonClick(SHORT_BUTTON_LABEL);
         }
 
-        private void AutoTradeButtonClick(object sender, RoutedEventArgs e)
+        private void StrategyButtonClick(string buttonLabel, string strategyName)
         {
-            ButtonInfo button = _buttonMap[AUTO_TRADE_BUTTON_LABEL];
+            if (!_buttonMap.TryGetValue(buttonLabel, out ButtonInfo button))
+            {
+                PrintOutput("Button not found: " + buttonLabel);
+                return;
+            }
+
             bool isActive = !button.IsActive;
             button.IsActive = isActive;
 
-            _orderFlowBotState.AutoTradeEnabled = isActive;
-
-            string outputMessage;
+            string outputMessage = isActive ? $"{strategyName} Enabled" : $"{strategyName} Disabled";
 
             if (isActive)
             {
-                outputMessage = "Auto Trade Enabled";
+                _strategiesController.AddSelectedStrategy(strategyName);
             }
             else
             {
-                outputMessage = "Auto Trade Disabled";
-            }
-
-            SetButtonBackground(isActive, AUTO_TRADE_BUTTON_LABEL);
-            PrintOutput(outputMessage);
-            ForceRefresh();
-        }
-
-        // Strategy Buttons
-        private void StrategyButtonClick(string buttonLabel, OrderFlowBotStrategy strategy, string enabledMessage, string disabledMessage)
-        {
-            ButtonInfo button = _buttonMap[buttonLabel];
-            bool isActive = !button.IsActive;
-            button.IsActive = isActive;
-
-            string outputMessage;
-
-            if (isActive)
-            {
-                _strategiesController.AddSelectedStrategy(strategy);
-                outputMessage = enabledMessage;
-            }
-            else
-            {
-                _strategiesController.RemoveSelectedStrategy(strategy);
-                outputMessage = disabledMessage;
+                _strategiesController.RemoveSelectedStrategy(strategyName);
             }
 
             SetButtonBackground(isActive, buttonLabel);
             PrintOutput(outputMessage);
             ForceRefresh();
-        }
-
-        private void RatiosClick(object sender, RoutedEventArgs e)
-        {
-            StrategyButtonClick(RATIOS_BUTTON_LABEL, OrderFlowBotStrategy.Ratios, "Ratios Enabled", "Ratios Disabled");
         }
 
         #endregion

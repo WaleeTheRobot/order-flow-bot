@@ -1,8 +1,8 @@
-﻿namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
+﻿namespace NinjaTrader.Custom.AddOns.OrderFlowBot.StrategiesIndicators.Strategies
 {
     public interface IStrategyInterface
     {
-        OrderFlowBotStrategy Name { get; set; }
+        string Name { get; set; }
         Direction ValidStrategyDirection { get; set; }
 
         void CheckStrategy();

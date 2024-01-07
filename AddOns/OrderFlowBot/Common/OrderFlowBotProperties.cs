@@ -12,11 +12,6 @@
         public long ValidAskVolume { get; set; }
         public double ValidExhaustionRatio { get; set; }
         public double ValidAbsorptionRatio { get; set; }
-
-        // Indicators
-        public bool AutoVolumeProfileEnabled { get; set; }
-        public int AutoVolumeProfileLookBackBars { get; set; }
-        public bool RatiosEnabled { get; set; }
     }
 
     public static class OrderFlowBotProperties
@@ -32,11 +27,6 @@
         public static double ValidExhaustionRatio { get; private set; }
         public static double ValidAbsorptionRatio { get; private set; }
 
-        // Indicators
-        public static bool AutoVolumeProfileEnabled { get; private set; }
-        public static int AutoVolumeProfileLookBackBars { get; private set; }
-        public static bool RatiosEnabled { get; private set; }
-
         public static void Initialize(OrderFlowBotPropertiesConfig config)
         {
             TickSize = config.TickSize;
@@ -48,10 +38,6 @@
             ValidAskVolume = config.ValidAskVolume;
             ValidExhaustionRatio = config.ValidExhaustionRatio;
             ValidAbsorptionRatio = config.ValidAbsorptionRatio;
-
-            AutoVolumeProfileEnabled = config.AutoVolumeProfileEnabled;
-            AutoVolumeProfileLookBackBars = config.AutoVolumeProfileLookBackBars;
-            RatiosEnabled = config.RatiosEnabled;
         }
     }
 }

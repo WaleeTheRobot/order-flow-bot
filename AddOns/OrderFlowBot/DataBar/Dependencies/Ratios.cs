@@ -15,10 +15,6 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies
         public double LastValidAskRatioPrice { get; set; }
         public double LastValidBidRatioPrice { get; set; }
 
-        public double LastValidAskRatioVolume { get; set; }
-        public double LastValidBidRatioVolume { get; set; }
-
-
         public void SetRatios(List<BidAskVolume> bidAskVolumes, bool validBidAskVolumes, BarType dataBarType)
         {
             if (!validBidAskVolumes)
@@ -42,7 +38,6 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies
             double lastBidPrice = 0;
             double lastAskPrice = 0;
 
-
             for (int i = dataBars.Count - 1; i >= 0; i--)
             {
                 var dataBar = dataBars[i];
@@ -50,13 +45,11 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies
                 if ((lastAskPrice == 0) && (dataBar.Ratios.HasValidAskExhaustionRatio || dataBar.Ratios.HasValidAskAbsorptionRatio))
                 {
                     lastAskPrice = dataBar.Prices.High;
-                    this.LastValidAskRatioVolume = dataBar.Volumes.Volume;
                 }
 
                 if ((lastBidPrice == 0) && (dataBar.Ratios.HasValidBidExhaustionRatio || dataBar.Ratios.HasValidBidAbsorptionRatio))
                 {
                     lastBidPrice = dataBar.Prices.Low;
-                    this.LastValidBidRatioVolume = dataBar.Volumes.Volume;
                 }
 
                 if (lastBidPrice != 0 && lastAskPrice != 0)
@@ -68,7 +61,6 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies
             this.LastValidBidRatioPrice = lastBidPrice;
             this.LastValidAskRatioPrice = lastAskPrice;
         }
-
 
         private void GetBottomBidVolumes(List<BidAskVolume> bidAskVolumes, out double secondBottomBid, out double bottomBid)
         {

@@ -4,7 +4,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
     public partial class OrderFlowBot : Strategy
     {
-        public void PrintDataBar(OrderFlowBotDataBar dataBar, OrderFlowBotDataBar previousdataBar)
+        public void PrintDataBar(OrderFlowBotDataBar dataBar)
         {
             Print(string.Format("{0}", ToDay(Time[0])));
             Print(string.Format("Time: {0}", dataBar.Time));
@@ -14,24 +14,12 @@ namespace NinjaTrader.NinjaScript.Strategies
             //Print(string.Format("High: {0}", dataBar.Prices.High));
             //Print(string.Format("Low: {0}", dataBar.Prices.Low));
             //Print(string.Format("Open: {0}", dataBar.Prices.Open));
-            Print(string.Format("Close: {0}", dataBar.Prices.Close));
+            //Print(string.Format("Close: {0}", dataBar.Prices.Close));
 
             Print(string.Format("Volume: {0}", dataBar.Volumes.Volume));
-            Print(string.Format("BuyingVolume: {0}", dataBar.Volumes.BuyingVolume));
-            Print(string.Format("SellingVolume: {0}", dataBar.Volumes.SellingVolume));
-            Print(string.Format("PointOfControl: {0}", dataBar.Volumes.PointOfControl));
-
-            Print(string.Format("Auto VP Total Volume: {0}", previousdataBar.AutoVolumeProfile.TotalVolume));
-            Print(string.Format("Auto VP POC: {0}", previousdataBar.AutoVolumeProfile.PointOfControl));
-            Print(string.Format("Auto VP VAH: {0}", previousdataBar.AutoVolumeProfile.ValueAreaHigh));
-            Print(string.Format("Auto VP VAL: {0}", previousdataBar.AutoVolumeProfile.ValueAreaLow));
-            //Print("Auto VP");
-            //Print("[");
-            //foreach (var kvp in previousdataBar.AutoVolumeProfile.SortedVolumes)
-            //{
-            //    Print(string.Format("{0} : {1}", kvp.Key, kvp.Value));
-            //}
-            //Print("]");
+            //Print(string.Format("BuyingVolume: {0}", dataBar.Volumes.BuyingVolume));
+            //Print(string.Format("SellingVolume: {0}", dataBar.Volumes.SellingVolume));
+            //Print(string.Format("PointOfControl: {0}", dataBar.Volumes.PointOfControl));
 
             Print(string.Format("Bid Ratio: {0}", dataBar.Ratios.BidRatio));
             Print(string.Format("Valid Bid Ratio: {0}", dataBar.Ratios.HasValidBidExhaustionRatio));
@@ -39,15 +27,6 @@ namespace NinjaTrader.NinjaScript.Strategies
             Print(string.Format("Valid Ask Ratio: {0}", dataBar.Ratios.HasValidAskExhaustionRatio));
             Print(string.Format("Last Valid Bid Ratio Price: {0}", dataBar.Ratios.LastValidBidRatioPrice));
             Print(string.Format("Last Valid Ask Ratio Price: {0}", dataBar.Ratios.LastValidAskRatioPrice));
-            Print(string.Format("Last Valid Bid Ratio Volume: {0}", dataBar.Ratios.LastValidBidRatioVolume));
-            Print(string.Format("Last Valid Ask Ratio Volume: {0}", dataBar.Ratios.LastValidAskRatioVolume));
-
-            Print(string.Format("Pre Bid Ratio: {0}", previousdataBar.Ratios.BidRatio));
-            Print(string.Format("Pre Valid Ex Bid Ratio: {0}", previousdataBar.Ratios.HasValidBidExhaustionRatio));
-            Print(string.Format("Pre Valid Abs Bid Ratio: {0}", previousdataBar.Ratios.HasValidBidAbsorptionRatio));
-            Print(string.Format("Pre Ask Ratio: {0}", previousdataBar.Ratios.AskRatio));
-            Print(string.Format("Pre Valid Ex Ask Ratio: {0}", previousdataBar.Ratios.HasValidAskExhaustionRatio));
-            Print(string.Format("Pre Valid Abs Ask Ratio: {0}", previousdataBar.Ratios.HasValidAskAbsorptionRatio));
 
             Print(string.Format("Delta: {0}", dataBar.Deltas.Delta));
             Print(string.Format("Min Delta: {0}", dataBar.Deltas.MinDelta));
