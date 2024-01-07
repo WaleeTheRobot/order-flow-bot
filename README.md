@@ -22,6 +22,8 @@ This shows the prices for the last valid exhaustion or valid absorption ratios f
 
 The below is currently the included strategy for OrderFlowBot and can be used as an example to add any other strategies. Note that there is a check to not re-enter on the same bar so a strategy doesn't re-enter on the same bar. This will prevent multiple entries on a bar, to prevent any false entries.
 
+The Long and Short buttons are used with a selected strategy to look for long or short entries. Selecting both will look for both long and short entries. Selecting only one will look for that specific entry.
+
 ### Stacked Imbalances
 
 This strategy looks if a bar is bullish or bearish and will enter if ask or bid stacked imbalances are found.
