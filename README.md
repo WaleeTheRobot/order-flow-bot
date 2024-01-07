@@ -4,45 +4,37 @@
 
 ### Requires the lifetime NinjaTrader license for the volumetric data
 
-A bot used for trading order flow. OrderFlowBot can be used to add existing strategies for automated trading or semi-automated trading. You can also include indicators so you can view the indicators while turning on the strategy. However, you update the code to remove the volumetric data and use it with whatever you want.
+A bot used for trading order flow. The focus for OrderFlowBot is semi-automated, but you can technically run your strategies fully automated with the backtesting enabled. Note that having the backtesting enabled will currently run all the strategies unless you only include a single strategy. You can also include any custom indicators so they will show when you enable the strategy.
 
-# Indicators
+# Included Indicators
 
-The two example indicators below uses the data from the OrderFlowDataBar.
-
-### AutoVolumeProfile
-
-This is disabled by default. On the first tick of the bar, the OrderFlowDataBar combines the last number of bar's volume profiles based on the `AutoVolumeProfileLookBackBars` property. This draws a line to represent the point of control, value area high and value area low of the combined volume profiles.
+The below indicators are included for OrderFlowBot and can be used as examples to add any other indicators.
 
 ### Ratios
 
-Made popular by Mike from OrderFlows, this shows the bottom divided bid ratios or top divided ask ratios. The ratios will be displayed in color, bold and larger font if it meets the threshold in `ValidRatio` property.
+Made popular by Mike from OrderFlows, this shows the bottom divided bid ratios or top divided ask ratios. The ratios will be displayed in color, bold and larger font if it meets the threshold in `ValidExhaustionRatio` or `ValidAbsorptionRatio` properies.
 
-### Adding an Indicator
+### LastExhaustionAbsorptionPrice
 
-- Add the class in the `Gui` folder
+This shows the prices for the last valid exhaustion or valid absorption ratios for the bid and ask.
 
-In `OrderFlowBot.cs`
+# Included Strategies
 
-- Instantiate the indicator
-- Add the indicator to the State.DataLoaded check
+The below is currently the included strategy for OrderFlowBot and can be used as an example to add any other strategies. Note that there is a check to not re-enter on the same bar so a strategy doesn't re-enter on the same bar. This will prevent multiple entries on a bar, to prevent any false entries.
 
-# Strategies
+### Stacked Imbalances
 
-### Don't use the example strategy
+This strategy looks if a bar is bullish or bearish and will enter if ask or bid stacked imbalances are found.
 
-Follow the example strategy and implement your own. You can then backtest it with BackTestingEnabled.
+# Adding Strategies and Indicators
 
-# Adding Buttons For Strategies
+The custom DataBar should be used if you are considering adding strategies and indicators. It takes some of the data from the volumetric bars and creates custom bars that you can also add any additional information to.
 
-Follow the same pattern as Imbalance Ratio Volume Profile.
+- Add your strategy or indicator into `StrategiesIndicatorsConfigList` in `OrderFlowBot/StrategiesIndicators/StrategiesIndicatorsConfig` file.
+- Create the class for your strategy or indicator and add it in `OrderFlowBot/StrategiesIndicators/Strategies/` or `OrderFlowBot/StrategiesIndicators/Indicators/`.
+- The strategies are dynamically created. Make sure to inherit the `StrategyBase` class similar to the `StackedImbalance` strategy. The buttons for the strategies are also dynamically added.
+- For an indicator, you can copy one of the existing indicator and make sure to also modify the NinjaScript generated code to reflect your indicator class. Go to `OrderFlowBot/OrderFlowBot` and add the option to enable or disable it in the `Indicators Properties`. Make sure to set the default value in `OnStateChange()` and add a check in `AddIndicators()`.
 
-In `ControlPanel.cs`
+# Unit Testing
 
-- Add a label
-- Add a new button in `_buttonMap` dictionary found in `DefineButtons` function
-- Add a new function to handle the button click
-
-# Testing
-
-Probably not the greatest way to go about it, but essentially just copying over code and testing them with mock data.
+Not the greatest way to go about it, but essentially just copying over code and testing them with mock data. This is really just used to make sure some of the values are as expected.
