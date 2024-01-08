@@ -272,8 +272,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 
             _strategiesController.ResetStrategies();
             _orderFlowBotState.ValidStrategyDirection = Direction.Flat;
-
-            ControlPanelOnExecutionUpdate();
         }
 
         private bool AllowCheckStrategies()
@@ -318,8 +316,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         private void CheckAtmStrategies()
         {
-            if (State < State.Realtime)
+            if (State < State.Realtime || BackTestingEnabled)
+            {
                 return;
+            }
 
             if (_isAtmStrategyCreated)
             {
@@ -328,6 +328,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     _orderFlowBotState.ValidStrategyDirection == Direction.Short))
                 {
                     Reset();
+                    ControlPanelOnExecutionUpdate();
                 }
             }
 
