@@ -343,6 +343,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 if (_orderFlowBotState.ValidStrategyDirection == Direction.Long)
                 {
                     _atmStrategyId = GetAtmStrategyUniqueId();
+                    _lastTradeBarNumber = _dataBars.Bar.BarNumber;
 
                     AtmStrategyCreate(OrderAction.Buy, OrderType.Market, 0, 0, TimeInForce.Day, _atmStrategyId, AtmTemplateName, _atmStrategyId, (atmCallbackErrorCode, atmCallbackId) =>
                     {
@@ -359,6 +360,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 if (_orderFlowBotState.ValidStrategyDirection == Direction.Short)
                 {
                     _atmStrategyId = GetAtmStrategyUniqueId();
+                    _lastTradeBarNumber = _dataBars.Bar.BarNumber;
 
                     AtmStrategyCreate(OrderAction.Sell, OrderType.Market, 0, 0, TimeInForce.Day, _atmStrategyId, AtmTemplateName, _atmStrategyId, (atmCallbackErrorCode, atmCallbackId) =>
                     {
