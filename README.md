@@ -41,11 +41,13 @@ The below are included for OrderFlowBot and can be used as an example to add any
 ### Stacked Imbalances
 
 Long Position: Bullish bar with ask stacked imbalances.
+
 Short Position: Bearish bar with bid stacked imbalances.
 
 ### Delta Divergence
 
 Long Position: Bullish bar, positive delta and new low based on last number of LookBackBars.
+
 Short Position: Bearish bar, negative delta and new high based on last number of LookBackBars.
 
 # Adding Strategies and Indicators
