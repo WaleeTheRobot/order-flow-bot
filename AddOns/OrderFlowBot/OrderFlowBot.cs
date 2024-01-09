@@ -144,8 +144,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 
                 // OrderFlowBot
                 Quantity = 1;
-                Target = 12;
-                Stop = 12;
+                Target = 16;
+                Stop = 16;
                 BackTestingEnabled = false;
                 AtmTemplateName = "OrderFlowBot";
 

@@ -28,6 +28,13 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.StrategiesIndicators
                 },
                 new StrategiesIndicators
                 {
+                    Name = "DeltaDivergence",
+                    ButtonLabel = "DeltaDivergence",
+                    IsStrategy = true,
+                    IsIndicator = false,
+                },
+                new StrategiesIndicators
+                {
                     Name = "Ratios",
                     ButtonLabel = "",
                     IsStrategy = false,

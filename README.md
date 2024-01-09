@@ -36,11 +36,17 @@ This shows the prices for the last valid exhaustion or valid absorption ratios f
 
 # Included Strategies
 
-The below is currently the included strategy for OrderFlowBot and can be used as an example to add any other strategies. Note that there is a check to not re-enter on the same bar in the main program so a strategy doesn't re-enter on the same bar. This will prevent multiple entries on a bar, to prevent any false entries.
+The below are included for OrderFlowBot and can be used as an example to add any other strategies. Note that there is a check to not re-enter on the same bar in the main program so a strategy doesn't re-enter on the same bar. This will prevent multiple entries on a bar, to prevent any false entries.
 
 ### Stacked Imbalances
 
-This strategy looks if a bar is bullish or bearish and will enter if ask or bid stacked imbalances are found.
+Long Position: Bullish bar with ask stacked imbalances.
+Short Position: Bearish bar with bid stacked imbalances.
+
+### Delta Divergence
+
+Long Position: Bullish bar, positive delta and new low based on last number of LookBackBars.
+Short Position: Bearish bar, negative delta and new high based on last number of LookBackBars.
 
 # Adding Strategies and Indicators
 

@@ -2,8 +2,6 @@
 
 namespace NinjaTrader.Custom.AddOns.OrderFlowBot.StrategiesIndicators.Strategies
 {
-    // This strategy is valid if stacked imbalances are found in the current bar. It will only be valid if the current bar
-    // is bullish for ask stacked imbalances or bearish for bid stacked imbalances.
     public class StackedImbalances : StrategyBase
     {
         public override string Name { get; set; }
@@ -28,6 +26,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.StrategiesIndicators.Strategies
             }
         }
 
+        // Bar is bullish and has x ask stacked imbalances.
         public override void CheckLong()
         {
             if (IsBullishBar() && HasValidAskStackedImbalance())
@@ -36,6 +35,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.StrategiesIndicators.Strategies
             }
         }
 
+        // Bar is bearish and has x bid stacked imbalances.
         public override void CheckShort()
         {
             if (IsBearishBar() && HasValidBidStackedImbalance())
