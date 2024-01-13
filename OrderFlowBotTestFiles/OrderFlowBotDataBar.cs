@@ -8,7 +8,6 @@ namespace OrderFlowBotTestFiles
         public BarType BarType { get; set; }
         public int Time { get; set; }
         public int BarNumber { get; set; }
-        public OrderFlowBotVolumeProfile AutoVolumeProfile { get; set; }
 
         public Prices Prices { get; set; }
         public Ratios Ratios { get; set; }
@@ -18,8 +17,6 @@ namespace OrderFlowBotTestFiles
 
         public OrderFlowBotDataBar()
         {
-            AutoVolumeProfile = new OrderFlowBotVolumeProfile();
-
             Prices = new Prices();
             Ratios = new Ratios();
             Volumes = new Volumes();

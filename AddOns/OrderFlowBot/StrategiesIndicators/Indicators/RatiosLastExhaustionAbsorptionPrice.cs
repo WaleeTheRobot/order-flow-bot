@@ -1,6 +1,5 @@
 ﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar;
 using NinjaTrader.Gui.Chart;
-using System.Linq;
 
 namespace NinjaTrader.NinjaScript.Indicators
 {
@@ -13,7 +12,7 @@ namespace NinjaTrader.NinjaScript.Indicators
             if (State == State.SetDefaults)
             {
                 Description = @"Indicator to draw a line to show the last exhaustion or absorption price for bid and ask.";
-                Name = "LastExhaustionAbsorptionPrice";
+                Name = "RatiosLastExhaustionAbsorptionPrice";
                 Calculate = Calculate.OnEachTick;
                 IsOverlay = true;
                 DisplayInDataBox = true;
@@ -26,6 +25,11 @@ namespace NinjaTrader.NinjaScript.Indicators
                 //See Help Guide for additional information.
                 IsSuspendedWhileInactive = true;
             }
+        }
+
+        public override string DisplayName
+        {
+            get { return ""; }
         }
 
         protected override void OnBarUpdate()
@@ -55,15 +59,15 @@ namespace NinjaTrader.NinjaScript.Indicators
 
                 using (var strokeStyle = new SharpDX.Direct2D1.StrokeStyle(RenderTarget.Factory, strokeStyleProperties, dashes))
                 {
-                    float askYValue = chartScale.GetYByValue(_dataBars.Bars.Last().Ratios.LastValidAskRatioPrice);
-                    SharpDX.Vector2 vahStartPoint = new SharpDX.Vector2(chartWidth - rightOffset, askYValue);
-                    SharpDX.Vector2 vahEndPoint = new SharpDX.Vector2(chartWidth - rightOffset - fixedLength, askYValue);
-                    RenderTarget.DrawLine(vahStartPoint, vahEndPoint, askBrush, 2, strokeStyle);
+                    float askYValue = chartScale.GetYByValue(_dataBars.Bar.Ratios.LastValidAskRatioPrice);
+                    SharpDX.Vector2 askStartPoint = new SharpDX.Vector2(chartWidth - rightOffset, askYValue);
+                    SharpDX.Vector2 askEndPoint = new SharpDX.Vector2(chartWidth - rightOffset - fixedLength, askYValue);
+                    RenderTarget.DrawLine(askStartPoint, askEndPoint, askBrush, 2, strokeStyle);
 
-                    float bidYValue = chartScale.GetYByValue(_dataBars.Bars.Last().Ratios.LastValidBidRatioPrice);
-                    SharpDX.Vector2 valStartPoint = new SharpDX.Vector2(chartWidth - rightOffset, bidYValue);
-                    SharpDX.Vector2 valEndPoint = new SharpDX.Vector2(chartWidth - rightOffset - fixedLength, bidYValue);
-                    RenderTarget.DrawLine(valStartPoint, valEndPoint, bidBrush, 2, strokeStyle);
+                    float bidYValue = chartScale.GetYByValue(_dataBars.Bar.Ratios.LastValidBidRatioPrice);
+                    SharpDX.Vector2 bidStartPoint = new SharpDX.Vector2(chartWidth - rightOffset, bidYValue);
+                    SharpDX.Vector2 bidEndPoint = new SharpDX.Vector2(chartWidth - rightOffset - fixedLength, bidYValue);
+                    RenderTarget.DrawLine(bidStartPoint, bidEndPoint, bidBrush, 2, strokeStyle);
                 }
             }
         }

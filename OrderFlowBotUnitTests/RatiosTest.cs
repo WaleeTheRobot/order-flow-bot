@@ -1,4 +1,6 @@
 using OrderFlowBotTestFiles;
+using OrderFlowBotTestFiles.Common;
+using OrderFlowBotTestFiles.Files.Dependencies;
 using OrderFlowBotUnitTests.Data;
 
 namespace OrderFlowBotUnitTests
@@ -16,8 +18,9 @@ namespace OrderFlowBotUnitTests
         public void BidAskRatio()
         {
             OrderFlowBotDataBar dataBar = new OrderFlowBotDataBar();
-            dataBar.Volumes.BidAskVolumes = _data.GetBidAskRatio();
-            dataBar.Ratios.SetRatios(_data.GetBidAskRatio(), true);
+            List<BidAskVolume> bidAskVolumeList = _data.GetBidAskRatio();
+            dataBar.Volumes.BidAskVolumes = bidAskVolumeList;
+            dataBar.Ratios.SetRatios(bidAskVolumeList, true, BarType.Bearish);
 
             Assert.Equal(40.2, dataBar.Ratios.AskRatio);
             Assert.Equal(15, dataBar.Ratios.BidRatio);
@@ -27,33 +30,56 @@ namespace OrderFlowBotUnitTests
         public void BidAskRatioZero()
         {
             OrderFlowBotDataBar dataBar = new OrderFlowBotDataBar();
-            dataBar.Volumes.BidAskVolumes = _data.GetBidAskRatioZero();
-            dataBar.Ratios.SetRatios(_data.GetBidAskRatioZero(), true);
+            List<BidAskVolume> bidAskVolumeList = _data.GetBidAskRatioZero();
+            dataBar.Volumes.BidAskVolumes = bidAskVolumeList;
+            dataBar.Ratios.SetRatios(bidAskVolumeList, true, BarType.Bearish);
 
             Assert.Equal(201, dataBar.Ratios.AskRatio);
             Assert.Equal(150, dataBar.Ratios.BidRatio);
         }
 
-        [Fact(DisplayName = "HasValid Ask/Bid Exhuastion Ratios should be valid")]
-        public void HasBidAskRatioValid()
+        [Fact(DisplayName = "Has Valid Bid Exhaustion Ratio should be valid")]
+        public void HasValidBidExhaustionRatio()
         {
             OrderFlowBotDataBar dataBar = new OrderFlowBotDataBar();
-            dataBar.Volumes.BidAskVolumes = _data.GetValidBidAskRatio();
-            dataBar.Ratios.SetRatios(_data.GetValidBidAskRatio(), true);
+            List<BidAskVolume> bidAskVolumeList = _data.GetValidBidAskExhaustion();
+            dataBar.Volumes.BidAskVolumes = bidAskVolumeList;
+            dataBar.Ratios.SetRatios(bidAskVolumeList, true, BarType.Bullish);
 
-            Assert.True(dataBar.Ratios.HasValidAskExhaustionRatio);
             Assert.True(dataBar.Ratios.HasValidBidExhaustionRatio);
         }
 
-        [Fact(DisplayName = "HasValid Ask/Bid Exhuastion Ratios should be invalid")]
-        public void HasBidAskRatioInvalid()
+        [Fact(DisplayName = "Has Valid Ask Exhaustion Ratio should be valid")]
+        public void HasValidAskExhaustionRatio()
         {
             OrderFlowBotDataBar dataBar = new OrderFlowBotDataBar();
-            dataBar.Volumes.BidAskVolumes = _data.GetInValidBidAskRatio();
-            dataBar.Ratios.SetRatios(_data.GetInValidBidAskRatio(), false);
+            List<BidAskVolume> bidAskVolumeList = _data.GetValidBidAskExhaustion();
+            dataBar.Volumes.BidAskVolumes = bidAskVolumeList;
+            dataBar.Ratios.SetRatios(bidAskVolumeList, true, BarType.Bearish);
 
-            Assert.False(dataBar.Ratios.HasValidAskExhaustionRatio);
-            Assert.False(dataBar.Ratios.HasValidBidExhaustionRatio);
+            Assert.True(dataBar.Ratios.HasValidAskExhaustionRatio);
+        }
+
+        [Fact(DisplayName = "Has Valid Bid Absorption Ratio should be valid")]
+        public void HasValidBidAborptionRatio()
+        {
+            OrderFlowBotDataBar dataBar = new OrderFlowBotDataBar();
+            List<BidAskVolume> bidAskVolumeList = _data.GetValidBidAskAbsorption();
+            dataBar.Volumes.BidAskVolumes = bidAskVolumeList;
+            dataBar.Ratios.SetRatios(bidAskVolumeList, true, BarType.Bullish);
+
+            Assert.True(dataBar.Ratios.HasValidBidAbsorptionRatio);
+        }
+
+        [Fact(DisplayName = "Has Valid Ask Absorption Ratio should be valid")]
+        public void HasValidAskAborptionRatio()
+        {
+            OrderFlowBotDataBar dataBar = new OrderFlowBotDataBar();
+            List<BidAskVolume> bidAskVolumeList = _data.GetValidBidAskAbsorption();
+            dataBar.Volumes.BidAskVolumes = bidAskVolumeList;
+            dataBar.Ratios.SetRatios(bidAskVolumeList, true, BarType.Bearish);
+
+            Assert.True(dataBar.Ratios.HasValidAskAbsorptionRatio);
         }
     }
 }

@@ -20,7 +20,7 @@ The Long and Short buttons are used with a selected strategy to look for long or
 
 ### Backtesting
 
-You can backtest your strategies by enabling the backtesting. This will use the target and stop where you enabled the backtesting. This will backtest all the strategies and can be a way to automate OrderFlowBot, but it is not the primary focus.
+You can backtest your strategies by enabling the backtesting. This will use the target and stop where you enabled the backtesting. This will backtest all the strategies and can be a way to automate OrderFlowBot, but it is not the primary focus. To backtest a single strategy, you can just comment out the other strategies in the `OrderFlowBot/StrategiesIndicators/StrategiesIndicatorsConfig` file.
 
 # Included Indicators
 
@@ -57,7 +57,7 @@ The custom DataBar should be used if you are considering adding strategies and i
 - Add your strategy or indicator into the config `StrategiesIndicatorsConfigList` in `OrderFlowBot/StrategiesIndicators/StrategiesIndicatorsConfig` file.
 - Create the class for your strategy or indicator and add it in `OrderFlowBot/StrategiesIndicators/Strategies/` or `OrderFlowBot/StrategiesIndicators/Indicators/`.
 - The strategies are dynamically instantiated based on the config. Make sure to inherit the `StrategyBase` class similar to the `StackedImbalances` strategy.
-- For an indicator, you can copy one of the existing indicator and make sure to also modify the NinjaScript generated code to reflect your indicator class. Go to `OrderFlowBot/OrderFlowBot` and add the option to enable or disable it in the `Indicators Properties`. Make sure to set the default value in `OnStateChange()` and add a check in `AddIndicators()`.
+- For an indicator, you can copy one of the existing indicators and make sure to also modify the NinjaScript generated code to reflect your indicator class. Go to `OrderFlowBot/OrderFlowBot` and add the option to enable or disable it in the `Indicators Properties`. Make sure to set the default value in `OnStateChange()` and add a check in `AddIndicators()`.
 
 # Unit Testing
 

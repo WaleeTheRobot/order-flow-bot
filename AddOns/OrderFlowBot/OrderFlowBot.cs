@@ -195,6 +195,12 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
         }
 
+        // Remove the display name on the chart
+        public override string DisplayName
+        {
+            get { return ""; }
+        }
+
         protected override void OnExecutionUpdate(Execution execution, string executionId, double price, int quantity, MarketPosition marketPosition, string orderId, DateTime time)
         {
             if (Position.MarketPosition == MarketPosition.Flat)
@@ -264,8 +270,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         private void Reset()
         {
+            PrintOutput($"Exit | {_entryName}");
+
             _entryLong = false;
             _entryShort = false;
+            _entryName = "";
 
             // Prevent re-entry on previous exit bar
             _lastTradeBarNumber = _dataBars.Bar.BarNumber + 1;
@@ -298,6 +307,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 _entryLong = true;
                 _entryName = _orderFlowBotState.ValidStrategy.ToString();
 
+                PrintOutput($"Enter Long | {_entryName}");
+
                 //PrintDataBar(_dataBars.Bar);
 
                 return;
@@ -307,6 +318,8 @@ namespace NinjaTrader.NinjaScript.Strategies
             {
                 _entryShort = true;
                 _entryName = _orderFlowBotState.ValidStrategy.ToString();
+
+                PrintOutput($"Enter Short | {_entryName}");
 
                 //PrintDataBar(_dataBars.Bar);
 
@@ -345,6 +358,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                 {
                     _atmStrategyId = GetAtmStrategyUniqueId();
                     _lastTradeBarNumber = _dataBars.Bar.BarNumber;
+                    _entryName = _orderFlowBotState.ValidStrategy.ToString();
+
+                    PrintOutput($"Enter Long | {_entryName}");
 
                     AtmStrategyCreate(OrderAction.Buy, OrderType.Market, 0, 0, TimeInForce.Day, _atmStrategyId, AtmTemplateName, _atmStrategyId, (atmCallbackErrorCode, atmCallbackId) =>
                     {
@@ -362,6 +378,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                 {
                     _atmStrategyId = GetAtmStrategyUniqueId();
                     _lastTradeBarNumber = _dataBars.Bar.BarNumber;
+                    _entryName = _orderFlowBotState.ValidStrategy.ToString();
+
+                    PrintOutput($"Enter Short | {_entryName}");
 
                     AtmStrategyCreate(OrderAction.Sell, OrderType.Market, 0, 0, TimeInForce.Day, _atmStrategyId, AtmTemplateName, _atmStrategyId, (atmCallbackErrorCode, atmCallbackId) =>
                     {

@@ -17,11 +17,12 @@ namespace OrderFlowBotUnitTests.Data
             OrderFlowBotPropertiesConfig config = new OrderFlowBotPropertiesConfig
             {
                 TickSize = 0.25,
-                AutoVolumeProfileLookBackBars = 3,
                 ImbalanceRatio = 1.5,
                 StackedImbalance = 3,
                 ValidBidVolume = 0,
                 ValidAskVolume = 0,
+                ValidExhaustionRatio = 15,
+                ValidAbsorptionRatio = 1.4
             };
 
             OrderFlowBotProperties.Initialize(config);

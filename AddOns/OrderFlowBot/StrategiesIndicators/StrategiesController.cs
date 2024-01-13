@@ -105,6 +105,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.StrategiesIndicators.Strategies
             foreach (var strategy in _strategies)
             {
                 strategy.ValidStrategyDirection = Direction.Flat;
+                this.RemoveSelectedStrategy(strategy.Name);
             }
         }
 
@@ -119,6 +120,11 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.StrategiesIndicators.Strategies
         public void RemoveSelectedStrategy(string strategy)
         {
             _orderFlowBotState.SelectedStrategies.Remove(strategy);
+        }
+
+        public bool StrategyExists(string strategy)
+        {
+            return _orderFlowBotState.SelectedStrategies.Contains(strategy);
         }
     }
 }

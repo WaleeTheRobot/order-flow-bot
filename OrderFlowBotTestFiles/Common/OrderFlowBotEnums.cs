@@ -14,10 +14,4 @@
         Long,
         Short
     }
-
-    public enum OrderFlowBotStrategy
-    {
-        None,
-        Ratios
-    }
 }

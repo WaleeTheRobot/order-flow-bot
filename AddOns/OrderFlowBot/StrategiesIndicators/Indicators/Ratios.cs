@@ -53,6 +53,11 @@ namespace NinjaTrader.NinjaScript.Indicators
             }
         }
 
+        public override string DisplayName
+        {
+            get { return ""; }
+        }
+
         public void InitializeWith(OrderFlowBotDataBars dataBars)
         {
             _dataBars = dataBars;

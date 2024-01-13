@@ -14,11 +14,13 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             public RoutedEventHandler Handler { get; set; }
             public bool IsActive { get; set; }
+            public string Name { get; set; }
 
-            public ButtonInfo(RoutedEventHandler handler, bool isActive)
+            public ButtonInfo(RoutedEventHandler handler, bool isActive, string name = "")
             {
                 Handler = handler;
                 IsActive = isActive;
+                Name = name;
             }
         }
 
@@ -67,11 +69,22 @@ namespace NinjaTrader.NinjaScript.Strategies
                 {
                     foreach (var buttonLabel in _buttonMap.Keys)
                     {
-                        SetButtonBackground(false, buttonLabel);
+                        if (buttonLabel != LONG_BUTTON_LABEL && buttonLabel != SHORT_BUTTON_LABEL)
+                        {
+                            var strategyName = _buttonMap[buttonLabel].Name;
+                            var isActive = _strategiesController.StrategyExists(strategyName);
+                            string outputMessage = isActive ? $"{strategyName} Enabled" : $"{strategyName} Disabled";
+
+                            SetButtonBackground(isActive, buttonLabel);
+                            PrintOutput(outputMessage);
+                        }
+                        else
+                        {
+                            SetButtonBackground(false, buttonLabel);
+                        }
                     }
 
                     UpdateSelectedTradeDirection();
-                    PrintOutput("Strategies Disabled");
                 }));
             }
         }
@@ -110,7 +123,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 {
                     _buttonMap.Add(buttonLabel, new ButtonInfo(
                         (sender, e) => StrategyButtonClick(buttonLabel, strategyIndicator.Name),
-                        false
+                        false,
+                        strategyIndicator.Name
                     ));
                 }
             }
@@ -126,6 +140,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 ButtonInfo info = item.Value;
                 Button button = GetStyleButton(label);
                 button.Click += info.Handler;
+                button.Background = new SolidColorBrush(Colors.DimGray);
 
                 if (label == LONG_BUTTON_LABEL)
                 {
@@ -175,7 +190,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 }
                 else
                 {
-                    button.Background = new SolidColorBrush(Colors.Transparent);
+                    button.Background = new SolidColorBrush(Colors.DimGray);
                 }
             }
         }
