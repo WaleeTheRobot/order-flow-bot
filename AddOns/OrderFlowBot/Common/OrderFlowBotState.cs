@@ -8,6 +8,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot
         public Direction SelectedTradeDirection { get; set; }
         public Direction ValidStrategyDirection { get; set; }
         public string ValidStrategy { get; set; }
+        public MarketDirection MarketDirection { get; set; }
         public List<string> SelectedStrategies { get; set; }
 
         public OrderFlowBotState()
@@ -17,6 +18,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot
             ValidStrategyDirection = Direction.Flat;
             ValidStrategy = "None";
             SelectedStrategies = new List<string>();
+            MarketDirection = MarketDirection.Trend;
         }
     }
 }

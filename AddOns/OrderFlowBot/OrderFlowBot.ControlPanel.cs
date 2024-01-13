@@ -15,12 +15,14 @@ namespace NinjaTrader.NinjaScript.Strategies
             public RoutedEventHandler Handler { get; set; }
             public bool IsActive { get; set; }
             public string Name { get; set; }
+            public string DisplayLabel { get; set; }
 
-            public ButtonInfo(RoutedEventHandler handler, bool isActive, string name = "")
+            public ButtonInfo(RoutedEventHandler handler, bool isActive, string displayLabel, string name = "")
             {
                 Handler = handler;
                 IsActive = isActive;
                 Name = name;
+                DisplayLabel = displayLabel;
             }
         }
 
@@ -36,6 +38,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         // Labels
         private const string LONG_BUTTON_LABEL = "Long";
         private const string SHORT_BUTTON_LABEL = "Short";
+        private const string MARKET_DIRECTION_BUTTON_LABEL = "Market Direction";
+        private const string TREND_BUTTON_LABEL = "Trend";
+        private const string RANGE_BUTTON_LABEL = "Range";
+        private const string CLOSE_BUTTON_LABEL = "Close";
 
         #endregion
 
@@ -69,7 +75,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 {
                     foreach (var buttonLabel in _buttonMap.Keys)
                     {
-                        if (buttonLabel != LONG_BUTTON_LABEL && buttonLabel != SHORT_BUTTON_LABEL)
+                        if (buttonLabel != LONG_BUTTON_LABEL && buttonLabel != SHORT_BUTTON_LABEL &&
+                            buttonLabel != MARKET_DIRECTION_BUTTON_LABEL && buttonLabel != CLOSE_BUTTON_LABEL)
                         {
                             var strategyName = _buttonMap[buttonLabel].Name;
                             var isActive = _strategiesController.StrategyExists(strategyName);
@@ -80,7 +87,10 @@ namespace NinjaTrader.NinjaScript.Strategies
                         }
                         else
                         {
-                            SetButtonBackground(false, buttonLabel);
+                            if (buttonLabel != MARKET_DIRECTION_BUTTON_LABEL)
+                            {
+                                SetButtonBackground(false, buttonLabel);
+                            }
                         }
                     }
 
@@ -110,8 +120,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             _buttonMap = new Dictionary<string, ButtonInfo>
             {
-                { LONG_BUTTON_LABEL, new ButtonInfo(LongButtonClick, false) },
-                { SHORT_BUTTON_LABEL, new ButtonInfo(ShortButtonClick, false) }
+                { LONG_BUTTON_LABEL, new ButtonInfo(LongButtonClick, false, LONG_BUTTON_LABEL) },
+                { SHORT_BUTTON_LABEL, new ButtonInfo(ShortButtonClick, false, SHORT_BUTTON_LABEL) },
+                { MARKET_DIRECTION_BUTTON_LABEL, new ButtonInfo(MarketDirectionButtonClick, true, MARKET_DIRECTION_BUTTON_LABEL) },
+                { CLOSE_BUTTON_LABEL, new ButtonInfo(CloseButtonClick, false, CLOSE_BUTTON_LABEL) }
             };
 
             // Dynamically add buttons for each strategy with event handler
@@ -124,6 +136,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     _buttonMap.Add(buttonLabel, new ButtonInfo(
                         (sender, e) => StrategyButtonClick(buttonLabel, strategyIndicator.Name),
                         false,
+                        buttonLabel,
                         strategyIndicator.Name
                     ));
                 }
@@ -136,20 +149,32 @@ namespace NinjaTrader.NinjaScript.Strategies
 
             foreach (var item in _buttonMap)
             {
-                string label = item.Key;
+                string tag = item.Key;
                 ButtonInfo info = item.Value;
-                Button button = GetStyleButton(label);
+                Button button = GetStyleButton(tag);
                 button.Click += info.Handler;
-                button.Background = new SolidColorBrush(Colors.DimGray);
+                button.Tag = tag;
+                button.Background = tag == MARKET_DIRECTION_BUTTON_LABEL ? new SolidColorBrush(Colors.SeaGreen) : new SolidColorBrush(Colors.DimGray);
 
-                if (label == LONG_BUTTON_LABEL)
+                if (tag == LONG_BUTTON_LABEL)
                 {
                     Grid.SetRow(button, 1);
                     Grid.SetColumn(button, 0);
                 }
-                else if (label == SHORT_BUTTON_LABEL)
+                else if (tag == SHORT_BUTTON_LABEL)
                 {
                     Grid.SetRow(button, 1);
+                    Grid.SetColumn(button, 1);
+                }
+                else if (tag == MARKET_DIRECTION_BUTTON_LABEL)
+                {
+                    button.Content = TREND_BUTTON_LABEL;
+                    Grid.SetRow(button, 2);
+                    Grid.SetColumn(button, 0);
+                }
+                else if (tag == CLOSE_BUTTON_LABEL)
+                {
+                    Grid.SetRow(button, 2);
                     Grid.SetColumn(button, 1);
                 }
                 else
@@ -180,18 +205,11 @@ namespace NinjaTrader.NinjaScript.Strategies
                 _buttonMap[buttonLabel].IsActive = isActive;
             }
 
-            Button button = _orderFlowBotDirectionGrid.Children.OfType<Button>().FirstOrDefault(b => b.Content.ToString() == buttonLabel);
+            Button button = _orderFlowBotDirectionGrid.Children.OfType<Button>().FirstOrDefault(b => Equals(b.Tag, buttonLabel));
 
             if (button != null)
             {
-                if (isActive)
-                {
-                    button.Background = new SolidColorBrush(Colors.DodgerBlue);
-                }
-                else
-                {
-                    button.Background = new SolidColorBrush(Colors.DimGray);
-                }
+                button.Background = isActive ? new SolidColorBrush(Colors.DodgerBlue) : new SolidColorBrush(Colors.DimGray);
             }
         }
 
@@ -244,6 +262,36 @@ namespace NinjaTrader.NinjaScript.Strategies
         private void ShortButtonClick(object sender, RoutedEventArgs e)
         {
             DirectionButtonClick(SHORT_BUTTON_LABEL);
+        }
+
+        private void MarketDirectionButtonClick(object sender, RoutedEventArgs e)
+        {
+            bool isActive = !_buttonMap[MARKET_DIRECTION_BUTTON_LABEL].IsActive;
+            string outputMessage = isActive ? "Market Trend Selected" : "Market Range Selected";
+
+            Button button = _orderFlowBotDirectionGrid.Children.OfType<Button>().FirstOrDefault(b => Equals(b.Tag, MARKET_DIRECTION_BUTTON_LABEL));
+            button.Content = isActive ? TREND_BUTTON_LABEL : RANGE_BUTTON_LABEL;
+
+            if (isActive)
+            {
+                _orderFlowBotState.MarketDirection = MarketDirection.Trend;
+                _buttonMap[MARKET_DIRECTION_BUTTON_LABEL].IsActive = true;
+                button.Background = new SolidColorBrush(Colors.SeaGreen);
+            }
+            else
+            {
+                _orderFlowBotState.MarketDirection = MarketDirection.Range;
+                _buttonMap[MARKET_DIRECTION_BUTTON_LABEL].IsActive = false;
+                button.Background = new SolidColorBrush(Colors.DimGray);
+            }
+
+            PrintOutput(outputMessage);
+            ForceRefresh();
+        }
+
+        private void CloseButtonClick(object sender, RoutedEventArgs e)
+        {
+            CloseAtmPosition();
         }
 
         private void StrategyButtonClick(string buttonLabel, string strategyName)

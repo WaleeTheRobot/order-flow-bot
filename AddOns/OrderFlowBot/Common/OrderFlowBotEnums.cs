@@ -7,6 +7,12 @@
         Flat
     }
 
+    public enum MarketDirection
+    {
+        Trend,
+        Range
+    }
+
     public enum Direction
     {
         Any,

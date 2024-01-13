@@ -92,7 +92,26 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.StrategiesIndicators.Strategies
                 if (strategy.ValidStrategyDirection != Direction.Flat)
                 {
                     _orderFlowBotState.ValidStrategy = strategy.Name;
-                    _orderFlowBotState.ValidStrategyDirection = strategy.ValidStrategyDirection;
+
+                    // Reverse entry if Range mode selected
+                    if (_orderFlowBotState.MarketDirection == MarketDirection.Range)
+                    {
+                        if (strategy.ValidStrategyDirection == Direction.Long)
+                        {
+                            _orderFlowBotState.ValidStrategyDirection = Direction.Short;
+
+                        }
+
+                        if (strategy.ValidStrategyDirection == Direction.Short)
+                        {
+                            _orderFlowBotState.ValidStrategyDirection = Direction.Long;
+                        }
+                    }
+                    else
+                    {
+                        // Continue with found valid strategy direction with Trend mode selected
+                        _orderFlowBotState.ValidStrategyDirection = strategy.ValidStrategyDirection;
+                    }
                 }
             }
         }

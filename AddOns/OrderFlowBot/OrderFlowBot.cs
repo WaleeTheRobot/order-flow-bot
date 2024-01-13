@@ -405,5 +405,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 
             return GetAtmStrategyMarketPosition(_atmStrategyId);
         }
+
+        private void CloseAtmPosition()
+        {
+            if (_atmStrategyId != null)
+            {
+                AtmStrategyClose(_atmStrategyId);
+            }
+        }
     }
 }

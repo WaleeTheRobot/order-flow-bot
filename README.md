@@ -16,7 +16,17 @@ OrderFlowBot uses an ATM Strategy. The default is called OrderFlowBot. This will
 
 ### Buttons
 
-The Long and Short buttons are used with a selected strategy to look for long or short entries. Selecting both will look for both long and short entries. Selecting only one will look for that specific entry. The strategy buttons are dynamically added.
+Long - Use this with a selected strategy to look for a long entry.
+
+Short - Use this with a selected strategy to look for a short entry.
+
+Long and Short - Use this with a selected strategy to look for either a long or short entry.
+
+Trend / Range - The default is Trend. Use this to select a Trend or Range market. Selecting trend will enter strategies as normal. Range will reverse the strategy. For example, if your strategy found a long entry with Range selected you will enter short instead of enter long.
+
+Close - This closes the current position with the ATM without disabling OrderFlowBot. The default NinjaTrade Close button will disable the OrderFlowBot.
+
+Strategies - Use a single or multiple strategies with the Long or Short button. Selecting multiple will look for an entry based on all selected strategies. It will enter based on the first valid strategy it finds.
 
 ### Backtesting
 
