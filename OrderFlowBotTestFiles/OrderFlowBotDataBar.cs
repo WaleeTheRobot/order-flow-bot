@@ -1,4 +1,5 @@
-﻿using OrderFlowBotTestFiles.Common;
+﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies;
+using OrderFlowBotTestFiles.Common;
 using OrderFlowBotTestFiles.Files.Dependencies;
 
 namespace OrderFlowBotTestFiles

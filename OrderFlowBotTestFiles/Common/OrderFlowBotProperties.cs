@@ -12,6 +12,8 @@
         public long ValidAskVolume { get; set; }
         public double ValidExhaustionRatio { get; set; }
         public double ValidAbsorptionRatio { get; set; }
+        public int ValidVolumeSequencing { get; set; }
+        public long ValidVolumeSequencingMinimumVolume { get; set; }
     }
 
     public static class OrderFlowBotProperties
@@ -26,6 +28,8 @@
         public static long ValidAskVolume { get; private set; }
         public static double ValidExhaustionRatio { get; private set; }
         public static double ValidAbsorptionRatio { get; private set; }
+        public static int ValidVolumeSequencing { get; private set; }
+        public static long ValidVolumeSequencingMinimumVolume { get; private set; }
 
         public static void Initialize(OrderFlowBotPropertiesConfig config)
         {
@@ -38,6 +42,8 @@
             ValidAskVolume = config.ValidAskVolume;
             ValidExhaustionRatio = config.ValidExhaustionRatio;
             ValidAbsorptionRatio = config.ValidAbsorptionRatio;
+            ValidVolumeSequencing = config.ValidVolumeSequencing;
+            ValidVolumeSequencingMinimumVolume = config.ValidVolumeSequencingMinimumVolume;
         }
     }
 }

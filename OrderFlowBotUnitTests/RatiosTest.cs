@@ -1,6 +1,6 @@
+using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies;
 using OrderFlowBotTestFiles;
 using OrderFlowBotTestFiles.Common;
-using OrderFlowBotTestFiles.Files.Dependencies;
 using OrderFlowBotUnitTests.Data;
 
 namespace OrderFlowBotUnitTests
@@ -11,6 +11,7 @@ namespace OrderFlowBotUnitTests
 
         public RatiosTest()
         {
+            var _ = CommonData.DefaultBidAskVolumeList;
             _data = new RatiosData();
         }
 

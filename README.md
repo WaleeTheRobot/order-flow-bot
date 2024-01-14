@@ -60,6 +60,12 @@ Long Position: Bullish bar, positive delta and new low based on last number of L
 
 Short Position: Bearish bar, negative delta and new high based on last number of LookBackBars.
 
+### Volume Sequencing
+
+Long Position: Bullish bar with sequential increasing volume on ask from bottom of bar.
+
+Short Position: Bearish bar with sequential decreasing volume on bid from top of bar.
+
 # Adding Strategies and Indicators
 
 The custom DataBar should be used if you are considering adding strategies and indicators. It takes some of the data from the volumetric bars and creates custom bars that you can also add any additional information to.

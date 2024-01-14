@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies
 {
@@ -16,6 +18,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies
         public long BuyingVolume { get; set; }
         public long SellingVolume { get; set; }
         public List<BidAskVolume> BidAskVolumes { get; set; }
+        public bool HasBidVolumeSequencing { get; set; }
+        public bool HasAskVolumeSequencing { get; set; }
 
         public Volumes()
         {
@@ -25,6 +29,60 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies
         public bool ValidBidAskVolumes()
         {
             return BidAskVolumes.Count > 2;
+        }
+
+        public void SetVolumeSequencing(List<BidAskVolume> bidAskVolumes, BarType barType, long totalVolume)
+        {
+            if (totalVolume < OrderFlowBotProperties.ValidVolumeSequencingMinimumVolume || bidAskVolumes.Count < OrderFlowBotProperties.ValidVolumeSequencing + 1)
+            {
+                this.HasAskVolumeSequencing = false;
+                this.HasBidVolumeSequencing = false;
+
+                return;
+            }
+
+            int validVolumeSequencing = OrderFlowBotProperties.ValidVolumeSequencing;
+            bool isValidSequence = true;
+
+            if (barType == BarType.Bullish)
+            {
+                var lastVolumes = bidAskVolumes.Skip(Math.Max(0, bidAskVolumes.Count - validVolumeSequencing)).Take(validVolumeSequencing).Reverse().ToList();
+
+                // Check if the AskVolume is sequentially increasing
+                for (int i = 0; i < lastVolumes.Count - 1; i++)
+                {
+                    if (lastVolumes[i].AskVolume >= lastVolumes[i + 1].AskVolume)
+                    {
+                        isValidSequence = false;
+                        break;
+                    }
+                }
+
+                this.HasAskVolumeSequencing = isValidSequence;
+                this.HasBidVolumeSequencing = false;
+            }
+            else if (barType == BarType.Bearish)
+            {
+                var firstVolumes = bidAskVolumes.Take(validVolumeSequencing).ToList();
+
+                // Check if the BidVolume is sequentially increasing
+                for (int i = 0; i < firstVolumes.Count - 1; i++)
+                {
+                    if (firstVolumes[i].BidVolume >= firstVolumes[i + 1].BidVolume)
+                    {
+                        isValidSequence = false;
+                        break;
+                    }
+                }
+
+                this.HasAskVolumeSequencing = false;
+                this.HasBidVolumeSequencing = isValidSequence;
+            }
+            else
+            {
+                this.HasAskVolumeSequencing = false;
+                this.HasBidVolumeSequencing = false;
+            }
         }
     }
 }

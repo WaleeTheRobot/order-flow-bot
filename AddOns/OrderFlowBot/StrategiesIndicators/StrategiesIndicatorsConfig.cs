@@ -35,6 +35,13 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.StrategiesIndicators
                 },
                 new StrategiesIndicators
                 {
+                    Name = "VolumeSequencing",
+                    ButtonLabel = "Volume Sequencing",
+                    IsStrategy = true,
+                    IsIndicator = false,
+                },
+                new StrategiesIndicators
+                {
                     Name = "Ratios",
                     ButtonLabel = "",
                     IsStrategy = false,

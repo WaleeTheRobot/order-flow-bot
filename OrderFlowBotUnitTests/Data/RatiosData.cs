@@ -1,4 +1,4 @@
-﻿using OrderFlowBotTestFiles.Files.Dependencies;
+﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies;
 
 namespace OrderFlowBotUnitTests.Data
 {

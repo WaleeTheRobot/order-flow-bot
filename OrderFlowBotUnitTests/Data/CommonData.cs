@@ -1,5 +1,5 @@
-﻿using OrderFlowBotTestFiles.Common;
-using OrderFlowBotTestFiles.Files.Dependencies;
+﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies;
+using OrderFlowBotTestFiles.Common;
 
 namespace OrderFlowBotUnitTests.Data
 {
@@ -22,7 +22,9 @@ namespace OrderFlowBotUnitTests.Data
                 ValidBidVolume = 0,
                 ValidAskVolume = 0,
                 ValidExhaustionRatio = 15,
-                ValidAbsorptionRatio = 1.4
+                ValidAbsorptionRatio = 1.4,
+                ValidVolumeSequencing = 4,
+                ValidVolumeSequencingMinimumVolume = 500
             };
 
             OrderFlowBotProperties.Initialize(config);

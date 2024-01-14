@@ -113,6 +113,14 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Display(Name = "Valid Absorption Ratio", Description = "The valid absorption ratio for comparing top and bottom.", Order = 6, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
         public double ValidAbsorptionRatio { get; set; }
 
+        [NinjaScriptProperty]
+        [Display(Name = "Valid Volume Sequencing", Description = "The valid number of price to check for volume sequencing.", Order = 7, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
+        public int ValidVolumeSequencing { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Valid Volume Sequencing Minimum Volume", Description = "The valid number of volume to check for volume sequencing.", Order = 8, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
+        public long ValidVolumeSequencingMinimumVolume { get; set; }
+
         #endregion
 
         protected override void OnStateChange()
@@ -157,6 +165,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 StackedImbalance = 3;
                 ValidExhaustionRatio = 15;
                 ValidAbsorptionRatio = 1.4;
+                ValidVolumeSequencing = 4;
+                ValidVolumeSequencingMinimumVolume = 500;
 
                 // Indicators
                 RatiosEnabled = true;
@@ -174,6 +184,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                     StackedImbalance = StackedImbalance,
                     ValidExhaustionRatio = ValidExhaustionRatio,
                     ValidAbsorptionRatio = ValidAbsorptionRatio,
+                    ValidVolumeSequencing = ValidVolumeSequencing,
+                    ValidVolumeSequencingMinimumVolume = ValidVolumeSequencingMinimumVolume
                 };
 
                 OrderFlowBotProperties.Initialize(config);
