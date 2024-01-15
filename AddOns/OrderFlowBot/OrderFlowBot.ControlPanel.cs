@@ -1,5 +1,6 @@
 ﻿using NinjaTrader.Custom.AddOns;
 using NinjaTrader.Gui.Chart;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -80,7 +81,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                         {
                             var strategyName = _buttonMap[buttonLabel].Name;
                             var isActive = _strategiesController.StrategyExists(strategyName);
-                            string outputMessage = isActive ? $"{strategyName} Enabled" : $"{strategyName} Disabled";
+                            string outputMessage = isActive ? String.Format("{0} Enabled", strategyName) : String.Format("{0} Disabled", strategyName);
 
                             SetButtonBackground(isActive, buttonLabel);
                             PrintOutput(outputMessage);
@@ -296,16 +297,19 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         private void StrategyButtonClick(string buttonLabel, string strategyName)
         {
-            if (!_buttonMap.TryGetValue(buttonLabel, out ButtonInfo button))
+            ButtonInfo button;
+            if (!_buttonMap.TryGetValue(buttonLabel, out button))
             {
                 PrintOutput("Button not found: " + buttonLabel);
                 return;
             }
 
+
             bool isActive = !button.IsActive;
             button.IsActive = isActive;
 
-            string outputMessage = isActive ? $"{strategyName} Enabled" : $"{strategyName} Disabled";
+            string outputMessage = isActive ? String.Format("{0} Enabled", strategyName) : String.Format("{0} Disabled", strategyName);
+
 
             if (isActive)
             {

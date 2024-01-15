@@ -33,7 +33,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.StrategiesIndicators.Strategies
             {
                 if (strategyConfig.IsStrategy)
                 {
-                    string fullClassName = $"{this.GetType().Namespace}.{strategyConfig.Name}";
+                    string fullClassName = String.Format("{0}.{1}", this.GetType().Namespace, strategyConfig.Name);
 
                     Type strategyType = Type.GetType(fullClassName);
 

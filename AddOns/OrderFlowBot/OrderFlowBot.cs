@@ -282,7 +282,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         private void Reset()
         {
-            PrintOutput($"Exit | {_entryName}");
+            PrintOutput(String.Format("Exit | {0}", _entryName));
 
             _entryLong = false;
             _entryShort = false;
@@ -319,7 +319,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 _entryLong = true;
                 _entryName = _orderFlowBotState.ValidStrategy.ToString();
 
-                PrintOutput($"Enter Long | {_entryName}");
+                PrintOutput(String.Format("Enter Long | {0}", _entryName));
+
 
                 //PrintDataBar(_dataBars.Bar);
 
@@ -331,7 +332,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 _entryShort = true;
                 _entryName = _orderFlowBotState.ValidStrategy.ToString();
 
-                PrintOutput($"Enter Short | {_entryName}");
+                PrintOutput(String.Format("Enter Short | {0}", _entryName));
+
 
                 //PrintDataBar(_dataBars.Bar);
 
@@ -372,7 +374,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     _lastTradeBarNumber = _dataBars.Bar.BarNumber;
                     _entryName = _orderFlowBotState.ValidStrategy.ToString();
 
-                    PrintOutput($"Enter Long | {_entryName}");
+                    PrintOutput(String.Format("Enter Long | {0}", _entryName));
 
                     AtmStrategyCreate(OrderAction.Buy, OrderType.Market, 0, 0, TimeInForce.Day, _atmStrategyId, AtmTemplateName, _atmStrategyId, (atmCallbackErrorCode, atmCallbackId) =>
                     {
@@ -392,7 +394,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     _lastTradeBarNumber = _dataBars.Bar.BarNumber;
                     _entryName = _orderFlowBotState.ValidStrategy.ToString();
 
-                    PrintOutput($"Enter Short | {_entryName}");
+                    PrintOutput(String.Format("Enter Short | {0}", _entryName));
 
                     AtmStrategyCreate(OrderAction.Sell, OrderType.Market, 0, 0, TimeInForce.Day, _atmStrategyId, AtmTemplateName, _atmStrategyId, (atmCallbackErrorCode, atmCallbackId) =>
                     {
