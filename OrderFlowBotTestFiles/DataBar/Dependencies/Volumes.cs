@@ -18,6 +18,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies
         public List<BidAskVolume> BidAskVolumes { get; set; }
         public bool HasBidVolumeSequencing { get; set; }
         public bool HasAskVolumeSequencing { get; set; }
+        public bool HasAskSinglePrint { get; set; }
+        public bool HasBidSinglePrint { get; set; }
 
         public Volumes()
         {
@@ -81,6 +83,17 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies
                 this.HasAskVolumeSequencing = false;
                 this.HasBidVolumeSequencing = false;
             }
+        }
+
+        public void SetSinglePrints()
+        {
+            if (this.BidAskVolumes == null || this.BidAskVolumes.Count == 0)
+            {
+                return;
+            }
+
+            this.HasAskSinglePrint = this.BidAskVolumes.First().AskVolume < 10;
+            this.HasBidSinglePrint = this.BidAskVolumes.Last().BidVolume < 10;
         }
     }
 }
