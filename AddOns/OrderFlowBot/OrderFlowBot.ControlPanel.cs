@@ -157,6 +157,11 @@ namespace NinjaTrader.NinjaScript.Strategies
                 button.Tag = tag;
                 button.Background = tag == MARKET_DIRECTION_BUTTON_LABEL ? new SolidColorBrush(Colors.SeaGreen) : new SolidColorBrush(Colors.DimGray);
 
+                if (BackTestingEnabled)
+                {
+                    button.IsEnabled = false;
+                }
+
                 if (tag == LONG_BUTTON_LABEL)
                 {
                     Grid.SetRow(button, 1);
@@ -353,7 +358,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Foreground = ChartControl.Properties.ChartText,
                 HorizontalAlignment = HorizontalAlignment.Left,
                 Margin = new Thickness(0, 50, 0, 5),
-                Text = string.Format("Order Flow Bot")
+                Text = BackTestingEnabled ? string.Format("Order Flow Bot Panel Disabled") : string.Format("Order Flow Bot")
             };
 
             Grid.SetRow(orderFlowLabel, 0);

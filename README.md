@@ -8,11 +8,11 @@ A bot used for trading order flow. The primary focus for OrderFlowBot is semi-au
 
 # Usage
 
-The below are information about OrderFlowBot usage.
+OrderFlowBot may not work if using a version of NinjaTrader below 8.1.2.1. This is the minimum version supporting features up to C# 8. The below are information about OrderFlowBot usage.
 
 ### ATM Strategy
 
-OrderFlowBot uses an ATM Strategy. The default is called OrderFlowBot. This will be used when a strategy's requirements our met for entry. You will need to create an ATM Strategy and include it in OrderFlowBot options.
+OrderFlowBot uses an ATM Strategy. The default is called OrderFlowBot. This will be used when a strategy's requirements are met for entry. You will need to create an ATM Strategy and include it in OrderFlowBot options.
 
 ### Buttons
 
