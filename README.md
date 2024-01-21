@@ -48,6 +48,8 @@ Strategies - Use a single or multiple strategies with the Long or Short button. 
 
 You can backtest your strategies by enabling the backtesting. This will use the target and stop where you enabled the backtesting. This will backtest all the strategies and can be a way to automate OrderFlowBot, but it is not the primary focus. To backtest a single strategy, you can just comment out the other strategies in the `OrderFlowBot/StrategiesIndicators/StrategiesIndicatorsConfig` file.
 
+Selecting `JSONFileEnabled` when backtesting will create a JSON file called `orderflowbot-trades.json` to the desktop. This will have the values for the OrderFlowBot entry databar and databar before it so that they can be used for any further analysis.
+
 # Included Indicators
 
 The below indicators are included for OrderFlowBot and can be used as examples to add any other indicators.
