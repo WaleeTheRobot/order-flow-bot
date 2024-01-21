@@ -2,11 +2,13 @@
 using NinjaTrader.Cbi;
 using NinjaTrader.Custom.AddOns;
 using NinjaTrader.Custom.AddOns.OrderFlowBot;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.BackTesting;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.StrategiesIndicators;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.StrategiesIndicators.Strategies;
 using NinjaTrader.NinjaScript.Indicators;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 #endregion
 
@@ -33,9 +35,12 @@ namespace NinjaTrader.NinjaScript.Strategies
         private StrategiesIndicatorsConfig _strategiesIndicatorsConfig;
         private StrategiesController _strategiesController;
 
+        private OrderFlowBotJsonFile _jsonFile;
+
         private bool _entryLong;
         private bool _entryShort;
         private string _entryName;
+        private List<string> _winningTradesExecutionIds;
         private string _atmStrategyId;
         private bool _isAtmStrategyCreated;
         // Prevent entry on same bar
@@ -58,15 +63,19 @@ namespace NinjaTrader.NinjaScript.Strategies
         public bool BackTestingEnabled { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Quantity", Description = "The name order quantity.", Order = 1, GroupName = GroupConstants.GROUP_NAME_TESTING)]
+        [Display(Name = "JSON File Enabled", Description = "Enable this to create a JSON file of trades to the desktop.", Order = 1, GroupName = GroupConstants.GROUP_NAME_TESTING)]
+        public bool JsonFileEnabled { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Quantity", Description = "The name order quantity.", Order = 2, GroupName = GroupConstants.GROUP_NAME_TESTING)]
         public int Quantity { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Target", Description = "The target in ticks.", Order = 2, GroupName = GroupConstants.GROUP_NAME_TESTING)]
+        [Display(Name = "Target", Description = "The target in ticks.", Order = 3, GroupName = GroupConstants.GROUP_NAME_TESTING)]
         public int Target { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Stop", Description = "The stop in ticks.", Order = 3, GroupName = GroupConstants.GROUP_NAME_TESTING)]
+        [Display(Name = "Stop", Description = "The stop in ticks.", Order = 4, GroupName = GroupConstants.GROUP_NAME_TESTING)]
         public int Stop { get; set; }
 
         #endregion
@@ -149,12 +158,13 @@ namespace NinjaTrader.NinjaScript.Strategies
                 // Backtesting based on default settings
                 Slippage = 2;
                 IncludeCommission = true;
-
-                // OrderFlowBot
                 Quantity = 1;
                 Target = 16;
                 Stop = 16;
                 BackTestingEnabled = false;
+                JsonFileEnabled = false;
+
+                // OrderFlowBot
                 AtmTemplateName = "OrderFlowBot";
 
                 // DataBar
@@ -198,6 +208,12 @@ namespace NinjaTrader.NinjaScript.Strategies
                 _strategiesIndicatorsConfig = new StrategiesIndicatorsConfig();
                 _strategiesController = new StrategiesController(_orderFlowBotState, _dataBars, _strategiesIndicatorsConfig);
 
+                if (JsonFileEnabled)
+                {
+                    _jsonFile = new OrderFlowBotJsonFile();
+                    _winningTradesExecutionIds = new List<string>();
+                }
+
                 ControlPanelSetStateDataLoaded();
                 AddIndicators();
             }
@@ -217,6 +233,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             if (Position.MarketPosition == MarketPosition.Flat)
             {
+                if (JsonFileEnabled)
+                {
+                    AppendWinningTradesToJsonFile();
+                }
+
                 Reset();
             }
         }
@@ -277,6 +298,21 @@ namespace NinjaTrader.NinjaScript.Strategies
                 RatiosLastExhaustionAbsorptionPrice ratiosLastExhaustionAbsorptionPrice = RatiosLastExhaustionAbsorptionPrice();
                 ratiosLastExhaustionAbsorptionPrice.InitializeWith(_dataBars);
                 AddChartIndicator(ratiosLastExhaustionAbsorptionPrice);
+            }
+        }
+
+        private void AppendWinningTradesToJsonFile()
+        {
+            if (SystemPerformance.AllTrades.WinningTrades.Count > 1)
+            {
+                Trade lastTrade = SystemPerformance.AllTrades.WinningTrades[SystemPerformance.AllTrades.WinningTrades.Count - 1];
+                double pnl = lastTrade.ProfitCurrency;
+
+                if (!_winningTradesExecutionIds.Contains(lastTrade.Entry.ExecutionId))
+                {
+                    _winningTradesExecutionIds.Add(lastTrade.Entry.ExecutionId);
+                    _jsonFile.Append(_dataBars, _lastTradeBarNumber, pnl, lastTrade.Entry.MarketPosition.ToString());
+                }
             }
         }
 
