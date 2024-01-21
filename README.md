@@ -8,6 +8,8 @@ A bot used for trading order flow. The primary focus for OrderFlowBot is semi-au
 
 # Development
 
+A clean NinjaTrader 8.1.2.1+ install should have Newtonsoft in `C:\Program Files\NinjaTrader 8\bin`, but you can manually add it below if needed.
+
 From NuGet add the following to NinjaTrader.Custom:
 
 - Newtonsoft.Json
@@ -18,7 +20,7 @@ The version should match the installed version
 
 - C:\Users\username\\.nuget\packages\newtonsoft.json\13.0.3\lib\net45\Newtonsoft.Json.dll
 
-The version should match the other added references
+The version should match the other added references. You might also need to add this.
 
 - C:\\Windows\Microsoft.NET\Framework\v4.0.30319\netstandard.dll
 
