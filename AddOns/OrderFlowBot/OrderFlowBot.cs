@@ -223,12 +223,6 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
         }
 
-        // Remove the display name on the chart
-        public override string DisplayName
-        {
-            get { return ""; }
-        }
-
         protected override void OnExecutionUpdate(Execution execution, string executionId, double price, int quantity, MarketPosition marketPosition, string orderId, DateTime time)
         {
             if (Position.MarketPosition == MarketPosition.Flat)
