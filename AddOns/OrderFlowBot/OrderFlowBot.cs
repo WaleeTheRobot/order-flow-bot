@@ -42,6 +42,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         private bool _entryShort;
         private string _entryName;
         private List<string> _winningTradesExecutionIds;
+        private List<string> _losingTradesExecutionIds;
         private string _atmStrategyId;
         private bool _isAtmStrategyCreated;
         // Prevent entry on same bar
@@ -218,6 +219,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 {
                     _jsonFile = new OrderFlowBotJsonFile();
                     _winningTradesExecutionIds = new List<string>();
+                    _losingTradesExecutionIds = new List<string>();
                 }
 
                 ControlPanelSetStateDataLoaded();
@@ -236,6 +238,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 if (JsonFileEnabled)
                 {
                     AppendWinningTradesToJsonFile();
+                    AppendLosingTradesToJsonFile();
                 }
 
                 Reset();
@@ -310,7 +313,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         private void AppendWinningTradesToJsonFile()
         {
-            if (SystemPerformance.AllTrades.WinningTrades.Count > 1)
+            if (SystemPerformance.AllTrades.WinningTrades.Count > 0)
             {
                 Trade lastTrade = SystemPerformance.AllTrades.WinningTrades[SystemPerformance.AllTrades.WinningTrades.Count - 1];
                 double pnl = lastTrade.ProfitCurrency;
@@ -318,6 +321,21 @@ namespace NinjaTrader.NinjaScript.Strategies
                 if (!_winningTradesExecutionIds.Contains(lastTrade.Entry.ExecutionId))
                 {
                     _winningTradesExecutionIds.Add(lastTrade.Entry.ExecutionId);
+                    _jsonFile.Append(_dataBars, _lastTradeBarNumber, pnl, lastTrade.Entry.MarketPosition.ToString());
+                }
+            }
+        }
+
+        private void AppendLosingTradesToJsonFile()
+        {
+            if (SystemPerformance.AllTrades.LosingTrades.Count > 0)
+            {
+                Trade lastTrade = SystemPerformance.AllTrades.LosingTrades[SystemPerformance.AllTrades.LosingTrades.Count - 1];
+                double pnl = lastTrade.ProfitCurrency;
+
+                if (!_losingTradesExecutionIds.Contains(lastTrade.Entry.ExecutionId))
+                {
+                    _losingTradesExecutionIds.Add(lastTrade.Entry.ExecutionId);
                     _jsonFile.Append(_dataBars, _lastTradeBarNumber, pnl, lastTrade.Entry.MarketPosition.ToString());
                 }
             }

@@ -17,32 +17,57 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.BackTesting
 
     public class OrderFlowBotJsonFile
     {
-        private readonly string _filePath;
+        private readonly string _filePathWinning;
+        private readonly string _filePathLosing;
 
         public OrderFlowBotJsonFile()
         {
             string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            _filePath = Path.Combine(desktopPath, "orderflowbot-trades.json");
+            _filePathWinning = Path.Combine(desktopPath, "orderflowbot-winning-trades.json");
+            _filePathLosing = Path.Combine(desktopPath, "orderflowbot-losing-trades.json");
 
-            File.WriteAllText(_filePath, "[]");
+            File.WriteAllText(_filePathWinning, "[]");
+            File.WriteAllText(_filePathLosing, "[]");
         }
 
         public void Append(OrderFlowBotDataBars dataBars, long entryBarNumber, double pnl, string entryType)
         {
-            List<OrderFlowBotTrade> existingData = ReadExistingData();
+            bool isWinning = pnl > 0;
+
+            List<OrderFlowBotTrade> existingData = ReadExistingData(isWinning);
 
             existingData.Add(GetOrderFlowBotTrade(dataBars, entryBarNumber, pnl, entryType));
 
             string updatedJson = JsonConvert.SerializeObject(existingData, Formatting.Indented);
-            File.WriteAllText(_filePath, updatedJson);
+
+            if (isWinning)
+            {
+                File.WriteAllText(_filePathWinning, updatedJson);
+            }
+
+            else
+            {
+                File.WriteAllText(_filePathLosing, updatedJson);
+            }
         }
 
-        private List<OrderFlowBotTrade> ReadExistingData()
+        private List<OrderFlowBotTrade> ReadExistingData(bool isWinning)
         {
-            if (File.Exists(_filePath))
+            if (isWinning)
             {
-                string jsonData = File.ReadAllText(_filePath);
-                return JsonConvert.DeserializeObject<List<OrderFlowBotTrade>>(jsonData) ?? new List<OrderFlowBotTrade>();
+                if (File.Exists(_filePathWinning))
+                {
+                    string jsonData = File.ReadAllText(_filePathWinning);
+                    return JsonConvert.DeserializeObject<List<OrderFlowBotTrade>>(jsonData) ?? new List<OrderFlowBotTrade>();
+                }
+            }
+            else
+            {
+                if (File.Exists(_filePathLosing))
+                {
+                    string jsonData = File.ReadAllText(_filePathLosing);
+                    return JsonConvert.DeserializeObject<List<OrderFlowBotTrade>>(jsonData) ?? new List<OrderFlowBotTrade>();
+                }
             }
 
             return new List<OrderFlowBotTrade>();
