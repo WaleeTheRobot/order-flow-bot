@@ -1,6 +1,6 @@
 # OrderFlowBot
 
-![Order Flow Bot](./screenshot.png)
+![Order Flow Bot](./images/screenshot.png)
 
 A bot used for trading order flow. The primary focus for OrderFlowBot is semi-automated trading. Strategies can be added and then manually selected for the software to look for entries. Indicators can also be added so they will startup when the OrderFlowBot strategy is enabled.
 
@@ -66,9 +66,19 @@ The below indicators are included for OrderFlowBot and can be used as examples t
 
 Made popular by Mike from OrderFlows, this shows the bottom divided bid ratios or top divided ask ratios. The ratios will be displayed in color, bold and larger font if it meets the threshold in `ValidExhaustionRatio` or `ValidAbsorptionRatio` properies.
 
-### LastExhaustionAbsorptionPrice
+![Ratios](./images/ratios.png)
+
+### Last Exhaustion Absorption Price
 
 This shows the prices for the last valid exhaustion or valid absorption ratios for the bid and ask.
+
+![Last Exhaustion Absorption Price](./images/lastratioprice.png)
+
+### Single Print
+
+This draws a bold red rectangle for single prints on the top and bottom of the bar.
+
+![Single Print](./images/singleprint.png)
 
 # Included Strategies
 

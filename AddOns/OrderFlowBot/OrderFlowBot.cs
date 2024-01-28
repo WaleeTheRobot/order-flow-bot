@@ -34,6 +34,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         private OrderFlowBotDataBars _dataBars;
         private StrategiesIndicatorsConfig _strategiesIndicatorsConfig;
         private StrategiesController _strategiesController;
+        private OrderFlowBotPropertiesConfig _config;
 
         private OrderFlowBotJsonFile _jsonFile;
 
@@ -89,6 +90,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         [NinjaScriptProperty]
         [Display(Name = "Last Ratios Price Enabled", Description = "Enable the last bid/ask ratios price.", Order = 1, GroupName = GroupConstants.GROUP_NAME_INDICATORS)]
         public bool LastRatiosPriceEnabled { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Single Print Enabled", Description = "Enable single print.", Order = 2, GroupName = GroupConstants.GROUP_NAME_INDICATORS)]
+        public bool SinglePrintEnabled { get; set; }
 
         #endregion
 
@@ -181,10 +186,11 @@ namespace NinjaTrader.NinjaScript.Strategies
                 // Indicators
                 RatiosEnabled = true;
                 LastRatiosPriceEnabled = true;
+                SinglePrintEnabled = true;
             }
             else if (State == State.Configure)
             {
-                OrderFlowBotPropertiesConfig config = new OrderFlowBotPropertiesConfig
+                _config = new OrderFlowBotPropertiesConfig
                 {
                     TickSize = TickSize,
                     LookBackBars = LookBackBars,
@@ -198,7 +204,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     ValidVolumeSequencingMinimumVolume = ValidVolumeSequencingMinimumVolume
                 };
 
-                OrderFlowBotProperties.Initialize(config);
+                OrderFlowBotProperties.Initialize(_config);
             }
             else if (State == State.DataLoaded)
             {
@@ -292,6 +298,13 @@ namespace NinjaTrader.NinjaScript.Strategies
                 RatiosLastExhaustionAbsorptionPrice ratiosLastExhaustionAbsorptionPrice = RatiosLastExhaustionAbsorptionPrice();
                 ratiosLastExhaustionAbsorptionPrice.InitializeWith(_dataBars);
                 AddChartIndicator(ratiosLastExhaustionAbsorptionPrice);
+            }
+
+            if (SinglePrintEnabled)
+            {
+                SinglePrint singlePrint = SinglePrint();
+                singlePrint.InitializeWith(_dataBars, _config);
+                AddChartIndicator(singlePrint);
             }
         }
 
