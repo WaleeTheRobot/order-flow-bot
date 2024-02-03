@@ -10,6 +10,10 @@ Requires the lifetime NinjaTrader license for the volumetric data
 
 Make sure Tick Replay is Checked.
 
+For developing, you can copy the OrderFlowBot folder into your local NinjaTrader AddOns folder.
+
+For usage, you can download the zip containing the word import in the release page. You can import this zip file similar to importing a normal NinjaTrader Add-On. https://github.com/WaleeTheRobot/order-flow-bot/releases
+
 # Development
 
 A clean NinjaTrader 8.1.2.1+ install should have Newtonsoft in `C:\Program Files\NinjaTrader 8\bin`, but you can manually add it below if needed.
