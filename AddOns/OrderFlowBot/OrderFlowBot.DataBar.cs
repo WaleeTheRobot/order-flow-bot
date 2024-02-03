@@ -68,6 +68,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 
             dataBar.Volumes.BidAskVolumes = bidAskVolumeList;
             dataBar.Volumes.SetVolumeSequencing(bidAskVolumeList, dataBar.BarType, dataBar.Volumes.Volume);
+            dataBar.Volumes.SetSinglePrints();
+            dataBar.Volumes.SetBidAskPriceVolumeAndVolumeDelta();
             dataBar.Imbalances.SetImbalances(bidAskVolumeList, dataBar.Volumes.ValidBidAskVolumes());
             dataBar.Ratios.SetLastRatioPrices(dataBars);
             dataBar.Ratios.SetRatios(bidAskVolumeList, dataBar.Volumes.ValidBidAskVolumes(), dataBar.BarType);

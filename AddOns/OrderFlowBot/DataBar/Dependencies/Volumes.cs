@@ -9,6 +9,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies
         public double Price;
         public long BidVolume;
         public long AskVolume;
+        public long Volume;
+        public long VolumeDelta;
     }
 
     public class Volumes
@@ -20,6 +22,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies
         public List<BidAskVolume> BidAskVolumes { get; set; }
         public bool HasBidVolumeSequencing { get; set; }
         public bool HasAskVolumeSequencing { get; set; }
+        public bool HasAskSinglePrint { get; set; }
+        public bool HasBidSinglePrint { get; set; }
 
         public Volumes()
         {
@@ -82,6 +86,33 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies
             {
                 this.HasAskVolumeSequencing = false;
                 this.HasBidVolumeSequencing = false;
+            }
+        }
+
+        public void SetSinglePrints()
+        {
+            if (this.BidAskVolumes == null || this.BidAskVolumes.Count == 0)
+            {
+                return;
+            }
+
+            this.HasAskSinglePrint = this.BidAskVolumes.First().AskVolume < 10;
+            this.HasBidSinglePrint = this.BidAskVolumes.Last().BidVolume < 10;
+        }
+
+        public void SetBidAskPriceVolumeAndVolumeDelta()
+        {
+            if (this.BidAskVolumes == null || this.BidAskVolumes.Count == 0)
+            {
+                return;
+            }
+
+            for (int i = 0; i < this.BidAskVolumes.Count; i++)
+            {
+                var bidAskVolume = this.BidAskVolumes[i];
+                bidAskVolume.Volume = bidAskVolume.BidVolume + bidAskVolume.AskVolume;
+                bidAskVolume.VolumeDelta = bidAskVolume.AskVolume - bidAskVolume.BidVolume;
+                this.BidAskVolumes[i] = bidAskVolume;
             }
         }
     }

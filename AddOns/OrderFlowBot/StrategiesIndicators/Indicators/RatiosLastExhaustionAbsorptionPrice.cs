@@ -27,11 +27,6 @@ namespace NinjaTrader.NinjaScript.Indicators
             }
         }
 
-        public override string DisplayName
-        {
-            get { return ""; }
-        }
-
         protected override void OnBarUpdate()
         {
         }

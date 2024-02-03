@@ -17,40 +17,46 @@ namespace NinjaTrader.NinjaScript.Strategies
             //Print(string.Format("Close: {0}", dataBar.Prices.Close));
 
             Print(string.Format("Volume: {0}", dataBar.Volumes.Volume));
-            //Print(string.Format("BuyingVolume: {0}", dataBar.Volumes.BuyingVolume));
+            Print(string.Format("BuyingVolume: {0}", dataBar.Volumes.BuyingVolume));
+            Print(string.Format("AskSinglePrint: {0}", dataBar.Volumes.HasAskSinglePrint));
+            Print(string.Format("BidSinglePrint: {0}", dataBar.Volumes.HasBidSinglePrint));
             //Print(string.Format("SellingVolume: {0}", dataBar.Volumes.SellingVolume));
             //Print(string.Format("PointOfControl: {0}", dataBar.Volumes.PointOfControl));
-
-            Print(string.Format("Bid Ratio: {0}", dataBar.Ratios.BidRatio));
-            Print(string.Format("Valid Bid Ratio: {0}", dataBar.Ratios.HasValidBidExhaustionRatio));
-            Print(string.Format("Ask Ratio: {0}", dataBar.Ratios.AskRatio));
-            Print(string.Format("Valid Ask Ratio: {0}", dataBar.Ratios.HasValidAskExhaustionRatio));
-            Print(string.Format("Last Valid Bid Ratio Price: {0}", dataBar.Ratios.LastValidBidRatioPrice));
-            Print(string.Format("Last Valid Ask Ratio Price: {0}", dataBar.Ratios.LastValidAskRatioPrice));
-
-            Print(string.Format("Delta: {0}", dataBar.Deltas.Delta));
-            Print(string.Format("Min Delta: {0}", dataBar.Deltas.MinDelta));
-            Print(string.Format("Max Delta: {0}", dataBar.Deltas.MaxDelta));
-            Print(string.Format("Cumulative Delta: {0}", dataBar.Deltas.CumulativeDelta));
-            Print(string.Format("Delta Percentage: {0}", dataBar.Deltas.DeltaPercentage));
-            Print(string.Format("MinMax Delta %: {0}", dataBar.Deltas.MinMaxDeltaRatio));
-            Print(string.Format("MaxMin Delta %: {0}", dataBar.Deltas.MaxMinDeltaRatio));
-            Print(string.Format("Delta Change: {0}", dataBar.Deltas.DeltaChange));
-
-            Print("Bid Imbalances");
-            Print("[");
-            foreach (var kvp in dataBar.Imbalances.BidImbalances)
+            foreach (var kvp in dataBar.Volumes.BidAskVolumes)
             {
-                Print(string.Format("{0} : {1}", kvp.Price, kvp.Volume));
+                Print(string.Format("{0} : {1}", kvp.Volume, kvp.VolumeDelta));
             }
-            Print("]");
-            Print("Ask Imbalances");
-            Print("[");
-            foreach (var kvp in dataBar.Imbalances.AskImbalances)
-            {
-                Print(string.Format("{0} : {1}", kvp.Price, kvp.Volume));
-            }
-            Print("]");
+
+            //Print(string.Format("Bid Ratio: {0}", dataBar.Ratios.BidRatio));
+            //Print(string.Format("Valid Bid Ratio: {0}", dataBar.Ratios.HasValidBidExhaustionRatio));
+            //Print(string.Format("Ask Ratio: {0}", dataBar.Ratios.AskRatio));
+            //Print(string.Format("Valid Ask Ratio: {0}", dataBar.Ratios.HasValidAskExhaustionRatio));
+            //Print(string.Format("Last Valid Bid Ratio Price: {0}", dataBar.Ratios.LastValidBidRatioPrice));
+            //Print(string.Format("Last Valid Ask Ratio Price: {0}", dataBar.Ratios.LastValidAskRatioPrice));
+
+            //Print(string.Format("Delta: {0}", dataBar.Deltas.Delta));
+            //Print(string.Format("Min Delta: {0}", dataBar.Deltas.MinDelta));
+            //Print(string.Format("Max Delta: {0}", dataBar.Deltas.MaxDelta));
+            //Print(string.Format("Cumulative Delta: {0}", dataBar.Deltas.CumulativeDelta));
+            //Print(string.Format("Delta Percentage: {0}", dataBar.Deltas.DeltaPercentage));
+            //Print(string.Format("MinMax Delta %: {0}", dataBar.Deltas.MinMaxDeltaRatio));
+            //Print(string.Format("MaxMin Delta %: {0}", dataBar.Deltas.MaxMinDeltaRatio));
+            //Print(string.Format("Delta Change: {0}", dataBar.Deltas.DeltaChange));
+
+            //Print("Bid Imbalances");
+            //Print("[");
+            //foreach (var kvp in dataBar.Imbalances.BidImbalances)
+            //{
+            //    Print(string.Format("{0} : {1}", kvp.Price, kvp.Volume));
+            //}
+            //Print("]");
+            //Print("Ask Imbalances");
+            //Print("[");
+            //foreach (var kvp in dataBar.Imbalances.AskImbalances)
+            //{
+            //    Print(string.Format("{0} : {1}", kvp.Price, kvp.Volume));
+            //}
+            //Print("]");
 
             Print("\n");
         }

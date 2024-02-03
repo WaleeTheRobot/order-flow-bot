@@ -1,10 +1,38 @@
 # OrderFlowBot
 
-![Order Flow Bot](./screenshot.png)
-
-### Requires the lifetime NinjaTrader license for the volumetric data
+<img src="./images/screenshot.png" alt="Order Flow Bot">
 
 A bot used for trading order flow. The primary focus for OrderFlowBot is semi-automated trading. Strategies can be added and then manually selected for the software to look for entries. Indicators can also be added so they will startup when the OrderFlowBot strategy is enabled.
+
+# Important
+
+Requires the lifetime NinjaTrader license for the volumetric data
+
+Make sure Tick Replay is Checked.
+
+For developing, you can copy the OrderFlowBot folder into your local NinjaTrader AddOns folder.
+
+For usage, you can download the zip containing the word import in the release page. You can import this zip file similar to importing a normal NinjaTrader Add-On. https://github.com/WaleeTheRobot/order-flow-bot/releases
+
+# Development
+
+A clean NinjaTrader 8.1.2.1+ install should have Newtonsoft in `C:\Program Files\NinjaTrader 8\bin`, but you can manually add it below if needed.
+
+If you run into any issues about another assembly having a higher version of Newtonsoft, you can try removing the reference to it in the NinjaScript Editor similar to adding it below.
+
+From NuGet add the following to NinjaTrader.Custom:
+
+- Newtonsoft.Json
+
+Right click the NinjaScript Editor and click References to add the following:
+
+The version should match the installed version
+
+- C:\Program Files\NinjaTrader 8\bin\Newtonsoft.Json.dll
+
+The version should match the other added references. You might also need to add this.
+
+- C:\\Windows\Microsoft.NET\Framework\v4.0.30319\netstandard.dll
 
 # Usage
 
@@ -14,7 +42,11 @@ OrderFlowBot may not work if using a version of NinjaTrader below 8.1.2.1. This 
 
 OrderFlowBot uses an ATM Strategy. The default is called OrderFlowBot. This will be used when a strategy's requirements are met for entry. You will need to create an ATM Strategy and include it in OrderFlowBot options.
 
-### Buttons
+### Control Panel Buttons
+
+The control panel buttons is disabled when backtesting is enabled.
+
+<img src="./images/controlpanel.png" alt="Order Flow Bot Control Panel">
 
 Long - Use this with a selected strategy to look for a long entry.
 
@@ -32,17 +64,29 @@ Strategies - Use a single or multiple strategies with the Long or Short button. 
 
 You can backtest your strategies by enabling the backtesting. This will use the target and stop where you enabled the backtesting. This will backtest all the strategies and can be a way to automate OrderFlowBot, but it is not the primary focus. To backtest a single strategy, you can just comment out the other strategies in the `OrderFlowBot/StrategiesIndicators/StrategiesIndicatorsConfig` file.
 
+Selecting `JSONFileEnabled` when backtesting will create two JSON files called `orderflowbot-winning-trades.json` and `orderflowbot-losing-trades.json` to the desktop. This will have the values for the OrderFlowBot entry databar and databar before it so that they can be used for any further analysis.
+
 # Included Indicators
 
-The below indicators are included for OrderFlowBot and can be used as examples to add any other indicators.
+The below indicators are included for OrderFlowBot and can be used as examples to add any other indicators. The indicators are not loaded like the standard NinjaTrader indicators. You will need to disable or enable them through the strategy since they use the data from the strategy.
 
 ### Ratios
 
 Made popular by Mike from OrderFlows, this shows the bottom divided bid ratios or top divided ask ratios. The ratios will be displayed in color, bold and larger font if it meets the threshold in `ValidExhaustionRatio` or `ValidAbsorptionRatio` properies.
 
-### LastExhaustionAbsorptionPrice
+<img src="./images/ratios.png" alt="Ratios" width="600" height="500">
+
+### Last Exhaustion Absorption Price
 
 This shows the prices for the last valid exhaustion or valid absorption ratios for the bid and ask.
+
+<img src="./images/lastratioprice.png" alt="Ratios" width="600" height="500">
+
+### Single Print
+
+This draws a bold red rectangle for single prints on the top and bottom of the bar. You may need to adjust the bar width and bar width shift when using the volume profile for the bar. A bar width of 4 and bar width shift of 1.58 might be a good starting point to start adjusting for your chart.
+
+<img src="./images/singleprint.png" alt="Ratios" width="600" height="500">
 
 # Included Strategies
 
@@ -54,17 +98,23 @@ Long Position: Bullish bar with ask stacked imbalances.
 
 Short Position: Bearish bar with bid stacked imbalances.
 
+<img src="./images/stackedimbalances.png" alt="Stacked Imbalances" width="600" height="500">
+
 ### Delta Divergence
 
 Long Position: Bullish bar, positive delta and new low based on last number of LookBackBars.
 
 Short Position: Bearish bar, negative delta and new high based on last number of LookBackBars.
 
+<img src="./images/deltadivergence.png" alt="Delta Divergence" width="600" height="500">
+
 ### Volume Sequencing
 
 Long Position: Bullish bar with sequential increasing volume on ask from bottom of bar.
 
 Short Position: Bearish bar with sequential decreasing volume on bid from top of bar.
+
+<img src="./images/volumesequencing.png" alt="Volume Sequencing" width="600" height="500">
 
 # Adding Strategies and Indicators
 
