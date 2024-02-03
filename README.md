@@ -64,7 +64,7 @@ Selecting `JSONFileEnabled` when backtesting will create two JSON files called `
 
 # Included Indicators
 
-The below indicators are included for OrderFlowBot and can be used as examples to add any other indicators.
+The below indicators are included for OrderFlowBot and can be used as examples to add any other indicators. The indicators are not loaded like the standard NinjaTrader indicators. You will need to disable or enable them through the strategy since they use the data from the strategy.
 
 ### Ratios
 
@@ -80,7 +80,7 @@ This shows the prices for the last valid exhaustion or valid absorption ratios f
 
 ### Single Print
 
-This draws a bold red rectangle for single prints on the top and bottom of the bar.
+This draws a bold red rectangle for single prints on the top and bottom of the bar. You may need to adjust the bar width and bar width shift when using the volume profile for the bar. A bar width of 4 and bar width shift of 1.58 might be a good starting point to start adjusting for your chart.
 
 <img src="./images/singleprint.png" alt="Ratios" width="600" height="500">
 

@@ -49,11 +49,6 @@ namespace NinjaTrader.NinjaScript.Indicators
             }
         }
 
-        public override string DisplayName
-        {
-            get { return ""; }
-        }
-
         public void InitializeWith(OrderFlowBotDataBars dataBars, OrderFlowBotPropertiesConfig config)
         {
             _dataBars = dataBars;
@@ -110,11 +105,11 @@ namespace NinjaTrader.NinjaScript.Indicators
             // Using the next tick to calculate the height
             double oneTickAboveLow = lowValue + _config.TickSize;
 
-            double barWidth = chartControl.BarWidth * 6.2;
+            double barWidth = chartControl.GetBarPaintWidth(chartControl.BarsArray[0]) - (chartControl.BarWidth * _config.SinglePrintBarWidth);
 
             // Calculate the X coordinates for the left and right sides of the bar
             float xCenter = chartControl.GetXByBarIndex(ChartBars, idx);
-            float xLeft = xCenter - (float)barWidth / (float)1.58;
+            float xLeft = xCenter - (float)barWidth / (float)_config.SinglePrintBarWidthShift;
             float xRight = xLeft + (float)barWidth;
 
             // Calculate the fixed vertical size for the rectangle

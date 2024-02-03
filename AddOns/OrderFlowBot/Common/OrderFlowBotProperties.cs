@@ -14,6 +14,10 @@
         public double ValidAbsorptionRatio { get; set; }
         public int ValidVolumeSequencing { get; set; }
         public long ValidVolumeSequencingMinimumVolume { get; set; }
+
+        // Indicators
+        public double SinglePrintBarWidth { get; set; }
+        public double SinglePrintBarWidthShift { get; set; }
     }
 
     public static class OrderFlowBotProperties
@@ -30,6 +34,8 @@
         public static double ValidAbsorptionRatio { get; private set; }
         public static int ValidVolumeSequencing { get; private set; }
         public static long ValidVolumeSequencingMinimumVolume { get; private set; }
+        public static double SinglePrintBarWidth { get; private set; }
+        public static double SinglePrintBarWidthShift { get; private set; }
 
         public static void Initialize(OrderFlowBotPropertiesConfig config)
         {
@@ -44,6 +50,8 @@
             ValidAbsorptionRatio = config.ValidAbsorptionRatio;
             ValidVolumeSequencing = config.ValidVolumeSequencing;
             ValidVolumeSequencingMinimumVolume = config.ValidVolumeSequencingMinimumVolume;
+            SinglePrintBarWidth = config.SinglePrintBarWidth;
+            SinglePrintBarWidthShift = config.SinglePrintBarWidthShift;
         }
     }
 }

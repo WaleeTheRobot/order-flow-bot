@@ -96,6 +96,14 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Display(Name = "Single Print Enabled", Description = "Enable single print.", Order = 2, GroupName = GroupConstants.GROUP_NAME_INDICATORS)]
         public bool SinglePrintEnabled { get; set; }
 
+        [NinjaScriptProperty]
+        [Display(Name = "Single Print Bar Width", Description = "Adjust bar width for single print box.", Order = 3, GroupName = GroupConstants.GROUP_NAME_INDICATORS)]
+        public double SinglePrintBarWidth { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Single Print Enabled", Description = "Adjust bar width shift for single print box.", Order = 4, GroupName = GroupConstants.GROUP_NAME_INDICATORS)]
+        public double SinglePrintBarWidthShift { get; set; }
+
         #endregion
 
         #region DataBar Properties
@@ -188,6 +196,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 RatiosEnabled = true;
                 LastRatiosPriceEnabled = true;
                 SinglePrintEnabled = true;
+                SinglePrintBarWidth = 1;
+                SinglePrintBarWidthShift = 2;
             }
             else if (State == State.Configure)
             {
@@ -202,7 +212,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                     ValidExhaustionRatio = ValidExhaustionRatio,
                     ValidAbsorptionRatio = ValidAbsorptionRatio,
                     ValidVolumeSequencing = ValidVolumeSequencing,
-                    ValidVolumeSequencingMinimumVolume = ValidVolumeSequencingMinimumVolume
+                    ValidVolumeSequencingMinimumVolume = ValidVolumeSequencingMinimumVolume,
+                    SinglePrintBarWidth = SinglePrintBarWidth,
+                    SinglePrintBarWidthShift = SinglePrintBarWidthShift
                 };
 
                 OrderFlowBotProperties.Initialize(_config);
