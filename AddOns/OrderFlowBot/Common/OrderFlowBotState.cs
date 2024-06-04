@@ -8,8 +8,10 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot
         public Direction SelectedTradeDirection { get; set; }
         public Direction ValidStrategyDirection { get; set; }
         public string ValidStrategy { get; set; }
-        public MarketDirection MarketDirection { get; set; }
+        public bool DisableTrading { get; set; }
         public List<string> SelectedStrategies { get; set; }
+        public double TriggerStrikePrice { get; set; }
+        public bool StrikePriceTriggered { get; set; }
 
         public OrderFlowBotState()
         {
@@ -18,7 +20,9 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot
             ValidStrategyDirection = Direction.Flat;
             ValidStrategy = "None";
             SelectedStrategies = new List<string>();
-            MarketDirection = MarketDirection.Trend;
+            DisableTrading = false;
+            TriggerStrikePrice = 0;
+            StrikePriceTriggered = false;
         }
     }
 }

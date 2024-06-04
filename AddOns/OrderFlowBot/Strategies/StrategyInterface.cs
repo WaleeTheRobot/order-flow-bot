@@ -1,4 +1,4 @@
-﻿namespace NinjaTrader.Custom.AddOns.OrderFlowBot.StrategiesIndicators.Strategies
+﻿namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 {
     public interface IStrategyInterface
     {

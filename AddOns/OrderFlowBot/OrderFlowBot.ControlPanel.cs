@@ -1,10 +1,12 @@
-﻿using NinjaTrader.Custom.AddOns;
+﻿using NinjaTrader.Cbi;
+using NinjaTrader.Custom.AddOns;
 using NinjaTrader.Gui.Chart;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace NinjaTrader.NinjaScript.Strategies
@@ -35,14 +37,15 @@ namespace NinjaTrader.NinjaScript.Strategies
         private bool _panelActive;
         private TabItem _tabItem;
         private Dictionary<string, ButtonInfo> _buttonMap;
+        private TextBox _triggerStrikeTextBox;
+        private Button _resetButton;
 
         // Labels
         private const string LONG_BUTTON_LABEL = "Long";
         private const string SHORT_BUTTON_LABEL = "Short";
-        private const string MARKET_DIRECTION_BUTTON_LABEL = "Market Direction";
-        private const string TREND_BUTTON_LABEL = "Trend";
-        private const string RANGE_BUTTON_LABEL = "Range";
         private const string CLOSE_BUTTON_LABEL = "Close";
+        private const string DISABLE_BUTTON_LABEL = "Enabled";
+        private const string RESET_BUTTON_LABEL = "Reset";
 
         #endregion
 
@@ -76,8 +79,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 {
                     foreach (var buttonLabel in _buttonMap.Keys)
                     {
-                        if (buttonLabel != LONG_BUTTON_LABEL && buttonLabel != SHORT_BUTTON_LABEL &&
-                            buttonLabel != MARKET_DIRECTION_BUTTON_LABEL && buttonLabel != CLOSE_BUTTON_LABEL)
+                        if (buttonLabel != LONG_BUTTON_LABEL && buttonLabel != SHORT_BUTTON_LABEL && buttonLabel != DISABLE_BUTTON_LABEL && buttonLabel != CLOSE_BUTTON_LABEL)
                         {
                             var strategyName = _buttonMap[buttonLabel].Name;
                             var isActive = _strategiesController.StrategyExists(strategyName);
@@ -88,10 +90,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                         }
                         else
                         {
-                            if (buttonLabel != MARKET_DIRECTION_BUTTON_LABEL)
-                            {
-                                SetButtonBackground(false, buttonLabel);
-                            }
+                            SetButtonBackground(false, buttonLabel);
                         }
                     }
 
@@ -113,7 +112,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Margin = new Thickness(3, 3, 3, 3),
                 Padding = new Thickness(0, 0, 0, 0),
                 Style = basicButtonStyle,
-                FontSize = 12
+                FontSize = 12,
+                BorderBrush = Brushes.Transparent,
+                BorderThickness = new Thickness(0)
             };
         }
 
@@ -123,12 +124,12 @@ namespace NinjaTrader.NinjaScript.Strategies
             {
                 { LONG_BUTTON_LABEL, new ButtonInfo(LongButtonClick, false, LONG_BUTTON_LABEL) },
                 { SHORT_BUTTON_LABEL, new ButtonInfo(ShortButtonClick, false, SHORT_BUTTON_LABEL) },
-                { MARKET_DIRECTION_BUTTON_LABEL, new ButtonInfo(MarketDirectionButtonClick, true, MARKET_DIRECTION_BUTTON_LABEL) },
+                { DISABLE_BUTTON_LABEL, new ButtonInfo(DisableButtonClick, false, DISABLE_BUTTON_LABEL) },
                 { CLOSE_BUTTON_LABEL, new ButtonInfo(CloseButtonClick, false, CLOSE_BUTTON_LABEL) }
             };
 
             // Dynamically add buttons for each strategy with event handler
-            foreach (var strategyIndicator in _strategiesIndicatorsConfig.StrategiesIndicatorsConfigList)
+            foreach (var strategyIndicator in _strategiesConfig.StrategiesConfigList)
             {
                 string buttonLabel = strategyIndicator.ButtonLabel;
 
@@ -155,7 +156,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Button button = GetStyleButton(tag);
                 button.Click += info.Handler;
                 button.Tag = tag;
-                button.Background = tag == MARKET_DIRECTION_BUTTON_LABEL ? new SolidColorBrush(Colors.SeaGreen) : new SolidColorBrush(Colors.DimGray);
+                button.Background = new SolidColorBrush(Colors.DimGray);
 
                 if (BackTestingEnabled)
                 {
@@ -164,29 +165,28 @@ namespace NinjaTrader.NinjaScript.Strategies
 
                 if (tag == LONG_BUTTON_LABEL)
                 {
-                    Grid.SetRow(button, 1);
+                    Grid.SetRow(button, 2);
                     Grid.SetColumn(button, 0);
                 }
                 else if (tag == SHORT_BUTTON_LABEL)
                 {
-                    Grid.SetRow(button, 1);
+                    Grid.SetRow(button, 2);
                     Grid.SetColumn(button, 1);
                 }
-                else if (tag == MARKET_DIRECTION_BUTTON_LABEL)
+                else if (tag == DISABLE_BUTTON_LABEL)
                 {
-                    button.Content = TREND_BUTTON_LABEL;
-                    Grid.SetRow(button, 2);
+                    Grid.SetRow(button, 3);
                     Grid.SetColumn(button, 0);
                 }
                 else if (tag == CLOSE_BUTTON_LABEL)
                 {
-                    Grid.SetRow(button, 2);
+                    Grid.SetRow(button, 3);
                     Grid.SetColumn(button, 1);
                 }
                 else
                 {
                     // For any other button, set it to take the entire row
-                    Grid.SetRow(button, index);
+                    Grid.SetRow(button, index + 4);
                     Grid.SetColumnSpan(button, 2);
                 }
 
@@ -260,6 +260,60 @@ namespace NinjaTrader.NinjaScript.Strategies
             ForceRefresh();
         }
 
+        private void DisableClick()
+        {
+            // Disable if flat
+            if (Position.MarketPosition == MarketPosition.Flat && AtmPosition() == MarketPosition.Flat)
+            {
+                bool disableAll = !_buttonMap[DISABLE_BUTTON_LABEL].IsActive;
+
+                // Toggle the activation state of the disable button
+                _buttonMap[DISABLE_BUTTON_LABEL].IsActive = disableAll;
+                // Update the state for trading
+                _orderFlowBotState.DisableTrading = disableAll;
+                _strategiesController.ResetStrategies();
+
+                // Find the disable button and update its properties
+                Button disableButton = _orderFlowBotDirectionGrid.Children.OfType<Button>().FirstOrDefault(b => Equals(b.Tag, DISABLE_BUTTON_LABEL));
+                if (disableButton != null)
+                {
+                    disableButton.Content = disableAll ? "Disabled" : DISABLE_BUTTON_LABEL;
+                    disableButton.Background = disableAll ? new SolidColorBrush(Colors.DarkRed) : new SolidColorBrush(Colors.DimGray);
+                }
+
+                // Update all other buttons
+                foreach (var pair in _buttonMap)
+                {
+                    // Exclude the disable button itself
+                    if (pair.Key != DISABLE_BUTTON_LABEL)
+                    {
+                        Button button = _orderFlowBotDirectionGrid.Children.OfType<Button>().FirstOrDefault(b => Equals(b.Tag, pair.Key));
+                        if (button != null)
+                        {
+                            button.IsEnabled = !disableAll;
+                            button.Background = new SolidColorBrush(Colors.DimGray);
+                        }
+
+                        pair.Value.IsActive = false;
+                    }
+                }
+
+                // Disable/Enable the trigger strike price TextBox and reset Button
+                if (_triggerStrikeTextBox != null)
+                {
+                    _triggerStrikeTextBox.IsEnabled = !disableAll;
+                }
+
+                if (_resetButton != null)
+                {
+                    _resetButton.IsEnabled = !disableAll;
+                }
+
+                PrintOutput(disableAll ? "Disable Trading Selected" : "Enable Trading Selected");
+                ForceRefresh();
+            }
+        }
+
         private void LongButtonClick(object sender, RoutedEventArgs e)
         {
             DirectionButtonClick(LONG_BUTTON_LABEL);
@@ -270,34 +324,29 @@ namespace NinjaTrader.NinjaScript.Strategies
             DirectionButtonClick(SHORT_BUTTON_LABEL);
         }
 
-        private void MarketDirectionButtonClick(object sender, RoutedEventArgs e)
+        private void DisableButtonClick(object sender, RoutedEventArgs e)
         {
-            bool isActive = !_buttonMap[MARKET_DIRECTION_BUTTON_LABEL].IsActive;
-            string outputMessage = isActive ? "Market Trend Selected" : "Market Range Selected";
-
-            Button button = _orderFlowBotDirectionGrid.Children.OfType<Button>().FirstOrDefault(b => Equals(b.Tag, MARKET_DIRECTION_BUTTON_LABEL));
-            button.Content = isActive ? TREND_BUTTON_LABEL : RANGE_BUTTON_LABEL;
-
-            if (isActive)
-            {
-                _orderFlowBotState.MarketDirection = MarketDirection.Trend;
-                _buttonMap[MARKET_DIRECTION_BUTTON_LABEL].IsActive = true;
-                button.Background = new SolidColorBrush(Colors.SeaGreen);
-            }
-            else
-            {
-                _orderFlowBotState.MarketDirection = MarketDirection.Range;
-                _buttonMap[MARKET_DIRECTION_BUTTON_LABEL].IsActive = false;
-                button.Background = new SolidColorBrush(Colors.DimGray);
-            }
-
-            PrintOutput(outputMessage);
-            ForceRefresh();
+            DisableClick();
         }
 
         private void CloseButtonClick(object sender, RoutedEventArgs e)
         {
             CloseAtmPosition();
+        }
+
+        private void ResetButtonClick(object sender, RoutedEventArgs e)
+        {
+            _strategiesController.ResetStrategies();
+
+            foreach (var pair in _buttonMap)
+            {
+                pair.Value.IsActive = false;
+                SetButtonBackground(false, pair.Key);
+            }
+
+            ClearTriggerStrikeTextBox();
+
+            PrintOutput("Reset button clicked. All inputs cleared and buttons reset.");
         }
 
         private void StrategyButtonClick(string buttonLabel, string strategyName)
@@ -309,12 +358,10 @@ namespace NinjaTrader.NinjaScript.Strategies
                 return;
             }
 
-
             bool isActive = !button.IsActive;
             button.IsActive = isActive;
 
             string outputMessage = isActive ? String.Format("{0} Enabled", strategyName) : String.Format("{0} Disabled", strategyName);
-
 
             if (isActive)
             {
@@ -344,6 +391,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 
             DefineButtons();
 
+            _orderFlowBotDirectionGrid.RowDefinitions.Add(new RowDefinition());
+            _orderFlowBotDirectionGrid.RowDefinitions.Add(new RowDefinition());
+
             // Rows subtract 1 because Long and Short buttons are in one row
             for (int i = 0; i <= _buttonMap.Count - 1; i++)
             {
@@ -354,10 +404,10 @@ namespace NinjaTrader.NinjaScript.Strategies
             TextBlock orderFlowLabel = new TextBlock()
             {
                 FontFamily = ChartControl.Properties.LabelFont.Family,
-                FontSize = 13,
+                FontSize = 15,
                 Foreground = ChartControl.Properties.ChartText,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                Margin = new Thickness(0, 50, 0, 5),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Margin = new Thickness(3, 50, 3, 3),
                 Text = BackTestingEnabled ? string.Format("Order Flow Bot Panel Disabled") : string.Format("Order Flow Bot")
             };
 
@@ -369,26 +419,207 @@ namespace NinjaTrader.NinjaScript.Strategies
             CreateButtons();
         }
 
+        private void TriggerStrikeTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBox textBox = sender as TextBox;
+            if (double.TryParse(textBox.Text, out double value))
+            {
+                _orderFlowBotState.TriggerStrikePrice = value;
+            }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(textBox.Text) || textBox.Text == "-")
+                {
+                    _orderFlowBotState.TriggerStrikePrice = 0;
+                }
+            }
+        }
+
+        private void ClearTriggerStrikeTextBox()
+        {
+            _orderFlowBotState.TriggerStrikePrice = 0;
+            _orderFlowBotState.StrikePriceTriggered = false;
+
+            ChartControl.Dispatcher.InvokeAsync(() =>
+            {
+                _triggerStrikeTextBox.Text = "";
+                _triggerStrikeTextBox.BorderBrush = Brushes.Transparent;
+                _triggerStrikeTextBox.BorderThickness = new Thickness(1);
+            });
+        }
+
+        private void UpdateTriggerStrikeTextBoxBorder()
+        {
+            ChartControl.Dispatcher.InvokeAsync(() =>
+            {
+                _triggerStrikeTextBox.BorderBrush = _orderFlowBotState.StrikePriceTriggered ? Brushes.DarkGreen : Brushes.Transparent;
+                _triggerStrikeTextBox.BorderThickness = _orderFlowBotState.StrikePriceTriggered ? new Thickness(2) : new Thickness(1);
+            });
+        }
+
         private void CreateWPFControls()
         {
             _chartWindow = Window.GetWindow(ChartControl.Parent) as Gui.Chart.Chart;
-
-            if (_chartWindow == null)
-                return;
+            if (_chartWindow == null) return;
 
             // Chart Trader area grid
-            _chartTraderGrid = (_chartWindow.FindFirst("ChartWindowChartTraderControl") as ChartTrader).Content as System.Windows.Controls.Grid;
+            _chartTraderGrid = (_chartWindow.FindFirst("ChartWindowChartTraderControl") as ChartTrader).Content as Grid;
 
             // Existing Chart Trader buttons
             _chartTraderButtonsGrid = _chartTraderGrid.Children[0] as Grid;
 
             SetOrderFlowDirectionGrid();
 
-            if (TabSelected())
-                InsertWPFControls();
+            if (TabSelected()) InsertWPFControls();
 
             _chartWindow.MainTabControl.SelectionChanged += TabChangedHandler;
+
+            // Create a container grid for the TextBox and Reset Button
+            Grid containerGrid = new Grid();
+            containerGrid.ColumnDefinitions.Add(new ColumnDefinition());
+            containerGrid.ColumnDefinitions.Add(new ColumnDefinition());
+
+            // Define rows for the container grid
+            containerGrid.RowDefinitions.Add(new RowDefinition()); // Row for the label
+            containerGrid.RowDefinitions.Add(new RowDefinition()); // Row for the TextBox and Reset Button
+
+            // Labels
+            TextBlock triggerStrikePriceLabel = new TextBlock()
+            {
+                FontFamily = ChartControl.Properties.LabelFont.Family,
+                FontSize = 11,
+                Foreground = ChartControl.Properties.ChartText,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                Margin = new Thickness(3),
+                Text = string.Format("Trigger Strike Price")
+            };
+
+            // Create TextBox for Trigger Strike Price
+            _triggerStrikeTextBox = new TextBox
+            {
+                Height = 31,
+                Margin = new Thickness(3),
+                ToolTip = "Trigger Strike Price",
+                VerticalContentAlignment = VerticalAlignment.Center
+            };
+
+            // Position the label in the container grid
+            Grid.SetRow(triggerStrikePriceLabel, 0);
+            Grid.SetColumn(triggerStrikePriceLabel, 0);
+            Grid.SetColumnSpan(triggerStrikePriceLabel, 2);
+
+            // Position the TextBox and Reset Button in the same row
+            Grid.SetRow(_triggerStrikeTextBox, 1);
+            Grid.SetColumn(_triggerStrikeTextBox, 0);
+
+            containerGrid.Children.Add(triggerStrikePriceLabel);
+            containerGrid.Children.Add(_triggerStrikeTextBox);
+
+            // Create Reset Button with the same style as other buttons using GetStyleButton method
+            _resetButton = GetStyleButton(RESET_BUTTON_LABEL);
+            _resetButton.Click += ResetButtonClick;
+            _resetButton.Background = new SolidColorBrush(Colors.DimGray);
+            Grid.SetRow(_resetButton, 1);
+            Grid.SetColumn(_resetButton, 1);
+            containerGrid.Children.Add(_resetButton);
+
+            // Add the container grid to the main grid
+            Grid.SetRow(containerGrid, 1); // Set to the second row, below the label
+            Grid.SetColumnSpan(containerGrid, 2); // Span across both columns
+            _orderFlowBotDirectionGrid.Children.Add(containerGrid);
+
+            // Attach event to handle text changes
+            _triggerStrikeTextBox.TextChanged += TriggerStrikeTextBox_TextChanged;
+            _triggerStrikeTextBox.PreviewKeyDown += TextBox_PreviewKeyDown;
+
+            // Adjusting the buttons to start from the third row
+            foreach (var item in _orderFlowBotDirectionGrid.Children.OfType<Button>())
+            {
+                int currentRow = Grid.GetRow(item);
+                Grid.SetRow(item, currentRow + 1);
+            }
         }
+
+        private void TextBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            TextBox textBoxSender = (TextBox)sender;
+
+            if (e.Key == Key.Back || e.Key == Key.Delete)
+            {
+                int selectionStart = textBoxSender.SelectionStart;
+                int selectionLength = textBoxSender.SelectionLength;
+
+                // If there's a selection, delete the selected text
+                if (selectionLength > 0)
+                {
+                    textBoxSender.Text = textBoxSender.Text.Remove(selectionStart, selectionLength);
+                    textBoxSender.SelectionStart = selectionStart;
+                }
+                else
+                {
+                    // Handle backspace or delete key press
+                    if (e.Key == Key.Back && selectionStart > 0)
+                    {
+                        textBoxSender.Text = textBoxSender.Text.Remove(selectionStart - 1, 1);
+                        textBoxSender.SelectionStart = selectionStart - 1;
+                    }
+                    else if (e.Key == Key.Delete && selectionStart < textBoxSender.Text.Length)
+                    {
+                        textBoxSender.Text = textBoxSender.Text.Remove(selectionStart, 1);
+                        textBoxSender.SelectionStart = selectionStart;
+                    }
+                }
+                e.Handled = true;
+            }
+            else if ((e.Key >= Key.D0 && e.Key <= Key.D9 && !Keyboard.Modifiers.HasFlag(ModifierKeys.Shift)) ||
+                     (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9 && Keyboard.IsKeyToggled(Key.NumLock)))
+            {
+                // Handle numeric key press
+                char num = (char)('0' + (e.Key - (e.Key >= Key.NumPad0 ? Key.NumPad0 : Key.D0)));
+                ReplaceText(textBoxSender, num.ToString());
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Decimal || e.Key == Key.OemPeriod)
+            {
+                if (!textBoxSender.Text.Contains('.'))
+                {
+                    ReplaceText(textBoxSender, ".");
+                    e.Handled = true;
+                }
+            }
+            else if (e.Key == Key.Subtract || e.Key == Key.OemMinus)
+            {
+                if (textBoxSender.SelectionStart == 0 && !textBoxSender.Text.StartsWith("-"))
+                {
+                    ReplaceText(textBoxSender, "-");
+                    e.Handled = true;
+                }
+            }
+            else
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void ReplaceText(TextBox textBox, string newText)
+        {
+            int selectionStart = textBox.SelectionStart;
+            int selectionLength = textBox.SelectionLength;
+
+            // Replace selected text
+            if (selectionLength > 0)
+            {
+                textBox.Text = textBox.Text.Remove(selectionStart, selectionLength).Insert(selectionStart, newText);
+                textBox.SelectionStart = selectionStart + newText.Length;
+            }
+            else
+            {
+                // Insert new text at the current cursor position
+                textBox.Text = textBox.Text.Insert(selectionStart, newText);
+                textBox.SelectionStart = selectionStart + newText.Length;
+            }
+        }
+
 
         private void DisposeWPFControls()
         {
@@ -409,6 +640,21 @@ namespace NinjaTrader.NinjaScript.Strategies
                 {
                     button.Click -= info.Handler;
                 }
+            }
+
+            if (_triggerStrikeTextBox != null)
+            {
+                _triggerStrikeTextBox.TextChanged -= TriggerStrikeTextBox_TextChanged;
+                _triggerStrikeTextBox.PreviewKeyDown -= TextBox_PreviewKeyDown;
+                if (UserControlCollection.Contains(_triggerStrikeTextBox))
+                    UserControlCollection.Remove(_triggerStrikeTextBox);
+            }
+
+            if (_resetButton != null)
+            {
+                _resetButton.Click -= ResetButtonClick;
+                if (UserControlCollection.Contains(_resetButton))
+                    UserControlCollection.Remove(_resetButton);
             }
 
             RemoveWPFControls();

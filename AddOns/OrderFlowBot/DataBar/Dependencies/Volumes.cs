@@ -24,6 +24,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies
         public bool HasAskVolumeSequencing { get; set; }
         public bool HasAskSinglePrint { get; set; }
         public bool HasBidSinglePrint { get; set; }
+        public double ValueAreaHighPrice { get; set; }
+        public double ValueAreaLowPrice { get; set; }
 
         public Volumes()
         {
@@ -37,7 +39,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies
 
         public void SetVolumeSequencing(List<BidAskVolume> bidAskVolumes, BarType barType, long totalVolume)
         {
-            if (totalVolume < OrderFlowBotProperties.ValidVolumeSequencingMinimumVolume || bidAskVolumes.Count < OrderFlowBotProperties.ValidVolumeSequencing + 1)
+            if (totalVolume < OrderFlowBotDataBarConfig.ValidVolumeSequencingMinimumVolume || bidAskVolumes.Count < OrderFlowBotDataBarConfig.ValidVolumeSequencing + 1)
             {
                 this.HasAskVolumeSequencing = false;
                 this.HasBidVolumeSequencing = false;
@@ -45,7 +47,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies
                 return;
             }
 
-            int validVolumeSequencing = OrderFlowBotProperties.ValidVolumeSequencing;
+            int validVolumeSequencing = OrderFlowBotDataBarConfig.ValidVolumeSequencing;
             bool isValidSequence = true;
 
             if (barType == BarType.Bullish)

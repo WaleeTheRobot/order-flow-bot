@@ -26,12 +26,12 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies
             BidStackedImbalances = new List<ImbalancePrice>();
         }
 
-        private bool IsValidBidImbalance(List<BidAskVolume> bidAskVolumes, int index, long validBidVolume, long validAskVolume, double imbalanceRatio)
+        private bool IsValidBidImbalance(List<BidAskVolume> bidAskVolumes, int index, long validImbalanceVolume, double imbalanceRatio)
         {
             long ask = bidAskVolumes[index - 1].AskVolume;
             long bid = bidAskVolumes[index].BidVolume;
 
-            if (bid < validBidVolume || ask < validAskVolume)
+            if (bid < validImbalanceVolume || ask < validImbalanceVolume)
             {
                 return false;
             }
@@ -45,12 +45,12 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies
             return (double)bid / ask >= imbalanceRatio;
         }
 
-        private bool IsValidAskImbalance(List<BidAskVolume> bidAskVolumes, int index, long validBidVolume, long validAskVolume, double imbalanceRatio)
+        private bool IsValidAskImbalance(List<BidAskVolume> bidAskVolumes, int index, long validImbalanceVolume, double imbalanceRatio)
         {
             long ask = bidAskVolumes[index].AskVolume;
             long bid = bidAskVolumes[index + 1].BidVolume;
 
-            if (bid < validBidVolume || ask < validAskVolume)
+            if (bid < validImbalanceVolume || ask < validImbalanceVolume)
             {
                 return false;
             }
@@ -69,9 +69,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies
             if (!validBidAskVolumes)
                 return;
 
-            double imbalanceRatio = OrderFlowBotProperties.ImbalanceRatio;
-            long validBidVolume = OrderFlowBotProperties.ValidBidVolume;
-            long validAskVolume = OrderFlowBotProperties.ValidAskVolume;
+            double imbalanceRatio = OrderFlowBotDataBarConfig.ImbalanceRatio;
+            long validImbalanceVolume = OrderFlowBotDataBarConfig.ValidImbalanceVolume;
 
             List<ImbalancePrice> askImbalancePriceList = new List<ImbalancePrice>();
             List<ImbalancePrice> bidImbalancePriceList = new List<ImbalancePrice>();
@@ -81,7 +80,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies
                 // This is high of bar. Can calculate ask, but not bid.
                 if (i == 0)
                 {
-                    bool isValidAskImbalance = IsValidAskImbalance(bidAskVolumes, i, validBidVolume, validAskVolume, imbalanceRatio);
+                    bool isValidAskImbalance = IsValidAskImbalance(bidAskVolumes, i, validImbalanceVolume, imbalanceRatio);
 
                     if (isValidAskImbalance)
                     {
@@ -95,7 +94,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies
                 // This is low of bar. Can calculate bid, but not ask.
                 else if (i == bidAskVolumes.Count - 1)
                 {
-                    bool isValidBidImbalance = IsValidBidImbalance(bidAskVolumes, i, validBidVolume, validAskVolume, imbalanceRatio);
+                    bool isValidBidImbalance = IsValidBidImbalance(bidAskVolumes, i, validImbalanceVolume, imbalanceRatio);
 
                     if (isValidBidImbalance)
                     {
@@ -108,8 +107,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies
                 }
                 else
                 {
-                    bool isValidAskImbalance = IsValidAskImbalance(bidAskVolumes, i, validBidVolume, validAskVolume, imbalanceRatio);
-                    bool isValidBidImbalance = IsValidBidImbalance(bidAskVolumes, i, validBidVolume, validAskVolume, imbalanceRatio);
+                    bool isValidAskImbalance = IsValidAskImbalance(bidAskVolumes, i, validImbalanceVolume, imbalanceRatio);
+                    bool isValidBidImbalance = IsValidBidImbalance(bidAskVolumes, i, validImbalanceVolume, imbalanceRatio);
 
                     if (isValidAskImbalance)
                     {
@@ -139,8 +138,11 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies
 
         private void SetStackedImbalances(List<ImbalancePrice> bidImbalancePriceList, List<ImbalancePrice> askImbalancePriceList)
         {
-            int stackedImbalance = OrderFlowBotProperties.StackedImbalance;
-            double tickSize = OrderFlowBotProperties.TickSize;
+            int stackedImbalance = OrderFlowBotDataBarConfig.StackedImbalance;
+            double tickSize = OrderFlowBotDataBarConfig.TickSize;
+
+            this.BidStackedImbalances.Clear();
+            this.AskStackedImbalances.Clear();
 
             ProcessStackedImbalances(bidImbalancePriceList, stackedImbalance, tickSize, isBid: true);
             ProcessStackedImbalances(askImbalancePriceList, stackedImbalance, tickSize, isBid: false);

@@ -2,20 +2,20 @@
 using System;
 using System.Collections.Generic;
 
-namespace NinjaTrader.Custom.AddOns.OrderFlowBot.StrategiesIndicators.Strategies
+namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 {
     public class StrategiesController
     {
         private readonly OrderFlowBotState _orderFlowBotState;
         private readonly OrderFlowBotDataBars _dataBars;
-        private readonly StrategiesIndicatorsConfig _strategiesIndicatorsConfig;
+        private readonly StrategiesConfig _strategiesConfig;
         private readonly List<IStrategyInterface> _strategies;
 
-        public StrategiesController(OrderFlowBotState orderFlowBotState, OrderFlowBotDataBars dataBars, StrategiesIndicatorsConfig strategiesIndicatorsConfig)
+        public StrategiesController(OrderFlowBotState orderFlowBotState, OrderFlowBotDataBars dataBars, StrategiesConfig strategiesConfig)
         {
             _orderFlowBotState = orderFlowBotState;
             _dataBars = dataBars;
-            _strategiesIndicatorsConfig = strategiesIndicatorsConfig;
+            _strategiesConfig = strategiesConfig;
             _strategies = new List<IStrategyInterface>();
 
             InitializeStrategies();
@@ -29,22 +29,19 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.StrategiesIndicators.Strategies
         private void InitializeStrategies()
         {
             // Dynamically creates the strategies based on the name in the config.
-            foreach (var strategyConfig in _strategiesIndicatorsConfig.StrategiesIndicatorsConfigList)
+            foreach (var strategyConfig in _strategiesConfig.StrategiesConfigList)
             {
-                if (strategyConfig.IsStrategy)
+                string fullClassName = String.Format("{0}.{1}", this.GetType().Namespace, strategyConfig.Name);
+
+                Type strategyType = Type.GetType(fullClassName);
+
+                if (strategyType != null && typeof(IStrategyInterface).IsAssignableFrom(strategyType))
                 {
-                    string fullClassName = String.Format("{0}.{1}", this.GetType().Namespace, strategyConfig.Name);
+                    var strategyInstance = (IStrategyInterface)Activator.CreateInstance(strategyType, _orderFlowBotState, _dataBars, strategyConfig.Name);
 
-                    Type strategyType = Type.GetType(fullClassName);
-
-                    if (strategyType != null && typeof(IStrategyInterface).IsAssignableFrom(strategyType))
+                    if (strategyInstance != null)
                     {
-                        var strategyInstance = (IStrategyInterface)Activator.CreateInstance(strategyType, _orderFlowBotState, _dataBars, strategyConfig.Name);
-
-                        if (strategyInstance != null)
-                        {
-                            _strategies.Add(strategyInstance);
-                        }
+                        _strategies.Add(strategyInstance);
                     }
                 }
             }
@@ -93,25 +90,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.StrategiesIndicators.Strategies
                 {
                     _orderFlowBotState.ValidStrategy = strategy.Name;
 
-                    // Reverse entry if Range mode selected
-                    if (_orderFlowBotState.MarketDirection == MarketDirection.Range)
-                    {
-                        if (strategy.ValidStrategyDirection == Direction.Long)
-                        {
-                            _orderFlowBotState.ValidStrategyDirection = Direction.Short;
-
-                        }
-
-                        if (strategy.ValidStrategyDirection == Direction.Short)
-                        {
-                            _orderFlowBotState.ValidStrategyDirection = Direction.Long;
-                        }
-                    }
-                    else
-                    {
-                        // Continue with found valid strategy direction with Trend mode selected
-                        _orderFlowBotState.ValidStrategyDirection = strategy.ValidStrategyDirection;
-                    }
+                    // Continue with found valid strategy direction with Trend mode selected
+                    _orderFlowBotState.ValidStrategyDirection = strategy.ValidStrategyDirection;
                 }
             }
         }

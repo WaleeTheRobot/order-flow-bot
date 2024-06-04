@@ -10,5 +10,7 @@
         public double MinMaxDeltaRatio { get; set; }
         public double MaxMinDeltaRatio { get; set; }
         public double DeltaChange { get; set; }
+        public long DeltaSl { get; set; }
+        public long DeltaSh { get; set; }
     }
 }
