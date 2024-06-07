@@ -129,17 +129,17 @@ namespace NinjaTrader.NinjaScript.Strategies
             };
 
             // Dynamically add buttons for each strategy with event handler
-            foreach (var strategyIndicator in _strategiesConfig.StrategiesConfigList)
+            foreach (var strategy in _strategiesConfig.StrategiesConfigList)
             {
-                string buttonLabel = strategyIndicator.ButtonLabel;
+                string buttonLabel = strategy.ButtonLabel;
 
                 if (!string.IsNullOrEmpty(buttonLabel))
                 {
                     _buttonMap.Add(buttonLabel, new ButtonInfo(
-                        (sender, e) => StrategyButtonClick(buttonLabel, strategyIndicator.Name),
+                        (sender, e) => StrategyButtonClick(buttonLabel, strategy.Name),
                         false,
                         buttonLabel,
-                        strategyIndicator.Name
+                        strategy.Name
                     ));
                 }
             }
@@ -163,36 +163,34 @@ namespace NinjaTrader.NinjaScript.Strategies
                     button.IsEnabled = false;
                 }
 
-                if (tag == LONG_BUTTON_LABEL)
+                // Set the Grid row and column based on the button tag
+                switch (tag)
                 {
-                    Grid.SetRow(button, 2);
-                    Grid.SetColumn(button, 0);
-                }
-                else if (tag == SHORT_BUTTON_LABEL)
-                {
-                    Grid.SetRow(button, 2);
-                    Grid.SetColumn(button, 1);
-                }
-                else if (tag == DISABLE_BUTTON_LABEL)
-                {
-                    Grid.SetRow(button, 3);
-                    Grid.SetColumn(button, 0);
-                }
-                else if (tag == CLOSE_BUTTON_LABEL)
-                {
-                    Grid.SetRow(button, 3);
-                    Grid.SetColumn(button, 1);
-                }
-                else
-                {
-                    // For any other button, set it to take the entire row
-                    Grid.SetRow(button, index + 4);
-                    Grid.SetColumnSpan(button, 2);
+                    case LONG_BUTTON_LABEL:
+                        Grid.SetRow(button, 2);
+                        Grid.SetColumn(button, 0);
+                        break;
+                    case SHORT_BUTTON_LABEL:
+                        Grid.SetRow(button, 2);
+                        Grid.SetColumn(button, 1);
+                        break;
+                    case DISABLE_BUTTON_LABEL:
+                        Grid.SetRow(button, 3);
+                        Grid.SetColumn(button, 0);
+                        break;
+                    case CLOSE_BUTTON_LABEL:
+                        Grid.SetRow(button, 3);
+                        Grid.SetColumn(button, 1);
+                        break;
+                    default:
+                        // For any other button, set it to take the entire row
+                        Grid.SetRow(button, index + 4);
+                        Grid.SetColumnSpan(button, 2);
+                        index++;
+                        break;
                 }
 
                 _orderFlowBotDirectionGrid.Children.Add(button);
-
-                index++;
             }
         }
 
@@ -421,6 +419,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         private void TriggerStrikeTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
+            _orderFlowBotState.StrikePriceTriggered = false;
+
             TextBox textBox = sender as TextBox;
             if (double.TryParse(textBox.Text, out double value))
             {

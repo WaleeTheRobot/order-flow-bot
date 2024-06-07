@@ -81,7 +81,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
             {
                 if (!_orderFlowBotState.SelectedStrategies.Contains(strategy.Name))
                 {
-                    return;
+                    continue;
                 }
 
                 strategy.CheckStrategy();

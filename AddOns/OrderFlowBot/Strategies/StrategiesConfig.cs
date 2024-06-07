@@ -21,6 +21,11 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
                 {
                     Name = "DeltaChaser",
                     ButtonLabel = "Delta Chaser"
+                },
+                new StrategiesImplementation
+                {
+                    Name = "RangeRebound",
+                    ButtonLabel = "Range Rebound"
                 }
             };
         }

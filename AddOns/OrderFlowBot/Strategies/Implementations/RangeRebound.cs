@@ -1,16 +1,15 @@
 ﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar;
-using System;
 
 namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 {
-    // This strategy is designed for trading pullbacks on a trend or larger price ranges.
-    // Trade the structure with appropriate targets on higher volatility times.
-    public class DeltaChaser : StrategyBase
+    // This strategy is designed for trading smaller price ranges aiming to capitalize on mean reversion.
+    // Trade the edges with smaller targets on lower volatility times.
+    public class RangeRebound : StrategyBase
     {
         public override string Name { get; set; }
         public override Direction ValidStrategyDirection { get; set; }
 
-        public DeltaChaser(OrderFlowBotState orderFlowBotState, OrderFlowBotDataBars dataBars, string name)
+        public RangeRebound(OrderFlowBotState orderFlowBotState, OrderFlowBotDataBars dataBars, string name)
         : base(orderFlowBotState, dataBars, name)
         {
         }
@@ -30,7 +29,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 
         public override void CheckLong()
         {
-            if (IsBullishBar() && IsOpenAboveTriggerStrikePrice() && IsBullishMinMaxDifference() && IsValidWithinTriggerStrikePriceRange())
+            if (IsBullishBar() && IsOpenAboveTriggerStrikePrice() && IsValidMinDelta() && IsValidWithinTriggerStrikePriceRange())
             {
                 ValidStrategyDirection = Direction.Long;
             }
@@ -38,7 +37,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 
         public override void CheckShort()
         {
-            if (IsBearishBar() && IsOpenBelowTriggerStrikePrice() && IsBearishMinMaxDifference() && IsValidWithinTriggerStrikePriceRange())
+            if (IsBearishBar() && IsOpenBelowTriggerStrikePrice() && IsValidMaxDelta() && IsValidWithinTriggerStrikePriceRange())
             {
                 ValidStrategyDirection = Direction.Short;
             }
@@ -64,22 +63,14 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
             return dataBars.Bar.Prices.Open < orderFlowBotState.TriggerStrikePrice;
         }
 
-        private bool IsBullishMinMaxDifference()
+        private bool IsValidMinDelta()
         {
-            long maxDelta = Math.Abs(dataBars.Bar.Deltas.MaxDelta);
-            long minDelta = Math.Abs(dataBars.Bar.Deltas.MinDelta);
-            bool validMinDelta = minDelta < 100;
-
-            return maxDelta >= 2.5 * minDelta && validMinDelta && dataBars.Bar.Deltas.Delta > 150;
+            return dataBars.Bar.Deltas.MinDelta > -100;
         }
 
-        private bool IsBearishMinMaxDifference()
+        private bool IsValidMaxDelta()
         {
-            long maxDelta = Math.Abs(dataBars.Bar.Deltas.MaxDelta);
-            long minDelta = Math.Abs(dataBars.Bar.Deltas.MinDelta);
-            bool validMaxDelta = maxDelta < 100;
-
-            return minDelta >= 2.5 * maxDelta && validMaxDelta && dataBars.Bar.Deltas.Delta < -150;
+            return dataBars.Bar.Deltas.MaxDelta < 100;
         }
 
         private bool IsValidWithinTriggerStrikePriceRange()
@@ -89,7 +80,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
                 return true;
             }
 
-            return orderFlowBotState.TriggerStrikePrice - dataBars.Bar.Prices.Close <= 3;
+            return orderFlowBotState.TriggerStrikePrice - dataBars.Bar.Prices.Close <= 2;
         }
 
         private bool IsBullishBar()
