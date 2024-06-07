@@ -65,12 +65,12 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 
         private bool IsValidMinDelta()
         {
-            return dataBars.Bar.Deltas.MinDelta > -100;
+            return dataBars.Bar.Deltas.MinDelta > -50 && dataBars.Bar.Deltas.MaxDelta > 50;
         }
 
         private bool IsValidMaxDelta()
         {
-            return dataBars.Bar.Deltas.MaxDelta < 100;
+            return dataBars.Bar.Deltas.MaxDelta < 50 && dataBars.Bar.Deltas.MinDelta < -50;
         }
 
         private bool IsValidWithinTriggerStrikePriceRange()
