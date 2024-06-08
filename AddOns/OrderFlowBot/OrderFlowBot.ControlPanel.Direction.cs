@@ -181,11 +181,21 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         private void LongButtonClick(object sender, RoutedEventArgs e)
         {
+            if (!CheckATMStrategyLoaded())
+            {
+                return;
+            }
+
             DirectionButtonClick(LONG_BUTTON_LABEL);
         }
 
         private void ShortButtonClick(object sender, RoutedEventArgs e)
         {
+            if (!CheckATMStrategyLoaded())
+            {
+                return;
+            }
+
             DirectionButtonClick(SHORT_BUTTON_LABEL);
         }
 

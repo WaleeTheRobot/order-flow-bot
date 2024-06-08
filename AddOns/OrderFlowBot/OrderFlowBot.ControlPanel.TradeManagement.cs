@@ -181,7 +181,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         private void AutoButtonClick(object sender, RoutedEventArgs e)
         {
             PrintOutput("Auto clicked.");
-            //MessageBox.Show("Test.", "Alert", MessageBoxButton.OK, MessageBoxImage.Information);
+
+            if (!CheckATMStrategyLoaded())
+            {
+                return;
+            }
         }
     }
 }

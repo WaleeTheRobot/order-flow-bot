@@ -1,4 +1,5 @@
 ﻿using NinjaTrader.Gui.Chart;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -198,6 +199,30 @@ namespace NinjaTrader.NinjaScript.Strategies
         }
 
         #endregion
+
+        private bool CheckATMStrategyLoaded()
+        {
+            bool atmStrategyLoaded = true;
+
+            try
+            {
+                string template = ChartControl?.OwnerChart?.ChartTrader?.AtmStrategy?.Template;
+
+                if (template == null)
+                {
+                    MessageBox.Show("ATM Strategy template is not loaded.", "Alert", MessageBoxButton.OK, MessageBoxImage.Information);
+                    atmStrategyLoaded = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                atmStrategyLoaded = false;
+            }
+
+            return atmStrategyLoaded;
+        }
+
+
 
         // Find child by tag
         private T FindChild<T>(DependencyObject parent, string tag) where T : DependencyObject
