@@ -108,6 +108,18 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
             }
         }
 
+        public void ResetTradeDirection()
+        {
+            _orderFlowBotState.SelectedTradeDirection = Direction.Flat;
+            _orderFlowBotState.ValidStrategy = "None";
+
+            // Just in case... reset the direction in the strategy
+            foreach (var strategy in _strategies)
+            {
+                strategy.ValidStrategyDirection = Direction.Flat;
+            }
+        }
+
         public void AddSelectedStrategy(string strategy)
         {
             if (!_orderFlowBotState.SelectedStrategies.Contains(strategy))

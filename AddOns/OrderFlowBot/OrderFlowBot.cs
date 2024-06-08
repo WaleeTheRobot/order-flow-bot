@@ -272,7 +272,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             _entryShort = false;
             _entryName = "";
 
-            ClearTriggerStrikeTextBox();
+            ResetTriggerStrikeTextBox();
 
             // Prevent re-entry on previous exit bar
             _lastTradeBarNumber = _dataBars.Bar.BarNumber + 1;
