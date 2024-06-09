@@ -10,6 +10,7 @@ namespace NinjaTrader.NinjaScript.Strategies
     public partial class OrderFlowBot : Strategy
     {
         private Grid _tradeManagementGrid;
+        private StackPanel _tradeManagementPanel;
         private Button _disableButton;
         private Button _resetDirectionButton;
         private Button _resetAdvancedStrategiesButton;
@@ -31,7 +32,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
             _tradeManagementGrid = new Grid
             {
-                Margin = new Thickness(0, 0, 0, 10)
+                Margin = new Thickness(0, 0, 0, 15),
             };
 
             _tradeManagementGrid.ColumnDefinitions.Add(new ColumnDefinition());
@@ -54,6 +55,14 @@ namespace NinjaTrader.NinjaScript.Strategies
             _tradeManagementGrid.Children.Add(_resetAdvancedStrategiesButton);
             _tradeManagementGrid.Children.Add(_resetSimpleStrategiesButton);
             _tradeManagementGrid.Children.Add(_closeButton);
+
+
+            TextBlock headerText = GetHeaderText("Trade Management");
+
+            _tradeManagementPanel = new StackPanel();
+
+            _tradeManagementPanel.Children.Add(headerText);
+            _tradeManagementPanel.Children.Add(_tradeManagementGrid);
         }
 
         private void AddTradeManagementButtons()
@@ -93,26 +102,26 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         private void DisableEnableTradeManagementButtons()
         {
-            foreach (var pair in _tradeManagementButtons)
+            foreach (var item in _tradeManagementButtons)
             {
-                if (pair.Key != DISABLE_BUTTON_LABEL)
+                if (item.Key != DISABLE_BUTTON_LABEL)
                 {
-                    Button button = FindChild<Button>(_tradeManagementGrid, pair.Key);
+                    Button button = FindChild<Button>(_tradeManagementGrid, item.Key);
 
                     if (button != null)
                     {
                         button.IsEnabled = !_orderFlowBotState.DisableTrading;
-                        button.Background = new SolidColorBrush(Colors.DimGray);
+                        button.Background = GetSolidColorBrushFromHex(_buttonNeutral);
                     }
 
-                    pair.Value.IsActive = false;
+                    item.Value.IsActive = false;
                 }
             }
         }
 
         private void DisableButtonClick(object sender, RoutedEventArgs e)
         {
-            if (Position.MarketPosition == MarketPosition.Flat && AtmPosition() == MarketPosition.Flat)
+            if (Position.MarketPosition == MarketPosition.Flat && AtmIsFlat())
             {
                 bool currentDisableState = !_tradeManagementButtons[DISABLE_BUTTON_LABEL].IsActive;
 
@@ -124,11 +133,11 @@ namespace NinjaTrader.NinjaScript.Strategies
                 // Update disable button
                 Button disableButton = FindChild<Button>(_tradeManagementGrid, DISABLE_BUTTON_LABEL);
                 disableButton.Content = _orderFlowBotState.DisableTrading ? "Disabled" : DISABLE_BUTTON_LABEL;
-                disableButton.Background = _orderFlowBotState.DisableTrading ? new SolidColorBrush(Colors.DarkRed) : new SolidColorBrush(Colors.DimGray);
+                disableButton.Background = _orderFlowBotState.DisableTrading ? new SolidColorBrush(Colors.DarkRed) : GetSolidColorBrushFromHex(_buttonNeutral);
 
                 DisableEnableTradeManagementButtons();
                 DisableEnableDirectionButtons();
-                // DisableEnableStrategyButtons();
+                DisableEnableAdvancedStrategyButtons();
 
                 PrintOutput(_orderFlowBotState.DisableTrading ? "Trading Disabled" : "Trading Enabled");
 
@@ -139,38 +148,29 @@ namespace NinjaTrader.NinjaScript.Strategies
         private void CloseButtonClick(object sender, RoutedEventArgs e)
         {
             CloseAtmPosition();
-            PrintOutput("ATM Positions Closed");
+            PrintOutput("ATM Position Closed");
+
+            ResetTradeDirection();
         }
 
         private void ResetDirectionButtonClick(object sender, RoutedEventArgs e)
         {
-            ResetDirection();
-            ResetTriggerStrikeTextBox();
+            ResetTradeDirection();
         }
 
         private void ResetAdvancedButtonClick(object sender, RoutedEventArgs e)
         {
-            /*_strategiesController.ResetStrategies();
-
-            foreach (var pair in _tradeManagementButtons)
-            {
-                pair.Value.IsActive = false;
-                SetButtonBackground(_tradeManagementButtons, false, pair.Key);
-            }
-
-            ClearTriggerStrikeTextBox();*/
-
-            PrintOutput("Advanced Strategies Reset");
+            ResetAdvancedStrategies();
         }
 
         private void ResetSimpleButtonClick(object sender, RoutedEventArgs e)
         {
             /*_strategiesController.ResetStrategies();
 
-            foreach (var pair in _tradeManagementButtons)
+            foreach (var item in _tradeManagementButtons)
             {
-                pair.Value.IsActive = false;
-                SetButtonBackground(_tradeManagementButtons, false, pair.Key);
+                item.Value.IsActive = false;
+                SetButtonBackground(_tradeManagementButtons, false, item.Key);
             }
 
             ClearTriggerStrikeTextBox();*/

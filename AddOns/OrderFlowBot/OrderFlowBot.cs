@@ -224,7 +224,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 }
             }
 
-            UpdateTriggerStrikeTextBoxBorder();
+            UpdateTriggerStrikeTextBoxBackground();
 
             if (Position.MarketPosition == MarketPosition.Flat && BackTestingEnabled)
             {
@@ -266,19 +266,20 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         private void Reset()
         {
-            PrintOutput(String.Format("Exit | {0}", _entryName));
+            if (_entryName != "")
+            {
+                PrintOutput(String.Format("Exit | {0}", _entryName));
 
-            _entryLong = false;
-            _entryShort = false;
-            _entryName = "";
+                _entryLong = false;
+                _entryShort = false;
+                _entryName = "";
+                _atmStrategyId = null;
 
-            ResetTriggerStrikeTextBox();
+                ResetTradeDirection();
 
-            // Prevent re-entry on previous exit bar
-            _lastTradeBarNumber = _dataBars.Bar.BarNumber + 1;
-
-            _strategiesController.ResetStrategies();
-            _orderFlowBotState.ValidStrategyDirection = Direction.Flat;
+                // Prevent re-entry on previous exit bar
+                _lastTradeBarNumber = _dataBars.Bar.BarNumber + 1;
+            }
         }
 
         private bool AllowCheckStrategies()
@@ -337,7 +338,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (_isAtmStrategyCreated)
             {
                 // Position was created and exited
-                if (AtmPosition() == MarketPosition.Flat && (_orderFlowBotState.ValidStrategyDirection == Direction.Long ||
+                if (AtmIsFlat() && _entryName != "" && (_orderFlowBotState.ValidStrategyDirection == Direction.Long ||
                     _orderFlowBotState.ValidStrategyDirection == Direction.Short))
                 {
                     Reset();
@@ -345,7 +346,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 }
             }
 
-            if (AtmPosition() == MarketPosition.Flat)
+            if (AtmIsFlat())
             {
                 if (!AllowCheckStrategies())
                 {
@@ -402,14 +403,14 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
         }
 
-        private MarketPosition AtmPosition()
+        private bool AtmIsFlat()
         {
             if (_atmStrategyId == null)
             {
-                return MarketPosition.Flat;
+                return true;
             }
 
-            return GetAtmStrategyMarketPosition(_atmStrategyId);
+            return GetAtmStrategyMarketPosition(_atmStrategyId) == MarketPosition.Flat;
         }
 
         private void CloseAtmPosition()

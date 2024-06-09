@@ -11,11 +11,13 @@ namespace NinjaTrader.NinjaScript.Strategies
     public partial class OrderFlowBot : Strategy
     {
         private Grid _directionGrid;
+        private StackPanel _directionPanel;
         private TextBox _triggerStrikeTextBox;
         private Button _longButton;
         private Button _shortButton;
         private Dictionary<string, ButtonInfo> _directionButtons;
 
+        private string _inputTextBoxBackgroundColor = "#272829";
         private const string LONG_BUTTON_LABEL = "Long";
         private const string SHORT_BUTTON_LABEL = "Short";
 
@@ -25,7 +27,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
             _directionGrid = new Grid
             {
-                Margin = new Thickness(0, 0, 0, 10)
+                Margin = new Thickness(0, 0, 0, 15),
             };
             _directionGrid.ColumnDefinitions.Add(new ColumnDefinition());
             _directionGrid.ColumnDefinitions.Add(new ColumnDefinition());
@@ -46,10 +48,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 
             _triggerStrikeTextBox = new TextBox
             {
-                Height = 31,
-                Margin = new Thickness(3),
+                Height = 30,
+                Margin = new Thickness(3, 3, 3, 3),
                 ToolTip = "The strike price to trigger the strategy",
-                VerticalContentAlignment = VerticalAlignment.Center
+                VerticalContentAlignment = VerticalAlignment.Center,
+                Background = GetSolidColorBrushFromHex(_inputTextBoxBackgroundColor)
             };
 
             Grid.SetRow(triggerStrikePriceLabel, 0);
@@ -70,6 +73,13 @@ namespace NinjaTrader.NinjaScript.Strategies
             _directionGrid.Children.Add(_triggerStrikeTextBox);
             _directionGrid.Children.Add(_longButton);
             _directionGrid.Children.Add(_shortButton);
+
+            TextBlock headerText = GetHeaderText("Trade Direction");
+
+            _directionPanel = new StackPanel();
+
+            _directionPanel.Children.Add(headerText);
+            _directionPanel.Children.Add(_directionGrid);
         }
 
         private void AddDirectionButtons()
@@ -105,20 +115,20 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         private void DisableEnableDirectionButtons()
         {
-            ResetDirection();
+            ResetTradeDirection();
             ResetTriggerStrikeTextBox();
 
-            foreach (var pair in _directionButtons)
+            foreach (var item in _directionButtons)
             {
-                Button button = FindChild<Button>(_directionGrid, pair.Key);
+                Button button = FindChild<Button>(_directionGrid, item.Key);
 
                 if (button != null)
                 {
                     button.IsEnabled = !_orderFlowBotState.DisableTrading;
-                    button.Background = new SolidColorBrush(Colors.DimGray);
+                    button.Background = GetSolidColorBrushFromHex(_buttonNeutral);
                 }
 
-                pair.Value.IsActive = false;
+                item.Value.IsActive = false;
             }
 
             // Disable/Enable trigger strike text box
@@ -199,21 +209,9 @@ namespace NinjaTrader.NinjaScript.Strategies
             DirectionButtonClick(SHORT_BUTTON_LABEL);
         }
 
-        private void ResetDirection()
+        private void ResetTradeDirection()
         {
-            PrintTradeDirectionReset();
-
-            bool isFlat = _orderFlowBotState.SelectedTradeDirection == Direction.Flat;
-
-            foreach (var pair in _directionButtons)
-            {
-                pair.Value.IsActive = !isFlat;
-                SetButtonBackground(_directionGrid, _directionButtons, !isFlat, pair.Key);
-            }
-        }
-
-        private void PrintTradeDirectionReset()
-        {
+            ResetTriggerStrikeTextBox();
             _strategiesController.ResetTradeDirection();
 
             if (_orderFlowBotState.SelectedTradeDirection == Direction.Flat)
@@ -232,6 +230,17 @@ namespace NinjaTrader.NinjaScript.Strategies
             {
                 PrintOutput("Short Did Not Reset");
             }
+
+            bool isFlat = _orderFlowBotState.SelectedTradeDirection == Direction.Flat;
+
+            foreach (var item in _directionButtons)
+            {
+                ChartControl.Dispatcher.InvokeAsync(() =>
+                {
+                    item.Value.IsActive = !isFlat;
+                    SetButtonBackground(_directionGrid, _directionButtons, !isFlat, item.Key);
+                });
+            }
         }
 
         #region Trigger Strike Price
@@ -242,6 +251,10 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (double.TryParse(textBox.Text, out double value))
             {
                 _orderFlowBotState.TriggerStrikePrice = value;
+
+                // Set to false and let it re-trigger
+                _orderFlowBotState.StrikePriceTriggered = false;
+                UpdateTriggerStrikeTextBoxBackground();
             }
             else
             {
@@ -257,22 +270,6 @@ namespace NinjaTrader.NinjaScript.Strategies
             _orderFlowBotState.TriggerStrikePrice = 0;
             _orderFlowBotState.StrikePriceTriggered = false;
 
-            PrintTriggerStrikeReset();
-
-            if (_orderFlowBotState.TriggerStrikePrice == 0 && !_orderFlowBotState.StrikePriceTriggered)
-            {
-                ChartControl.Dispatcher.InvokeAsync(() =>
-                {
-                    _triggerStrikeTextBox.Text = "";
-                    _triggerStrikeTextBox.BorderBrush = Brushes.Transparent;
-                    _triggerStrikeTextBox.BorderThickness = new Thickness(1);
-                });
-
-            }
-        }
-
-        private void PrintTriggerStrikeReset()
-        {
             if (_orderFlowBotState.TriggerStrikePrice == 0 && !_orderFlowBotState.StrikePriceTriggered)
             {
                 PrintOutput("Trigger Strike Price Reset");
@@ -281,14 +278,22 @@ namespace NinjaTrader.NinjaScript.Strategies
             {
                 PrintOutput("Trigger Strike Price Did Not Reset");
             }
+
+            if (_orderFlowBotState.TriggerStrikePrice == 0 && !_orderFlowBotState.StrikePriceTriggered)
+            {
+                ChartControl.Dispatcher.InvokeAsync(() =>
+                {
+                    _triggerStrikeTextBox.Text = "";
+                    UpdateTriggerStrikeTextBoxBackground();
+                });
+            }
         }
 
-        private void UpdateTriggerStrikeTextBoxBorder()
+        private void UpdateTriggerStrikeTextBoxBackground()
         {
             ChartControl.Dispatcher.InvokeAsync(() =>
             {
-                _triggerStrikeTextBox.BorderBrush = _orderFlowBotState.StrikePriceTriggered ? Brushes.DarkGreen : Brushes.Transparent;
-                _triggerStrikeTextBox.BorderThickness = _orderFlowBotState.StrikePriceTriggered ? new Thickness(2) : new Thickness(1);
+                _triggerStrikeTextBox.Background = _orderFlowBotState.StrikePriceTriggered ? Brushes.DarkGreen : GetSolidColorBrushFromHex(_inputTextBoxBackgroundColor);
             });
         }
 

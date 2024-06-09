@@ -15,6 +15,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 
         public StrategiesConfig()
         {
+            // Note that the checks will iterate through the list. Insertion order matters, if you want to prioritize strategy checks.
             StrategiesConfigList = new List<StrategiesImplementation>
             {
                 new StrategiesImplementation

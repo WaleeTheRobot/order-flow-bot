@@ -31,6 +31,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         private bool _panelActive;
         private TabItem _tabItem;
 
+        // Colors
+        private string _buttonNeutral = "#6c757d";
+        private string _buttonActive = "#284b63";
+
         private void ControlPanelSetStateDataLoaded()
         {
             if (ChartControl != null)
@@ -90,7 +94,12 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
 
             // Create main grid with rows for each section
-            _mainGrid = new Grid();
+            _mainGrid = new Grid
+            {
+                Background = GetSolidColorBrushFromHex("#32373b")
+            };
+
+            _mainGrid.RowDefinitions.Add(new RowDefinition());
             _mainGrid.RowDefinitions.Add(new RowDefinition());
             _mainGrid.RowDefinitions.Add(new RowDefinition());
             _mainGrid.RowDefinitions.Add(new RowDefinition());
@@ -98,15 +107,17 @@ namespace NinjaTrader.NinjaScript.Strategies
             TopGrid();
             TradeManagementGrid();
             DirectionGrid();
-            //StrategiesGrid();
+            StrategiesGrid();
 
             Grid.SetRow(_topGrid, 0);
-            Grid.SetRow(_tradeManagementGrid, 1);
-            Grid.SetRow(_directionGrid, 2);
+            Grid.SetRow(_tradeManagementPanel, 1);
+            Grid.SetRow(_directionPanel, 2);
+            Grid.SetRow(_strategiesPanel, 3);
 
             _mainGrid.Children.Add(_topGrid);
-            _mainGrid.Children.Add(_tradeManagementGrid);
-            _mainGrid.Children.Add(_directionGrid);
+            _mainGrid.Children.Add(_tradeManagementPanel);
+            _mainGrid.Children.Add(_directionPanel);
+            _mainGrid.Children.Add(_strategiesPanel);
 
             if (TabSelected()) InsertWPFControls();
 
@@ -117,7 +128,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             _topGrid = new Grid
             {
-                Margin = new Thickness(0, 0, 0, 10)
+                Margin = new Thickness(0, 0, 0, 10),
+                Background = GetSolidColorBrushFromHex(_buttonActive)
             };
 
             Grid.SetColumnSpan(_topGrid, 2);
@@ -131,10 +143,11 @@ namespace NinjaTrader.NinjaScript.Strategies
             TextBlock orderFlowLabel = new TextBlock()
             {
                 FontFamily = ChartControl.Properties.LabelFont.Family,
-                FontSize = 15,
+                FontSize = 16,
+                FontWeight = FontWeights.Bold,
                 Foreground = ChartControl.Properties.ChartText,
                 HorizontalAlignment = HorizontalAlignment.Center,
-                Margin = new Thickness(3, 50, 3, 3),
+                Margin = new Thickness(3, 3, 3, 3),
                 Text = BackTestingEnabled ? "OrderFlowBot Panel Disabled" : "OrderFlowBot"
             };
 
@@ -150,6 +163,21 @@ namespace NinjaTrader.NinjaScript.Strategies
             {
                 Print(string.Format("{0} | {1}", ToTime(Time[0]), message));
             }, null);
+        }
+
+        private TextBlock GetHeaderText(string value)
+        {
+            return new TextBlock
+            {
+                Text = value,
+                FontWeight = FontWeights.Bold,
+                FontFamily = ChartControl.Properties.LabelFont.Family,
+                FontSize = 14,
+                Foreground = GetSolidColorBrushFromHex("#d9d9d9"),
+                Margin = new Thickness(0, 0, 0, 5),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
         }
 
         #region Buttons
@@ -183,7 +211,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
             if (button != null)
             {
-                button.Background = isActive ? new SolidColorBrush(Colors.DodgerBlue) : new SolidColorBrush(Colors.DimGray);
+                button.Background = isActive ? GetSolidColorBrushFromHex(_buttonActive) : GetSolidColorBrushFromHex(_buttonNeutral);
             }
         }
 
@@ -191,7 +219,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             Button button = GetStyleButton(label);
             button.Click += clickHandler;
-            button.Background = new SolidColorBrush(Colors.DimGray);
+            button.Background = GetSolidColorBrushFromHex(_buttonNeutral);
             button.Tag = label;
             Grid.SetRow(button, row);
             Grid.SetColumn(button, column);
@@ -199,6 +227,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         }
 
         #endregion
+
+        private SolidColorBrush GetSolidColorBrushFromHex(string hexColor)
+        {
+            return new SolidColorBrush((Color)ColorConverter.ConvertFromString(hexColor));
+        }
 
         private bool CheckATMStrategyLoaded()
         {
@@ -221,8 +254,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 
             return atmStrategyLoaded;
         }
-
-
 
         // Find child by tag
         private T FindChild<T>(DependencyObject parent, string tag) where T : DependencyObject
@@ -250,7 +281,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (_chartWindow != null)
                 _chartWindow.MainTabControl.SelectionChanged -= TabChangedHandler;
 
-            DisposeStrategyButtons();
+            DisposeAdvancedStrategyButtons();
             DisposeDirectionButtons();
             DisposeManagementButtons();
 

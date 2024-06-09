@@ -3,50 +3,64 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 
 namespace NinjaTrader.NinjaScript.Strategies
 {
     public partial class OrderFlowBot : Strategy
     {
         private Grid _strategiesGrid;
+        private StackPanel _strategiesPanel;
         private Dictionary<string, ButtonInfo> _strategyButtons;
 
         private void StrategiesGrid()
         {
             AddStrategyButtons();
 
-            _topGrid = new Grid
+            _strategiesGrid = new Grid
             {
-                Margin = new Thickness(0, 0, 0, 10)
+                Margin = new Thickness(0, 0, 0, 15),
             };
 
-            Grid.SetColumnSpan(_topGrid, 2);
+            _strategiesGrid.ColumnDefinitions.Add(new ColumnDefinition());
+            _strategiesGrid.ColumnDefinitions.Add(new ColumnDefinition());
 
-            _topGrid.ColumnDefinitions.Add(new ColumnDefinition());
-            _topGrid.ColumnDefinitions.Add(new ColumnDefinition());
+            int strategyCount = _strategyButtons.Count;
+            int rows = (int)Math.Ceiling(strategyCount / 2.0);
 
-            _topGrid.RowDefinitions.Add(new RowDefinition());
-            _topGrid.RowDefinitions.Add(new RowDefinition());
-
-            TextBlock orderFlowLabel = new TextBlock()
+            // Dynamically add rows based on the number of strategies
+            for (int j = 0; j < rows; j++)
             {
-                FontFamily = ChartControl.Properties.LabelFont.Family,
-                FontSize = 15,
-                Foreground = ChartControl.Properties.ChartText,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                Margin = new Thickness(3, 50, 3, 3),
-                Text = BackTestingEnabled ? "Order Flow Bot Panel Disabled" : "Order Flow Bot"
-            };
+                _strategiesGrid.RowDefinitions.Add(new RowDefinition());
+            }
 
-            Grid.SetRow(orderFlowLabel, 0);
-            Grid.SetColumnSpan(orderFlowLabel, 2);
+            // Add strategy buttons to the grid
+            int index = 0;
+            foreach (var buttonInfo in _strategyButtons.Values)
+            {
+                int row = index / 2;
+                int column = index % 2;
 
-            _topGrid.Children.Add(orderFlowLabel);
+                Button strategyButton = CreateButton(buttonInfo.DisplayLabel, buttonInfo.Handler, row, column);
+
+                Grid.SetRow(strategyButton, row);
+                Grid.SetColumn(strategyButton, column);
+
+                _strategiesGrid.Children.Add(strategyButton);
+                index++;
+            }
+
+            TextBlock headerText = GetHeaderText("Advanced Strategies");
+
+            _strategiesPanel = new StackPanel();
+
+            _strategiesPanel.Children.Add(headerText);
+            _strategiesPanel.Children.Add(_strategiesGrid);
         }
 
         private void AddStrategyButtons()
         {
+            _strategyButtons = new Dictionary<string, ButtonInfo>();
+
             // Dynamically add buttons for each strategy with event handler
             foreach (var strategy in _strategiesConfig.StrategiesConfigList)
             {
@@ -55,7 +69,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 if (!string.IsNullOrEmpty(buttonLabel))
                 {
                     _strategyButtons.Add(buttonLabel, new ButtonInfo(
-                        (sender, e) => StrategyButtonClick(buttonLabel, strategy.Name),
+                        (sender, e) => StrategyAdvancedButtonClick(buttonLabel, strategy.Name),
                         false,
                         buttonLabel,
                         strategy.Name
@@ -77,23 +91,48 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
         }
 
-        private void DisableEnableStrategyButtons()
+        private void DisableEnableAdvancedStrategyButtons()
         {
-            foreach (var pair in _strategyButtons)
+            ResetAdvancedStrategies();
+
+            foreach (var item in _strategyButtons)
             {
-                Button button = FindChild<Button>(_strategiesGrid, pair.Key);
+                Button button = FindChild<Button>(_strategiesGrid, item.Key);
 
                 if (button != null)
                 {
                     button.IsEnabled = !_orderFlowBotState.DisableTrading;
-                    button.Background = new SolidColorBrush(Colors.DimGray);
+                    button.Background = GetSolidColorBrushFromHex(_buttonNeutral);
                 }
 
-                pair.Value.IsActive = false;
+                item.Value.IsActive = false;
+
             }
         }
 
-        private void DisposeStrategyButtons()
+        private void ResetAdvancedStrategies()
+        {
+            _strategiesController.ResetStrategies();
+
+            if (_orderFlowBotState.SelectedStrategies.Count == 0)
+            {
+                PrintOutput("Advanced Strategies Reset");
+            }
+            else
+            {
+                PrintOutput("Advanced Strategies Did Not Reset");
+            }
+
+            bool noSelectedStrategies = _orderFlowBotState.SelectedStrategies.Count == 0;
+
+            foreach (var item in _strategyButtons)
+            {
+                item.Value.IsActive = !noSelectedStrategies;
+                SetButtonBackground(_strategiesGrid, _strategyButtons, !noSelectedStrategies, item.Key);
+            }
+        }
+
+        private void DisposeAdvancedStrategyButtons()
         {
             if (_strategyButtons == null)
                 return;
@@ -103,20 +142,25 @@ namespace NinjaTrader.NinjaScript.Strategies
                 string label = item.Key;
                 ButtonInfo info = item.Value;
 
-                Button button = _mainGrid.Children.OfType<Button>().FirstOrDefault(b => b.Content.ToString() == label);
+                Button button = _strategiesGrid.Children.OfType<Button>().FirstOrDefault(b => b.Content.ToString() == label);
 
                 if (button != null)
                 {
                     button.Click -= info.Handler;
-                    _mainGrid.Children.Remove(button);
+                    _strategiesGrid.Children.Remove(button);
                 }
             }
 
             _strategyButtons.Clear();
         }
 
-        private void StrategyButtonClick(string buttonLabel, string strategyName)
+        private void StrategyAdvancedButtonClick(string buttonLabel, string strategyName)
         {
+            if (!CheckATMStrategyLoaded())
+            {
+                return;
+            }
+
             ButtonInfo button;
             if (!_strategyButtons.TryGetValue(buttonLabel, out button))
             {
