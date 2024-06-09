@@ -107,17 +107,17 @@ namespace NinjaTrader.NinjaScript.Strategies
             TopGrid();
             TradeManagementGrid();
             DirectionGrid();
-            StrategiesGrid();
+            AdvancedStrategiesGrid();
 
             Grid.SetRow(_topGrid, 0);
             Grid.SetRow(_tradeManagementPanel, 1);
             Grid.SetRow(_directionPanel, 2);
-            Grid.SetRow(_strategiesPanel, 3);
+            Grid.SetRow(_advancedStrategiesPanel, 3);
 
             _mainGrid.Children.Add(_topGrid);
             _mainGrid.Children.Add(_tradeManagementPanel);
             _mainGrid.Children.Add(_directionPanel);
-            _mainGrid.Children.Add(_strategiesPanel);
+            _mainGrid.Children.Add(_advancedStrategiesPanel);
 
             if (TabSelected()) InsertWPFControls();
 
@@ -193,7 +193,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Margin = new Thickness(3, 3, 3, 3),
                 Padding = new Thickness(0, 0, 0, 0),
                 Style = basicButtonStyle,
-                FontSize = 12,
+                FontSize = 11,
                 BorderBrush = Brushes.Transparent,
                 BorderThickness = new Thickness(0),
                 Visibility = Visibility.Visible

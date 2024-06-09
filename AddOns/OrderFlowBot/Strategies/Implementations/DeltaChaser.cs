@@ -68,18 +68,18 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
         {
             long maxDelta = Math.Abs(dataBars.Bar.Deltas.MaxDelta);
             long minDelta = Math.Abs(dataBars.Bar.Deltas.MinDelta);
-            bool validMinDelta = minDelta < 100;
+            bool validMinDelta = dataBars.Bar.Deltas.MinDelta > OrderFlowBotAdvancedStrategiesConfig.DeltaChaserMinMaxDifferenceDelta * -1;
 
-            return maxDelta >= 2.5 * minDelta && validMinDelta && dataBars.Bar.Deltas.Delta > 150;
+            return maxDelta >= OrderFlowBotAdvancedStrategiesConfig.DeltaChaserMinMaxDifferenceMultiplier * minDelta && validMinDelta && dataBars.Bar.Deltas.Delta > OrderFlowBotAdvancedStrategiesConfig.DeltaChaserDelta;
         }
 
         private bool IsBearishMinMaxDifference()
         {
             long maxDelta = Math.Abs(dataBars.Bar.Deltas.MaxDelta);
             long minDelta = Math.Abs(dataBars.Bar.Deltas.MinDelta);
-            bool validMaxDelta = maxDelta < 100;
+            bool validMaxDelta = dataBars.Bar.Deltas.MaxDelta < OrderFlowBotAdvancedStrategiesConfig.DeltaChaserMinMaxDifferenceDelta;
 
-            return minDelta >= 2.5 * maxDelta && validMaxDelta && dataBars.Bar.Deltas.Delta < -150;
+            return minDelta >= OrderFlowBotAdvancedStrategiesConfig.DeltaChaserMinMaxDifferenceMultiplier * maxDelta && validMaxDelta && dataBars.Bar.Deltas.Delta < OrderFlowBotAdvancedStrategiesConfig.DeltaChaserDelta * -1;
         }
 
         private bool IsValidWithinTriggerStrikePriceRange()
@@ -89,7 +89,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
                 return true;
             }
 
-            return orderFlowBotState.TriggerStrikePrice - dataBars.Bar.Prices.Close <= 3;
+            return orderFlowBotState.TriggerStrikePrice - dataBars.Bar.Prices.Close <= OrderFlowBotAdvancedStrategiesConfig.DeltaChaserValidEntryTicks * OrderFlowBotDataBarConfig.TickSize;
         }
 
         private bool IsBullishBar()

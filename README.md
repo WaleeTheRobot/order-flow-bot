@@ -2,7 +2,7 @@
 
 In case you see this... it's still in development. So you probably shouldn't use it.
 
-A bot used for trading order flow with a selected ATM strategy. The recommended way to use OrderFlowBot is semi-automated trading, but fully automated is an option.
+A bot used for trading order flow with a selected ATM strategy. The recommended way to use OrderFlowBot is semi-automated trading to assist with entries, but fully automated is an option.
 
 OrderFlowBot uses the selected ATM strategy. Just create your ATM strategies and select the one you want to use for the trade.
 
@@ -34,11 +34,11 @@ This section has options to manage OrderFlowBot, quickly clear other sections an
 
 #### Enabled/Disabled
 
-Resets all sections and disables or enable the sections. No strategies will be checked when disabled is selected.
+Resets all sections and disables or enable the sections. No strategies will be checked when disabled is selected. This can only be activated when there aren't any positions opened.
 
 #### Auto
 
-Automatically trades the selected strategies. This is NOT recommended, but is an option. Only custom created advanced strategies should be considered if this option is used. Both the default advanced strategies "Delta Chaser and Range Rebound" are NOT designed for fully automatic trading.
+Automatically trades the selected strategies. This is NOT recommended, but is an option. Only custom created advanced strategies should be considered if this option is used. Both the default advanced strategies "Delta Chaser and Range Rebound" are NOT designed for fully automated trading.
 
 #### Reset Direction
 

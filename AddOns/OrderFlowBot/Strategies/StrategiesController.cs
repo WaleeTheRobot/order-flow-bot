@@ -99,7 +99,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
         // Set all strategies false
         public void ResetStrategies()
         {
-            _orderFlowBotState.ValidStrategy = "None";
+
+            _orderFlowBotState.ValidStrategyDirection = Direction.Flat;
 
             foreach (var strategy in _strategies)
             {
@@ -112,7 +113,10 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
         {
             _orderFlowBotState.SelectedTradeDirection = Direction.Flat;
 
-            // Just in case... reset the direction in the strategy
+            // Reset valid strategies and direction without removing them
+            _orderFlowBotState.ValidStrategy = "None";
+            _orderFlowBotState.ValidStrategyDirection = Direction.Flat;
+
             foreach (var strategy in _strategies)
             {
                 strategy.ValidStrategyDirection = Direction.Flat;
