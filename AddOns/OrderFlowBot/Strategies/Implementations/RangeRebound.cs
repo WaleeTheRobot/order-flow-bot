@@ -65,12 +65,12 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 
         private bool IsValidMinDelta()
         {
-            return dataBars.Bar.Deltas.MinDelta > OrderFlowBotAdvancedStrategiesConfig.RangeReboundMinMaxDelta * -1 && dataBars.Bar.Deltas.MaxDelta > OrderFlowBotAdvancedStrategiesConfig.RangeReboundMinMaxDelta;
+            return dataBars.Bar.Deltas.MinDelta > OrderFlowBotStrategiesProperties.RangeReboundMinMaxDelta * -1 && dataBars.Bar.Deltas.MaxDelta > OrderFlowBotStrategiesProperties.RangeReboundMinMaxDelta;
         }
 
         private bool IsValidMaxDelta()
         {
-            return dataBars.Bar.Deltas.MaxDelta < OrderFlowBotAdvancedStrategiesConfig.RangeReboundMinMaxDelta && dataBars.Bar.Deltas.MinDelta < OrderFlowBotAdvancedStrategiesConfig.RangeReboundMinMaxDelta * -1;
+            return dataBars.Bar.Deltas.MaxDelta < OrderFlowBotStrategiesProperties.RangeReboundMinMaxDelta && dataBars.Bar.Deltas.MinDelta < OrderFlowBotStrategiesProperties.RangeReboundMinMaxDelta * -1;
         }
 
         private bool IsValidWithinTriggerStrikePriceRange()
@@ -80,7 +80,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
                 return true;
             }
 
-            return orderFlowBotState.TriggerStrikePrice - dataBars.Bar.Prices.Close <= OrderFlowBotAdvancedStrategiesConfig.RangeReboundValidEntryTicks * OrderFlowBotDataBarConfig.TickSize;
+            return orderFlowBotState.TriggerStrikePrice - dataBars.Bar.Prices.Close <= OrderFlowBotStrategiesProperties.RangeReboundValidEntryTicks * OrderFlowBotDataBarConfig.TickSize;
         }
 
         private bool IsBullishBar()

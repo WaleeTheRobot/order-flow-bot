@@ -13,8 +13,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         private StackPanel _tradeManagementPanel;
         private Button _disableButton;
         private Button _resetDirectionButton;
-        private Button _resetAdvancedStrategiesButton;
-        private Button _resetSimpleStrategiesButton;
+        private Button _resetStrategiesButton;
         private Button _autoButton;
         private Button _closeButton;
         private Dictionary<string, ButtonInfo> _tradeManagementButtons;
@@ -23,8 +22,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         private const string AUTO_BUTTON_LABEL = "Auto";
         private const string CLOSE_BUTTON_LABEL = "Close";
         private const string RESET_DIRECTION_BUTTON_LABEL = "Reset Direction";
-        private const string RESET_ADVANCED_BUTTON_LABEL = "Reset Advanced";
-        private const string RESET_SIMPLE_BUTTON_LABEL = "Reset Simple";
+        private const string RESET_STRATEGIES_BUTTON_LABEL = "Reset Strategies";
 
         private void TradeManagementGrid()
         {
@@ -45,15 +43,13 @@ namespace NinjaTrader.NinjaScript.Strategies
             _disableButton = CreateButton(DISABLE_BUTTON_LABEL, DisableButtonClick, 0, 0);
             _autoButton = CreateButton(AUTO_BUTTON_LABEL, AutoButtonClick, 0, 1);
             _resetDirectionButton = CreateButton(RESET_DIRECTION_BUTTON_LABEL, ResetDirectionButtonClick, 1, 0);
-            _resetAdvancedStrategiesButton = CreateButton(RESET_ADVANCED_BUTTON_LABEL, ResetAdvancedButtonClick, 1, 1);
-            _resetSimpleStrategiesButton = CreateButton(RESET_SIMPLE_BUTTON_LABEL, ResetSimpleButtonClick, 2, 0);
-            _closeButton = CreateButton(CLOSE_BUTTON_LABEL, CloseButtonClick, 2, 1);
+            _resetStrategiesButton = CreateButton(RESET_STRATEGIES_BUTTON_LABEL, ResetStrategiesButtonClick, 1, 1);
+            _closeButton = CreateButton(CLOSE_BUTTON_LABEL, CloseButtonClick, 2, 0);
 
             _tradeManagementGrid.Children.Add(_disableButton);
             _tradeManagementGrid.Children.Add(_autoButton);
             _tradeManagementGrid.Children.Add(_resetDirectionButton);
-            _tradeManagementGrid.Children.Add(_resetAdvancedStrategiesButton);
-            _tradeManagementGrid.Children.Add(_resetSimpleStrategiesButton);
+            _tradeManagementGrid.Children.Add(_resetStrategiesButton);
             _tradeManagementGrid.Children.Add(_closeButton);
 
 
@@ -73,8 +69,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 { AUTO_BUTTON_LABEL, new ButtonInfo(AutoButtonClick, false, AUTO_BUTTON_LABEL) },
                 { CLOSE_BUTTON_LABEL, new ButtonInfo(DisableButtonClick, false, CLOSE_BUTTON_LABEL) },
                 { RESET_DIRECTION_BUTTON_LABEL, new ButtonInfo(AutoButtonClick, false, RESET_DIRECTION_BUTTON_LABEL) },
-                { RESET_ADVANCED_BUTTON_LABEL, new ButtonInfo(AutoButtonClick, false, RESET_ADVANCED_BUTTON_LABEL) },
-                { RESET_SIMPLE_BUTTON_LABEL, new ButtonInfo(AutoButtonClick, false, RESET_SIMPLE_BUTTON_LABEL) }
+                { RESET_STRATEGIES_BUTTON_LABEL, new ButtonInfo(AutoButtonClick, false, RESET_STRATEGIES_BUTTON_LABEL) }
             };
         }
 
@@ -137,7 +132,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
                 DisableEnableTradeManagementButtons();
                 DisableEnableDirectionButtons();
-                DisableEnableAdvancedStrategyButtons();
+                DisableEnableStrategyButtons();
 
                 PrintOutput(_orderFlowBotState.DisableTrading ? "Trading Disabled" : "Trading Enabled");
 
@@ -158,24 +153,9 @@ namespace NinjaTrader.NinjaScript.Strategies
             ResetTradeDirection();
         }
 
-        private void ResetAdvancedButtonClick(object sender, RoutedEventArgs e)
+        private void ResetStrategiesButtonClick(object sender, RoutedEventArgs e)
         {
-            ResetAdvancedStrategies();
-        }
-
-        private void ResetSimpleButtonClick(object sender, RoutedEventArgs e)
-        {
-            /*_strategiesController.ResetStrategies();
-
-            foreach (var item in _tradeManagementButtons)
-            {
-                item.Value.IsActive = false;
-                SetButtonBackground(_tradeManagementButtons, false, item.Key);
-            }
-
-            ClearTriggerStrikeTextBox();*/
-
-            PrintOutput("Simple Strategies Reset");
+            ResetStrategies();
         }
 
         private void AutoButtonClick(object sender, RoutedEventArgs e)

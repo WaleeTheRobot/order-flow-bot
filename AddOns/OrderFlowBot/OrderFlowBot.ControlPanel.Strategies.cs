@@ -49,7 +49,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 index++;
             }
 
-            TextBlock headerText = GetHeaderText("Advanced Strategies");
+            TextBlock headerText = GetHeaderText("Strategies");
 
             _strategiesPanel = new StackPanel();
 
@@ -69,7 +69,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 if (!string.IsNullOrEmpty(buttonLabel))
                 {
                     _strategyButtons.Add(buttonLabel, new ButtonInfo(
-                        (sender, e) => StrategyAdvancedButtonClick(buttonLabel, strategy.Name),
+                        (sender, e) => StrategyButtonClick(buttonLabel, strategy.Name),
                         false,
                         buttonLabel,
                         strategy.Name
@@ -91,9 +91,9 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
         }
 
-        private void DisableEnableAdvancedStrategyButtons()
+        private void DisableEnableStrategyButtons()
         {
-            ResetAdvancedStrategies();
+            ResetStrategies();
 
             foreach (var item in _strategyButtons)
             {
@@ -110,17 +110,17 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
         }
 
-        private void ResetAdvancedStrategies()
+        private void ResetStrategies()
         {
             _strategiesController.ResetStrategies();
 
             if (_orderFlowBotState.SelectedStrategies.Count == 0)
             {
-                PrintOutput("Advanced Strategies Reset");
+                PrintOutput("Strategies Reset");
             }
             else
             {
-                PrintOutput("Advanced Strategies Did Not Reset");
+                PrintOutput("Strategies Did Not Reset");
             }
 
             bool noSelectedStrategies = _orderFlowBotState.SelectedStrategies.Count == 0;
@@ -132,7 +132,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
         }
 
-        private void DisposeAdvancedStrategyButtons()
+        private void DisposeStrategyButtons()
         {
             if (_strategyButtons == null)
                 return;
@@ -154,7 +154,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             _strategyButtons.Clear();
         }
 
-        private void StrategyAdvancedButtonClick(string buttonLabel, string strategyName)
+        private void StrategyButtonClick(string buttonLabel, string strategyName)
         {
             if (!CheckATMStrategyLoaded())
             {

@@ -68,18 +68,18 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
         {
             long maxDelta = Math.Abs(dataBars.Bar.Deltas.MaxDelta);
             long minDelta = Math.Abs(dataBars.Bar.Deltas.MinDelta);
-            bool validMinDelta = dataBars.Bar.Deltas.MinDelta > OrderFlowBotAdvancedStrategiesConfig.DeltaChaserMinMaxDifferenceDelta * -1;
+            bool validMinDelta = dataBars.Bar.Deltas.MinDelta > OrderFlowBotStrategiesProperties.DeltaChaserMinMaxDifferenceDelta * -1;
 
-            return maxDelta >= OrderFlowBotAdvancedStrategiesConfig.DeltaChaserMinMaxDifferenceMultiplier * minDelta && validMinDelta && dataBars.Bar.Deltas.Delta > OrderFlowBotAdvancedStrategiesConfig.DeltaChaserDelta;
+            return maxDelta >= OrderFlowBotStrategiesProperties.DeltaChaserMinMaxDifferenceMultiplier * minDelta && validMinDelta && dataBars.Bar.Deltas.Delta > OrderFlowBotStrategiesProperties.DeltaChaserDelta;
         }
 
         private bool IsBearishMinMaxDifference()
         {
             long maxDelta = Math.Abs(dataBars.Bar.Deltas.MaxDelta);
             long minDelta = Math.Abs(dataBars.Bar.Deltas.MinDelta);
-            bool validMaxDelta = dataBars.Bar.Deltas.MaxDelta < OrderFlowBotAdvancedStrategiesConfig.DeltaChaserMinMaxDifferenceDelta;
+            bool validMaxDelta = dataBars.Bar.Deltas.MaxDelta < OrderFlowBotStrategiesProperties.DeltaChaserMinMaxDifferenceDelta;
 
-            return minDelta >= OrderFlowBotAdvancedStrategiesConfig.DeltaChaserMinMaxDifferenceMultiplier * maxDelta && validMaxDelta && dataBars.Bar.Deltas.Delta < OrderFlowBotAdvancedStrategiesConfig.DeltaChaserDelta * -1;
+            return minDelta >= OrderFlowBotStrategiesProperties.DeltaChaserMinMaxDifferenceMultiplier * maxDelta && validMaxDelta && dataBars.Bar.Deltas.Delta < OrderFlowBotStrategiesProperties.DeltaChaserDelta * -1;
         }
 
         private bool IsValidWithinTriggerStrikePriceRange()
@@ -89,7 +89,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
                 return true;
             }
 
-            return orderFlowBotState.TriggerStrikePrice - dataBars.Bar.Prices.Close <= OrderFlowBotAdvancedStrategiesConfig.DeltaChaserValidEntryTicks * OrderFlowBotDataBarConfig.TickSize;
+            return orderFlowBotState.TriggerStrikePrice - dataBars.Bar.Prices.Close <= OrderFlowBotStrategiesProperties.DeltaChaserValidEntryTicks * OrderFlowBotDataBarConfig.TickSize;
         }
 
         private bool IsBullishBar()

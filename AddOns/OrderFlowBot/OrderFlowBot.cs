@@ -16,13 +16,13 @@ namespace NinjaTrader.NinjaScript.Strategies
     {
         public const string GROUP_NAME_GENERAL = "Order Flow Bot";
         public const string GROUP_NAME_DATA_BAR = "Data Bar";
-        public const string GROUP_NAME_ADVANCED_STRATEGIES = "Advanced Strategies";
+        public const string GROUP_NAME_STRATEGIES = "Strategies";
         public const string GROUP_NAME_TESTING = "Testing";
     }
 
     [Gui.CategoryOrder(GroupConstants.GROUP_NAME_GENERAL, 0)]
     [Gui.CategoryOrder(GroupConstants.GROUP_NAME_DATA_BAR, 1)]
-    [Gui.CategoryOrder(GroupConstants.GROUP_NAME_ADVANCED_STRATEGIES, 2)]
+    [Gui.CategoryOrder(GroupConstants.GROUP_NAME_STRATEGIES, 2)]
     [Gui.CategoryOrder(GroupConstants.GROUP_NAME_TESTING, 3)]
     public partial class OrderFlowBot : Strategy
     {
@@ -44,7 +44,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         #endregion
 
-        #region Default Properties
+        #region General Properties
 
         [NinjaScriptProperty]
         [Display(Name = "Version", Description = "OrderFlowBot version.", Order = 0, GroupName = GroupConstants.GROUP_NAME_GENERAL)]
@@ -96,30 +96,30 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         #endregion
 
-        #region Advanced Strategies Properties
+        #region Strategies Properties
 
         [NinjaScriptProperty]
-        [Display(Name = "Delta Chaser Delta", Description = "Min delta will be less than this number as negative for bearish. Max delta will be more than this number as positive for bullish.", Order = 0, GroupName = GroupConstants.GROUP_NAME_ADVANCED_STRATEGIES)]
+        [Display(Name = "Delta Chaser Delta", Description = "Min delta will be less than this number as negative for bearish. Max delta will be more than this number as positive for bullish.", Order = 0, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
         public int DeltaChaserDelta { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Delta Chaser Min Max Difference Delta", Description = "Min delta will be greater than this number as negative for bullish. Max delta will be less than this number as positive for bearish.", Order = 1, GroupName = GroupConstants.GROUP_NAME_ADVANCED_STRATEGIES)]
+        [Display(Name = "Delta Chaser Min Max Difference Delta", Description = "Min delta will be greater than this number as negative for bullish. Max delta will be less than this number as positive for bearish.", Order = 1, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
         public int DeltaChaserMinMaxDifferenceDelta { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Delta Chaser Min Max Difference Multiplier", Description = "Min delta will be multiplied by this number for bearish. Max delta will be multiplied by this for bullish.", Order = 2, GroupName = GroupConstants.GROUP_NAME_ADVANCED_STRATEGIES)]
+        [Display(Name = "Delta Chaser Min Max Difference Multiplier", Description = "Min delta will be multiplied by this number for bearish. Max delta will be multiplied by this for bullish.", Order = 2, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
         public double DeltaChaserMinMaxDifferenceMultiplier { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Delta Chaser Valid Entry Ticks", Description = "Spot price has to be equal to within this for a valid entry in ticks.", Order = 3, GroupName = GroupConstants.GROUP_NAME_ADVANCED_STRATEGIES)]
+        [Display(Name = "Delta Chaser Valid Entry Ticks", Description = "Spot price has to be equal to within this for a valid entry in ticks.", Order = 3, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
         public int DeltaChaserValidEntryTicks { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Range Rebound Min Max Delta", Description = "Min delta will be less than this number as negative for bearish. Max delta will be more than this number as positive for bullish.", Order = 4, GroupName = GroupConstants.GROUP_NAME_ADVANCED_STRATEGIES)]
+        [Display(Name = "Range Rebound Min Max Delta", Description = "Min delta will be less than this number as negative for bearish. Max delta will be more than this number as positive for bullish.", Order = 4, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
         public int RangeReboundMinMaxDelta { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Range Rebound Valid Entry Ticks", Description = "Spot price has to be equal to within this for a valid entry in ticks.", Order = 5, GroupName = GroupConstants.GROUP_NAME_ADVANCED_STRATEGIES)]
+        [Display(Name = "Range Rebound Valid Entry Ticks", Description = "Spot price has to be equal to within this for a valid entry in ticks.", Order = 5, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
         public int RangeReboundValidEntryTicks { get; set; }
 
         #endregion
@@ -183,7 +183,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 ValidVolumeSequencing = 4;
                 ValidVolumeSequencingMinimumVolume = 500;
 
-                // Advanced Strategies
+                // Strategies
                 DeltaChaserDelta = 150;
                 DeltaChaserMinMaxDifferenceDelta = 100;
                 DeltaChaserMinMaxDifferenceMultiplier = 2.5;
@@ -221,8 +221,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 _strategiesConfig = new StrategiesConfig();
                 _strategiesController = new StrategiesController(_orderFlowBotState, _dataBars, _strategiesConfig);
 
-                OrderFlowBotAdvancedStrategiesConfig.Initialize(
-                     new OrderFlowBotAdvancedStrategiesConfigValues
+                OrderFlowBotStrategiesProperties.Initialize(
+                     new OrderFlowBotStrategiesPropertiesValues
                      {
                          DeltaChaserDelta = DeltaChaserDelta,
                          DeltaChaserMinMaxDifferenceDelta = DeltaChaserMinMaxDifferenceDelta,

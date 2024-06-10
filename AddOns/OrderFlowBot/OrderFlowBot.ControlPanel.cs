@@ -107,17 +107,17 @@ namespace NinjaTrader.NinjaScript.Strategies
             TopGrid();
             TradeManagementGrid();
             DirectionGrid();
-            AdvancedStrategiesGrid();
+            StrategiesGrid();
 
             Grid.SetRow(_topGrid, 0);
             Grid.SetRow(_tradeManagementPanel, 1);
             Grid.SetRow(_directionPanel, 2);
-            Grid.SetRow(_advancedStrategiesPanel, 3);
+            Grid.SetRow(_strategiesPanel, 3);
 
             _mainGrid.Children.Add(_topGrid);
             _mainGrid.Children.Add(_tradeManagementPanel);
             _mainGrid.Children.Add(_directionPanel);
-            _mainGrid.Children.Add(_advancedStrategiesPanel);
+            _mainGrid.Children.Add(_strategiesPanel);
 
             if (TabSelected()) InsertWPFControls();
 
@@ -281,7 +281,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (_chartWindow != null)
                 _chartWindow.MainTabControl.SelectionChanged -= TabChangedHandler;
 
-            DisposeAdvancedStrategyButtons();
+            DisposeStrategyButtons();
             DisposeDirectionButtons();
             DisposeManagementButtons();
 
