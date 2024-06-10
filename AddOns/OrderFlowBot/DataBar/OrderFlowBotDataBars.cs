@@ -8,7 +8,6 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar
     public struct OrderFlowBotDataBarConfigValues
     {
         public double TickSize { get; set; }
-        public int MinLookBackBars { get; set; }
         public double ImbalanceRatio { get; set; }
         public int StackedImbalance { get; set; }
         public long ValidImbalanceVolume { get; set; }
@@ -21,7 +20,6 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar
     public static class OrderFlowBotDataBarConfig
     {
         public static double TickSize { get; private set; }
-        public static int MinLookBackBars { get; private set; }
         public static double ImbalanceRatio { get; private set; }
         public static int StackedImbalance { get; private set; }
         public static long ValidImbalanceVolume { get; private set; }
@@ -33,7 +31,6 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar
         public static void Initialize(OrderFlowBotDataBarConfigValues config)
         {
             TickSize = config.TickSize;
-            MinLookBackBars = config.MinLookBackBars;
             ImbalanceRatio = config.ImbalanceRatio;
             StackedImbalance = config.StackedImbalance;
             ValidImbalanceVolume = config.ValidImbalanceVolume;
@@ -90,7 +87,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar
 
         public void SetCurrentDataBar()
         {
-            if (_baseBar.VolumetricBar == null || _baseBar.CurrentBar < OrderFlowBotDataBarConfig.MinLookBackBars)
+            if (_baseBar.VolumetricBar == null)
             {
                 return;
             }
