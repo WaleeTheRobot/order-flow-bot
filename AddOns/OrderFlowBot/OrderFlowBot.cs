@@ -17,13 +17,15 @@ namespace NinjaTrader.NinjaScript.Strategies
         public const string GROUP_NAME_GENERAL = "Order Flow Bot";
         public const string GROUP_NAME_DATA_BAR = "Data Bar";
         public const string GROUP_NAME_STRATEGIES = "Strategies";
+        public const string GROUP_NAME_INDICATORS = "Indicators";
         public const string GROUP_NAME_TESTING = "Testing";
     }
 
     [Gui.CategoryOrder(GroupConstants.GROUP_NAME_GENERAL, 0)]
     [Gui.CategoryOrder(GroupConstants.GROUP_NAME_DATA_BAR, 1)]
     [Gui.CategoryOrder(GroupConstants.GROUP_NAME_STRATEGIES, 2)]
-    [Gui.CategoryOrder(GroupConstants.GROUP_NAME_TESTING, 3)]
+    [Gui.CategoryOrder(GroupConstants.GROUP_NAME_INDICATORS, 3)]
+    [Gui.CategoryOrder(GroupConstants.GROUP_NAME_TESTING, 4)]
     public partial class OrderFlowBot : Strategy
     {
         #region Variables
@@ -122,6 +124,22 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Display(Name = "Range Rebound Valid Entry Ticks", Description = "Spot price has to be equal to within this for a valid entry in ticks.", Order = 5, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
         public int RangeReboundValidEntryTicks { get; set; }
 
+        [NinjaScriptProperty]
+        [Display(Name = "Stacked Imbalance Valid Open TSP", Description = "Enable to enter only if open above Trigger Strike Price for long or below it for short if TSP exist.", Order = 6, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
+        public bool StackedImbalanceValidOpenTSP { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Volume Sequencing Valid Open TSP", Description = "Enable to enter only if open above Trigger Strike Price for long or below it for short if TSP exist.", Order = 7, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
+        public bool VolumeSequencingValidOpenTSP { get; set; }
+
+        #endregion
+
+        #region Indicators Properties
+
+        [NinjaScriptProperty]
+        [Display(Name = "Ratios Enabled", Description = "Enable to display ratios indicator", Order = 0, GroupName = GroupConstants.GROUP_NAME_INDICATORS)]
+        public bool RatiosEnabled { get; set; }
+
         #endregion
 
         #region Back Test Properties
@@ -131,15 +149,19 @@ namespace NinjaTrader.NinjaScript.Strategies
         public bool BackTestingEnabled { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Quantity", Description = "The name order quantity.", Order = 1, GroupName = GroupConstants.GROUP_NAME_TESTING)]
+        [Display(Name = "Back Testing Strategy Name", Description = "The strategy name to back test. This should be the same as the file name.", Order = 1, GroupName = GroupConstants.GROUP_NAME_TESTING)]
+        public string BackTestingStrategyName { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Quantity", Description = "The name order quantity.", Order = 2, GroupName = GroupConstants.GROUP_NAME_TESTING)]
         public int Quantity { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Target", Description = "The target in ticks.", Order = 2, GroupName = GroupConstants.GROUP_NAME_TESTING)]
+        [Display(Name = "Target", Description = "The target in ticks.", Order = 3, GroupName = GroupConstants.GROUP_NAME_TESTING)]
         public int Target { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Stop", Description = "The stop in ticks.", Order = 3, GroupName = GroupConstants.GROUP_NAME_TESTING)]
+        [Display(Name = "Stop", Description = "The stop in ticks.", Order = 4, GroupName = GroupConstants.GROUP_NAME_TESTING)]
         public int Stop { get; set; }
 
         #endregion
@@ -192,11 +214,19 @@ namespace NinjaTrader.NinjaScript.Strategies
                 RangeReboundMinMaxDelta = 50;
                 RangeReboundValidEntryTicks = 8;
 
+                StackedImbalanceValidOpenTSP = true;
+
+                VolumeSequencingValidOpenTSP = true;
+
+                // Indicators
+                RatiosEnabled = true;
+
                 // Backtesting
+                BackTestingEnabled = false;
+                BackTestingStrategyName = "StackedImbalances";
                 Quantity = 1;
                 Target = 16;
                 Stop = 16;
-                BackTestingEnabled = false;
             }
             else if (State == State.DataLoaded)
             {
@@ -216,6 +246,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
                 _orderFlowBotState = new OrderFlowBotState();
                 _orderFlowBotState.BackTestingEnabled = BackTestingEnabled;
+                _orderFlowBotState.BackTestingStrategyName = BackTestingStrategyName;
 
                 _strategiesConfig = new StrategiesConfig();
                 _strategiesController = new StrategiesController(_orderFlowBotState, _dataBars, _strategiesConfig);
@@ -228,7 +259,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                          DeltaChaserMinMaxDifferenceMultiplier = DeltaChaserMinMaxDifferenceMultiplier,
                          DeltaChaserValidEntryTicks = DeltaChaserValidEntryTicks,
                          RangeReboundMinMaxDelta = RangeReboundMinMaxDelta,
-                         RangeReboundValidEntryTicks = RangeReboundValidEntryTicks
+                         RangeReboundValidEntryTicks = RangeReboundValidEntryTicks,
+                         StackedImbalanceValidOpenTSP = StackedImbalanceValidOpenTSP,
+                         VolumeSequencingValidOpenTSP = VolumeSequencingValidOpenTSP
                      }
                 );
 
@@ -321,12 +354,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         private void AddIndicators()
         {
-            //if (RatiosEnabled)
-            //{
-            Ratios ratios = Ratios();
-            ratios.InitializeWith(_dataBars);
-            AddChartIndicator(ratios);
-            //}
+            if (RatiosEnabled)
+            {
+                Ratios ratios = Ratios();
+                ratios.InitializeWith(_dataBars);
+                AddChartIndicator(ratios);
+            }
         }
 
         private void Reset()
@@ -354,6 +387,21 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
 
             return true;
+        }
+
+        private bool AllowAtmCheckStrategies()
+        {
+            if (_orderFlowBotState.SelectedTradeDirection == Direction.Flat || _dataBars.Bar.BarNumber <= _lastTradeBarNumber)
+            {
+                return false;
+            }
+
+            if (_orderFlowBotState.AutoTradeEnabled || _orderFlowBotState.SelectedTradeDirection != Direction.Flat)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private void CheckStrategies()
@@ -401,8 +449,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 
             if (_isAtmStrategyCreated)
             {
-                Print("In Atm Strat Created");
-                // Position was created and exited
                 if (AtmIsFlat() && (_orderFlowBotState.ValidStrategyDirection == Direction.Long ||
                     _orderFlowBotState.ValidStrategyDirection == Direction.Short))
                 {
@@ -413,7 +459,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
             if (AtmIsFlat())
             {
-                if (!AllowCheckStrategies())
+                if (!AllowAtmCheckStrategies())
                 {
                     return;
                 }
@@ -441,9 +487,6 @@ namespace NinjaTrader.NinjaScript.Strategies
                             }
                         }
                     });
-
-                    Print("********** ATM Strategy Created **********");
-                    Print(_atmStrategyId);
                 }
 
                 if (_orderFlowBotState.ValidStrategyDirection == Direction.Short)
@@ -467,22 +510,16 @@ namespace NinjaTrader.NinjaScript.Strategies
                             }
                         }
                     });
-
-                    Print("********** ATM Strategy Created **********");
-                    Print(_atmStrategyId);
                 }
             }
         }
 
         private bool AtmIsFlat()
         {
-            if (_atmStrategyId == null)
+            if (_atmStrategyId == null || !_isAtmStrategyCreated)
             {
                 return true;
             }
-
-            Print("********** Calling GetAtmStrategyMarketPosition **********");
-            Print(_atmStrategyId);
 
             return GetAtmStrategyMarketPosition(_atmStrategyId) == MarketPosition.Flat;
         }

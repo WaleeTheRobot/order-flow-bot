@@ -1,4 +1,5 @@
 ﻿using NinjaTrader.Cbi;
+using NinjaTrader.Custom.AddOns;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -130,8 +131,11 @@ namespace NinjaTrader.NinjaScript.Strategies
                 disableButton.Content = _orderFlowBotState.DisableTrading ? "Disabled" : DISABLE_BUTTON_LABEL;
                 disableButton.Background = _orderFlowBotState.DisableTrading ? new SolidColorBrush(Colors.DarkRed) : GetSolidColorBrushFromHex(_buttonNeutral);
 
+                // Disable Auto Trade
+                _orderFlowBotState.AutoTradeEnabled = false;
+
                 DisableEnableTradeManagementButtons();
-                DisableEnableDirectionButtons();
+                DisableEnableDirectionButtons(!_orderFlowBotState.DisableTrading);
                 DisableEnableStrategyButtons();
 
                 PrintOutput(_orderFlowBotState.DisableTrading ? "Trading Disabled" : "Trading Enabled");
@@ -160,11 +164,39 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         private void AutoButtonClick(object sender, RoutedEventArgs e)
         {
-            PrintOutput("Auto clicked.");
-
             if (!CheckATMStrategyLoaded())
             {
                 return;
+            }
+
+            if (Position.MarketPosition == MarketPosition.Flat && AtmIsFlat())
+            {
+                bool currentDisableState = !_tradeManagementButtons[AUTO_BUTTON_LABEL].IsActive;
+
+                _orderFlowBotState.AutoTradeEnabled = currentDisableState;
+
+                // Reset directions before checking
+                DisableEnableDirectionButtons(!_orderFlowBotState.AutoTradeEnabled);
+
+                _orderFlowBotState.SelectedTradeDirection = _orderFlowBotState.AutoTradeEnabled ? Direction.Any : Direction.Flat;
+                _tradeManagementButtons[AUTO_BUTTON_LABEL].IsActive = _orderFlowBotState.AutoTradeEnabled;
+
+                // Update auto button
+                Button autoButton = FindChild<Button>(_tradeManagementGrid, AUTO_BUTTON_LABEL);
+                autoButton.Background = _orderFlowBotState.AutoTradeEnabled ? new SolidColorBrush(Colors.DarkGreen) : GetSolidColorBrushFromHex(_buttonNeutral);
+
+                Button resetDirectionButton = FindChild<Button>(_tradeManagementGrid, RESET_DIRECTION_BUTTON_LABEL);
+
+                if (resetDirectionButton != null)
+                {
+                    resetDirectionButton.IsEnabled = !_orderFlowBotState.AutoTradeEnabled;
+                    resetDirectionButton.Background = GetSolidColorBrushFromHex(_buttonNeutral);
+                }
+
+                PrintOutput(_orderFlowBotState.AutoTradeEnabled ? "Auto Trading Enabled" : "Auto Trading Disabled");
+                Print(string.Format("Trade Direction: {0}", _orderFlowBotState.SelectedTradeDirection));
+
+                ForceRefresh();
             }
         }
     }

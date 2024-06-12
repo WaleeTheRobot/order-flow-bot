@@ -5,6 +5,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot
     public class OrderFlowBotState
     {
         public bool BackTestingEnabled { get; set; }
+        public string BackTestingStrategyName { get; set; }
+        public bool AutoTradeEnabled { get; set; }
         public Direction SelectedTradeDirection { get; set; }
         public Direction ValidStrategyDirection { get; set; }
         public string ValidStrategy { get; set; }
@@ -16,6 +18,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot
         public OrderFlowBotState()
         {
             BackTestingEnabled = false;
+            BackTestingStrategyName = "";
+            AutoTradeEnabled = false;
             SelectedTradeDirection = Direction.Flat;
             ValidStrategyDirection = Direction.Flat;
             ValidStrategy = "None";

@@ -27,7 +27,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 
         public override void CheckLong()
         {
-            if (IsBullishBar() && HasValidAskStackedImbalance())
+            if (IsBullishBar() && HasValidAskStackedImbalance() && IsOpenAboveTriggerStrikePrice())
             {
                 ValidStrategyDirection = Direction.Long;
             }
@@ -35,7 +35,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 
         public override void CheckShort()
         {
-            if (IsBearishBar() && HasValidBidStackedImbalance())
+            if (IsBearishBar() && HasValidBidStackedImbalance() && IsOpenBelowTriggerStrikePrice())
             {
                 ValidStrategyDirection = Direction.Short;
             }
@@ -59,6 +59,26 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
         private bool HasValidBidStackedImbalance()
         {
             return dataBars.Bar.Imbalances.HasBidStackedImbalances;
+        }
+
+        private bool IsOpenAboveTriggerStrikePrice()
+        {
+            if (orderFlowBotState.TriggerStrikePrice == 0 || !OrderFlowBotStrategiesProperties.StackedImbalanceValidOpenTSP)
+            {
+                return true;
+            }
+
+            return dataBars.Bar.Prices.Open > orderFlowBotState.TriggerStrikePrice;
+        }
+
+        private bool IsOpenBelowTriggerStrikePrice()
+        {
+            if (orderFlowBotState.TriggerStrikePrice == 0 || !OrderFlowBotStrategiesProperties.StackedImbalanceValidOpenTSP)
+            {
+                return true;
+            }
+
+            return dataBars.Bar.Prices.Open < orderFlowBotState.TriggerStrikePrice;
         }
     }
 }

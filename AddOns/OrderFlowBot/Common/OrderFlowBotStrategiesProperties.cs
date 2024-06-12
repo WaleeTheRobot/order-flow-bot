@@ -11,6 +11,12 @@
         // Range Rebound
         public int RangeReboundMinMaxDelta { get; set; }
         public int RangeReboundValidEntryTicks { get; set; }
+
+        // Stacked Imbalances
+        public bool StackedImbalanceValidOpenTSP { get; set; }
+
+        // Volume Sequencing
+        public bool VolumeSequencingValidOpenTSP { get; set; }
     }
 
     public static class OrderFlowBotStrategiesProperties
@@ -25,6 +31,12 @@
         public static int RangeReboundMinMaxDelta { get; set; }
         public static int RangeReboundValidEntryTicks { get; set; }
 
+        // Stacked Imbalances
+        public static bool StackedImbalanceValidOpenTSP { get; set; }
+
+        // Volume Sequencing
+        public static bool VolumeSequencingValidOpenTSP { get; set; }
+
         public static void Initialize(OrderFlowBotStrategiesPropertiesValues config)
         {
             DeltaChaserDelta = config.DeltaChaserDelta;
@@ -33,6 +45,8 @@
             DeltaChaserValidEntryTicks = config.DeltaChaserValidEntryTicks;
             RangeReboundMinMaxDelta = config.RangeReboundMinMaxDelta;
             RangeReboundValidEntryTicks = config.RangeReboundValidEntryTicks;
+            StackedImbalanceValidOpenTSP = config.StackedImbalanceValidOpenTSP;
+            VolumeSequencingValidOpenTSP = config.VolumeSequencingValidOpenTSP;
         }
     }
 }

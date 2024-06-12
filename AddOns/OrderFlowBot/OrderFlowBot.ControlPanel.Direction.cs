@@ -113,10 +113,9 @@ namespace NinjaTrader.NinjaScript.Strategies
             _directionButtons.Clear();
         }
 
-        private void DisableEnableDirectionButtons()
+        private void DisableEnableDirectionButtons(bool disableValue)
         {
             ResetTradeDirection();
-            ResetTriggerStrikeTextBox();
 
             foreach (var item in _directionButtons)
             {
@@ -124,7 +123,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
                 if (button != null)
                 {
-                    button.IsEnabled = !_orderFlowBotState.DisableTrading;
+                    button.IsEnabled = disableValue;
                     button.Background = GetSolidColorBrushFromHex(_buttonNeutral);
                 }
 
@@ -134,7 +133,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             // Disable/Enable trigger strike text box
             if (_triggerStrikeTextBox != null)
             {
-                _triggerStrikeTextBox.IsEnabled = !_orderFlowBotState.DisableTrading;
+                _triggerStrikeTextBox.IsEnabled = disableValue;
             }
         }
 
@@ -211,6 +210,15 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         private void ResetTradeDirection()
         {
+            // Don't reset selected trade direction if auto trade is enabled
+            // This will also reset the valid strategy after a trade closes
+            if (_orderFlowBotState.AutoTradeEnabled)
+            {
+                _strategiesController.ResetValidStrategy();
+
+                return;
+            }
+
             ResetTriggerStrikeTextBox();
             _strategiesController.ResetTradeDirection();
 

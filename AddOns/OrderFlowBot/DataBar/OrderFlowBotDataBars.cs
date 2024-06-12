@@ -128,8 +128,9 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar
             Bar.Volumes.Volume = volumes.TotalVolume;
             Bar.Volumes.BuyingVolume = volumes.TotalBuyingVolume;
             Bar.Volumes.SellingVolume = volumes.TotalSellingVolume;
-            Bar.Volumes.ValueAreaHighPrice = volumes.ValueAreaHighPrice;
-            Bar.Volumes.ValueAreaLowPrice = volumes.ValueAreaLowPrice;
+            // Property that may change in the future and not currently supported. Uncommented for now.
+            //Bar.Volumes.ValueAreaHighPrice = volumes.ValueAreaHighPrice;
+            //Bar.Volumes.ValueAreaLowPrice = volumes.ValueAreaLowPrice;
 
             double pointOfControl;
             volumes.GetMaximumVolume(null, out pointOfControl);

@@ -27,7 +27,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 
         public override void CheckLong()
         {
-            if (IsBullishBar() && HasAskVolumeSequencing())
+            if (IsBullishBar() && HasAskVolumeSequencing() && IsOpenAboveTriggerStrikePrice())
             {
                 ValidStrategyDirection = Direction.Long;
             }
@@ -35,7 +35,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 
         public override void CheckShort()
         {
-            if (IsBearishBar() && HasBidVolumeSequencing())
+            if (IsBearishBar() && HasBidVolumeSequencing() && IsOpenBelowTriggerStrikePrice())
             {
                 ValidStrategyDirection = Direction.Short;
             }
@@ -59,6 +59,26 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
         private bool HasBidVolumeSequencing()
         {
             return dataBars.Bar.Volumes.HasBidVolumeSequencing;
+        }
+
+        private bool IsOpenAboveTriggerStrikePrice()
+        {
+            if (orderFlowBotState.TriggerStrikePrice == 0 || !OrderFlowBotStrategiesProperties.VolumeSequencingValidOpenTSP)
+            {
+                return true;
+            }
+
+            return dataBars.Bar.Prices.Open > orderFlowBotState.TriggerStrikePrice;
+        }
+
+        private bool IsOpenBelowTriggerStrikePrice()
+        {
+            if (orderFlowBotState.TriggerStrikePrice == 0 || !OrderFlowBotStrategiesProperties.VolumeSequencingValidOpenTSP)
+            {
+                return true;
+            }
+
+            return dataBars.Bar.Prices.Open < orderFlowBotState.TriggerStrikePrice;
         }
     }
 }

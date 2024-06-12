@@ -1,6 +1,7 @@
 ﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 {
@@ -50,26 +51,23 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
         public void EnableBackTesting()
         {
             _orderFlowBotState.SelectedTradeDirection = Direction.Any;
-
-            foreach (var strategy in _strategies)
-            {
-                _orderFlowBotState.SelectedStrategies.Add(strategy.Name);
-            }
+            _orderFlowBotState.SelectedStrategies.Add(_orderFlowBotState.BackTestingStrategyName);
         }
 
         public void CheckStrategies()
         {
             if (_orderFlowBotState.BackTestingEnabled)
             {
-                // Check every strategy
-                foreach (var strategy in _strategies)
-                {
-                    strategy.CheckStrategy();
+                var backtestingStrategy = _strategies.FirstOrDefault(strategy => strategy.Name == _orderFlowBotState.BackTestingStrategyName);
 
-                    if (strategy.ValidStrategyDirection != Direction.Flat)
+                if (backtestingStrategy != null)
+                {
+                    backtestingStrategy.CheckStrategy();
+
+                    if (backtestingStrategy.ValidStrategyDirection != Direction.Flat)
                     {
-                        _orderFlowBotState.ValidStrategy = strategy.Name;
-                        _orderFlowBotState.ValidStrategyDirection = strategy.ValidStrategyDirection;
+                        _orderFlowBotState.ValidStrategy = backtestingStrategy.Name;
+                        _orderFlowBotState.ValidStrategyDirection = backtestingStrategy.ValidStrategyDirection;
                     }
                 }
 
@@ -112,7 +110,11 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
         public void ResetTradeDirection()
         {
             _orderFlowBotState.SelectedTradeDirection = Direction.Flat;
+            ResetValidStrategy();
+        }
 
+        public void ResetValidStrategy()
+        {
             // Reset valid strategies and direction without removing them
             _orderFlowBotState.ValidStrategy = "None";
             _orderFlowBotState.ValidStrategyDirection = Direction.Flat;

@@ -38,7 +38,7 @@ Resets all sections and disables or enable the sections. No strategies will be c
 
 #### Auto
 
-Automatically trades the selected strategies. This is NOT recommended, but is an option. Only custom created strategies should be considered if this option is used. Both the default strategies "Delta Chaser and Range Rebound" are NOT designed for fully automated trading.
+Automatically trades the selected strategies for both long and short. Disables the Trade Direction. This is NOT recommended, but is an option. Only custom created strategies should be considered if this option is used. None of the default strategies available for OrderFlowBot are designed for fully automated trading.
 
 #### Reset Direction
 
@@ -79,3 +79,7 @@ This strategy is designed for trading pullbacks on a trend or larger price range
 #### Range Rebound
 
 This strategy is designed for trading smaller price ranges aiming to capitalize on mean reversion. Trade the edges with smaller targets on lower volatility times.
+
+## Backtesting
+
+WIP

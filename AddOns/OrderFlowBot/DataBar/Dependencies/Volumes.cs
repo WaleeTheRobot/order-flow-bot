@@ -24,8 +24,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies
         public bool HasAskVolumeSequencing { get; set; }
         public bool HasAskSinglePrint { get; set; }
         public bool HasBidSinglePrint { get; set; }
-        public double ValueAreaHighPrice { get; set; }
-        public double ValueAreaLowPrice { get; set; }
+        //public double ValueAreaHighPrice { get; set; }
+        //public double ValueAreaLowPrice { get; set; }
 
         public Volumes()
         {
