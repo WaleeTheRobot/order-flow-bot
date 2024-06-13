@@ -76,8 +76,6 @@ This indicator shows the bottom divided bid ratios or top divided ask ratios. Th
 
 ## Strategies
 
-<img src="./images/deltachaser.png" alt="OrderFlowBot Delta Chaser" style="display: block; margin: 0 auto">
-
 This section contains the custom created strategies and are dynamically created from the `StrategiesConfig`. The strategies available are intended to be semi-automated, meaning you select the strategy you want OrderFlowBot to start looking at based on your analysis and OrderFlowBot will assist with finding entries based on the strategy. The default strategies here can be used as examples to create your own custom strategy. More strategies will be considered in the future. Note that a strategy will trigger when the requirements are met, but the requirement may become invalid before the bar completes.
 
 #### Delta Chaser
