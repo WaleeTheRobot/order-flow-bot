@@ -22,6 +22,10 @@ For developing, you can copy the OrderFlowBot folder into your local NinjaTrader
 
 For usage, you can download the zip containing the word import in the release page. You can import this zip file similar to importing a normal NinjaTrader Add-On. https://github.com/WaleeTheRobot/order-flow-bot/releases
 
+# Issues
+
+Sometimes NinjaTrader will complain about an import failed. You can just open the zip file from the release and copy the OrderFlowBot folder into the Add On folder on your computer after removing the previous OrderFlowBot folder. It's normally located at: `C:\Users\<username>\Documents\NinjaTrader 8\bin\Custom\AddOns`. Afterwards, open NinjaTrader and click `New` > `NinjaScript Editor`. Click the NinjaScript Editor and press `F5`. It'll take a few seconds and you'll hear a sound. The icon at the bottom left corner of it will disappear when it's done compiling. Close the NinjaScript Editor and you should be good to go.
+
 # Control Panel
 
 <img src="./images/controlpanel.png" alt="OrderFlowBot Control Panel" style="display: block; margin: 0 auto">
