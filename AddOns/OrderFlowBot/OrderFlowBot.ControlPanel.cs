@@ -96,6 +96,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             // Create main grid with rows for each section
             _mainGrid = new Grid
             {
+                Margin = new Thickness(0, 50, 0, 0),
                 Background = GetSolidColorBrushFromHex("#32373b")
             };
 
@@ -105,19 +106,23 @@ namespace NinjaTrader.NinjaScript.Strategies
             _mainGrid.RowDefinitions.Add(new RowDefinition());
 
             TopGrid();
-            TradeManagementGrid();
-            DirectionGrid();
-            StrategiesGrid();
-
             Grid.SetRow(_topGrid, 0);
-            Grid.SetRow(_tradeManagementPanel, 1);
-            Grid.SetRow(_directionPanel, 2);
-            Grid.SetRow(_strategiesPanel, 3);
-
             _mainGrid.Children.Add(_topGrid);
-            _mainGrid.Children.Add(_tradeManagementPanel);
-            _mainGrid.Children.Add(_directionPanel);
-            _mainGrid.Children.Add(_strategiesPanel);
+
+            if (!BackTestingEnabled)
+            {
+                TradeManagementGrid();
+                DirectionGrid();
+                StrategiesGrid();
+
+                Grid.SetRow(_tradeManagementPanel, 1);
+                Grid.SetRow(_directionPanel, 2);
+                Grid.SetRow(_strategiesPanel, 3);
+
+                _mainGrid.Children.Add(_tradeManagementPanel);
+                _mainGrid.Children.Add(_directionPanel);
+                _mainGrid.Children.Add(_strategiesPanel);
+            }
 
             if (TabSelected()) InsertWPFControls();
 

@@ -209,7 +209,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 DeltaChaserDelta = 150;
                 DeltaChaserMinMaxDifferenceDelta = 100;
                 DeltaChaserMinMaxDifferenceMultiplier = 2.5;
-                DeltaChaserValidEntryTicks = 12;
+                DeltaChaserValidEntryTicks = 10;
 
                 RangeReboundMinMaxDelta = 50;
                 RangeReboundValidEntryTicks = 8;
@@ -370,6 +370,21 @@ namespace NinjaTrader.NinjaScript.Strategies
             _entryShort = false;
             _entryName = "";
 
+            // Prevent re-entry on previous exit bar
+            _lastTradeBarNumber = _dataBars.Bar.BarNumber + 1;
+
+            _strategiesController.ResetBackTestingStrategy();
+            _orderFlowBotState.ValidStrategyDirection = Direction.Flat;
+        }
+
+        private void ResetAtm()
+        {
+            PrintOutput(String.Format("Exit | {0}", _entryName));
+
+            _entryLong = false;
+            _entryShort = false;
+            _entryName = "";
+
             _atmStrategyId = null;
             _isAtmStrategyCreated = false;
 
@@ -420,9 +435,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 
                 PrintOutput(String.Format("Enter Long | {0}", _entryName));
 
-
-                //PrintDataBar(_dataBars.Bar);
-
                 return;
             }
 
@@ -432,9 +444,6 @@ namespace NinjaTrader.NinjaScript.Strategies
                 _entryName = _orderFlowBotState.ValidStrategy.ToString();
 
                 PrintOutput(String.Format("Enter Short | {0}", _entryName));
-
-
-                //PrintDataBar(_dataBars.Bar);
 
                 return;
             }
@@ -452,7 +461,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 if (AtmIsFlat() && (_orderFlowBotState.ValidStrategyDirection == Direction.Long ||
                     _orderFlowBotState.ValidStrategyDirection == Direction.Short))
                 {
-                    Reset();
+                    ResetAtm();
                     ControlPanelOnExecutionUpdate();
                 }
             }

@@ -1,14 +1,10 @@
 # OrderFlowBot
 
-In case you see this... it's still in development. So you probably shouldn't use it.
+<img src="./images/screenshot.png" alt="OrderFlowBot" style="display: block; margin: 0 auto">
 
-A bot used for trading order flow with a selected ATM strategy. The recommended way to use OrderFlowBot is semi-automated trading to assist with entries, but fully automated is an option.
+A bot used for trading order flow with a selected ATM strategy. The recommended way to use OrderFlowBot is semi-automated trading to **_assist_** with entries, but fully automated is an option.
 
-OrderFlowBot uses the selected ATM strategy. Just create your ATM strategies and select the one you want to use for the trade.
-
-You can create your own strategies and easily hook it to OrderFlowBot for semi-automated or fully automated trading. You can also use the simple strategies to look for entries.
-
-Indicators can also be created with data from the OrderFlowBot DataBar for usage when the OrderFlowBot is enabled.
+OrderFlowBot uses the selected ATM strategy. Just create your ATM strategies and select the one you want to use for the trade. You can create your own strategies and easily hook it to OrderFlowBot for semi-automated or fully automated trading. Indicators can also be created with data from the OrderFlowBot DataBar for usage when the OrderFlowBot is enabled.
 
 # Important
 
@@ -28,6 +24,8 @@ For usage, you can download the zip containing the word import in the release pa
 
 # Control Panel
 
+<img src="./images/controlpanel.png" alt="OrderFlowBot Control Panel" style="display: block; margin: 0 auto">
+
 ## Trade Management
 
 This section has options to manage OrderFlowBot, quickly clear other sections and close trades.
@@ -38,7 +36,7 @@ Resets all sections and disables or enable the sections. No strategies will be c
 
 #### Auto
 
-Automatically trades the selected strategies for both long and short. Disables the Trade Direction. This is NOT recommended, but is an option. Only custom created strategies should be considered if this option is used. None of the default strategies available for OrderFlowBot are designed for fully automated trading.
+Automatically trades the selected strategies for both long and short. Disables the Trade Direction. This is **NOT** recommended, but is an option. Only custom created strategies should be considered if this option is used. None of the default strategies available for OrderFlowBot are designed for fully automated trading.
 
 #### Reset Direction
 
@@ -68,18 +66,100 @@ Select this to look for long trades.
 
 Select this to look for short trades.
 
+## Indicators
+
+#### Ratios
+
+ <img src="./images/ratios.png" alt="OrderFlowBot Ratios" style="display: block; margin: 0 auto">
+
+This indicator shows the bottom divided bid ratios or top divided ask ratios. The ratios will be displayed in color, bold and larger font if it meets the threshold in `ValidExhaustionRatio` or `ValidAbsorptionRatio` properies.
+
 ## Strategies
 
-This section contains the custom created strategies and are dynamically created from the `StrategiesConfig`. The default strategies here can be used as examples to create your own custom strategy.
+<img src="./images/deltachaser.png" alt="OrderFlowBot Delta Chaser" style="display: block; margin: 0 auto">
+
+This section contains the custom created strategies and are dynamically created from the `StrategiesConfig`. The default strategies here can be used as examples to create your own custom strategy. More strategies will be considered in the future. Note that a strategy will trigger when the requirements are met, but the requirement may become invalid before the bar completes.
 
 #### Delta Chaser
 
+<img src="./images/deltachaser.png" alt="OrderFlowBot Delta Chaser" style="display: block; margin: 0 auto">
+
 This strategy is designed for trading pullbacks on a trend or larger price ranges. Trade the structure with appropriate targets on higher volatility times.
+
+#### Long
+
+- Bullish bar
+- Open above trigger strike price and within `DeltaChaserValidEntryTicks` if trigger strike price is used
+- Max delta >= `DeltaChaserMinMaxDifferenceMultiplier` \* Min delta
+- Delta > `DeltaChaserDelta`
+
+#### Short
+
+- Bearish bar
+- Open below trigger strike price and wihtin `DeltaChaserValidEntryTicks` if trigger strike price is used
+- Min delta >= `DeltaChaserMinMaxDifferenceMultiplier` \* Max delta
+- Delta < -`DeltaChaserDelta`
 
 #### Range Rebound
 
-This strategy is designed for trading smaller price ranges aiming to capitalize on mean reversion. Trade the edges with smaller targets on lower volatility times.
+<img src="./images/rangerebound.png" alt="OrderFlowBot Range Rebound" style="display: block; margin: 0 auto">
+
+This strategy is designed for trading smaller price ranges aiming to capitalize on reversion with quicker entries based on deltas. Trade the edges with smaller targets on lower volatility times.
+
+#### Long
+
+- Bullish bar
+- Open above trigger strike price and within `RangeReboundValidEntryTicks` if trigger strike price is used
+- Min delta > -`RangeReboundMinMaxDelta`
+- Max delta > `RangeReboundMinMaxDelta`
+
+#### Short
+
+- Bearish bar
+- Open below trigger strike price and within `RangeReboundValidEntryTicks` if trigger strike price is used
+- Min delta < -`RangeReboundMinMaxDelta`
+- Max delta < `RangeReboundMinMaxDelta`
+
+#### Stacked Imbalances
+
+<img src="./images/stackedimbalances.png" alt="OrderFlowBot Stacked Imbalances" style="display: block; margin: 0 auto">
+
+This strategy is the common stacked imbalances strategy.
+
+#### Long
+
+- Bullish bar
+- Open above trigger strike price if trigger strike price is used
+- Has valid ask stacked imbalances
+
+#### Short
+
+- Bearish bar
+- Open below trigger strike price if trigger strike price is used
+- Has valid bid stacked imbalances
+
+#### Volume Sequencing
+
+<img src="./images/volumesequencing.png" alt="OrderFlowBot Volume Sequencing" style="display: block; margin: 0 auto">
+
+This strategy is triggered based on the sequential increasing volume starting from the top or bottom.
+
+#### Long
+
+- Bullish bar
+- Open above trigger strike price if trigger strike price is used
+- Has sequential increasing volume on ask starting from the bottom of bar
+
+#### Short
+
+- Bearish bar
+- Open below trigger strike price if trigger strike price is used
+- Has sequential increasing volume on bid starting from the top of bar
 
 ## Backtesting
 
-WIP
+You can backtest your strategies by enabling the backtesting. This will use the backtest file name, target and stop where you enabled the backtesting.
+
+## Adding Strategies and Indicators
+
+The custom DataBar should be used if you are considering adding strategies and indicators. It takes some of the data from the volumetric bars and creates custom bars that you can also add any additional information to. The default strategies and indicators can be used as a reference.

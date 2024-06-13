@@ -2,7 +2,7 @@
 
 namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 {
-    // This strategy is designed for trading smaller price ranges aiming to capitalize on mean reversion.
+    // This strategy is designed for trading smaller price ranges aiming to capitalize on reversion.
     // Trade the edges with smaller targets on lower volatility times.
     public class RangeRebound : StrategyBase
     {

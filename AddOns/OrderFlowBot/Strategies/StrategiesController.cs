@@ -94,10 +94,21 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
             }
         }
 
+        public void ResetBackTestingStrategy()
+        {
+            _orderFlowBotState.ValidStrategy = "None";
+
+            var backtestingStrategy = _strategies.FirstOrDefault(strategy => strategy.Name == _orderFlowBotState.BackTestingStrategyName);
+
+            if (backtestingStrategy != null)
+            {
+                backtestingStrategy.ValidStrategyDirection = Direction.Flat;
+            }
+        }
+
         // Set all strategies false
         public void ResetStrategies()
         {
-
             _orderFlowBotState.ValidStrategyDirection = Direction.Flat;
 
             foreach (var strategy in _strategies)
