@@ -2,7 +2,7 @@
 
 <img src="./images/screenshot.png" alt="OrderFlowBot" style="display: block; margin: 0 auto">
 
-A bot used for trading order flow with a selected ATM strategy. The recommended way to use OrderFlowBot is semi-automated trading to **_assist_** with entries, but fully automated is an option.
+A bot used for trading order flow with a selected ATM strategy. The recommended way to use OrderFlowBot is semi-automated trading to **ASSIST** with entries, but fully automated is an option.
 
 OrderFlowBot uses the selected ATM strategy. Just create your ATM strategies and select the one you want to use for the trade. You can create your own strategies and easily hook it to OrderFlowBot for semi-automated or fully automated trading. Indicators can also be created with data from the OrderFlowBot DataBar for usage when the OrderFlowBot is enabled.
 
@@ -36,7 +36,7 @@ Resets all sections and disables or enable the sections. No strategies will be c
 
 #### Auto
 
-Automatically trades the selected strategies for both long and short. Disables the Trade Direction. This is **NOT** recommended, but is an option. Only custom created strategies should be considered if this option is used. None of the default strategies available for OrderFlowBot are designed for fully automated trading.
+Automatically trades the selected strategies for both long and short. Disables the Trade Direction. This is **NOT** recommended, but is an option. Only custom created advanced strategies should be considered if this option is used. None of the default strategies available for OrderFlowBot are designed for fully automated trading.
 
 #### Reset Direction
 
@@ -48,7 +48,7 @@ Resets the Strategies section.
 
 #### Close
 
-Closes any ATM position and resets the Trade Direction section.
+Closes any ATM positions created by OrderFlowBot and resets the Trade Direction section.
 
 ## Trade Direction
 
@@ -78,7 +78,7 @@ This indicator shows the bottom divided bid ratios or top divided ask ratios. Th
 
 <img src="./images/deltachaser.png" alt="OrderFlowBot Delta Chaser" style="display: block; margin: 0 auto">
 
-This section contains the custom created strategies and are dynamically created from the `StrategiesConfig`. The default strategies here can be used as examples to create your own custom strategy. More strategies will be considered in the future. Note that a strategy will trigger when the requirements are met, but the requirement may become invalid before the bar completes.
+This section contains the custom created strategies and are dynamically created from the `StrategiesConfig`. The strategies available are intended to be semi-automated, meaning you select the strategy you want OrderFlowBot to start looking at based on your analysis and OrderFlowBot will assist with finding entries based on the strategy. The default strategies here can be used as examples to create your own custom strategy. More strategies will be considered in the future. Note that a strategy will trigger when the requirements are met, but the requirement may become invalid before the bar completes.
 
 #### Delta Chaser
 
