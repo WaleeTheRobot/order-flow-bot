@@ -1,130 +1,165 @@
 # OrderFlowBot
 
-<img src="./images/screenshot.png" alt="Order Flow Bot">
+<img src="./images/screenshot.png" alt="OrderFlowBot" style="display: block; margin: 0 auto">
 
-A bot used for trading order flow. The primary focus for OrderFlowBot is semi-automated trading. Strategies can be added and then manually selected for the software to look for entries. Indicators can also be added so they will startup when the OrderFlowBot strategy is enabled.
+A bot used for trading order flow with a selected ATM strategy. The recommended way to use OrderFlowBot is semi-automated trading to **_assist_** with entries, but fully automated is an option.
+
+OrderFlowBot uses the selected ATM strategy. Just create your ATM strategies and select the one you want to use for the trade. You can create your own strategies and easily hook it to OrderFlowBot for semi-automated or fully automated trading. Indicators can also be created with data from the OrderFlowBot DataBar for usage when the OrderFlowBot is enabled.
 
 # Important
 
-Requires the lifetime NinjaTrader license for the volumetric data
+Requires the lifetime NinjaTrader license for the volumetric data or the Order Flow + subscription.
 
 Make sure Tick Replay is Checked.
+
+Make sure you have ATM strategies.
+
+OrderFlowBot may not work if using a version of NinjaTrader below 8.1.2.1. This is the minimum version supporting features up to C# 8. The below are information about OrderFlowBot usage.
+
+Consider increasing the ticks per level in the data series for less liquid assets.
 
 For developing, you can copy the OrderFlowBot folder into your local NinjaTrader AddOns folder.
 
 For usage, you can download the zip containing the word import in the release page. You can import this zip file similar to importing a normal NinjaTrader Add-On. https://github.com/WaleeTheRobot/order-flow-bot/releases
 
-# Development
+# Control Panel
 
-A clean NinjaTrader 8.1.2.1+ install should have Newtonsoft in `C:\Program Files\NinjaTrader 8\bin`, but you can manually add it below if needed.
+<img src="./images/controlpanel.png" alt="OrderFlowBot Control Panel" style="display: block; margin: 0 auto">
 
-If you run into any issues about another assembly having a higher version of Newtonsoft, you can try removing the reference to it in the NinjaScript Editor similar to adding it below.
+## Trade Management
 
-From NuGet add the following to NinjaTrader.Custom:
+This section has options to manage OrderFlowBot, quickly clear other sections and close trades.
 
-- Newtonsoft.Json
+#### Enabled/Disabled
 
-Right click the NinjaScript Editor and click References to add the following:
+Resets all sections and disables or enable the sections. No strategies will be checked when disabled is selected. This can only be activated when there aren't any positions opened.
 
-The version should match the installed version
+#### Auto
 
-- C:\Program Files\NinjaTrader 8\bin\Newtonsoft.Json.dll
+Automatically trades the selected strategies for both long and short. Disables the Trade Direction. This is **NOT** recommended, but is an option. Only custom created strategies should be considered if this option is used. None of the default strategies available for OrderFlowBot are designed for fully automated trading.
 
-The version should match the other added references. You might also need to add this.
+#### Reset Direction
 
-- C:\\Windows\Microsoft.NET\Framework\v4.0.30319\netstandard.dll
+Resets the Trade Direction section.
 
-# Usage
+#### Reset Strategies
 
-OrderFlowBot may not work if using a version of NinjaTrader below 8.1.2.1. This is the minimum version supporting features up to C# 8. The below are information about OrderFlowBot usage.
+Resets the Strategies section.
 
-### ATM Strategy
+#### Close
 
-OrderFlowBot uses an ATM Strategy. The default is called OrderFlowBot. This will be used when a strategy's requirements are met for entry. You will need to create an ATM Strategy and include it in OrderFlowBot options.
+Closes any ATM position and resets the Trade Direction section.
 
-### Control Panel Buttons
+## Trade Direction
 
-The control panel buttons is disabled when backtesting is enabled.
+This section contains the inputs for triggering a trade direction.
 
-<img src="./images/controlpanel.png" alt="Order Flow Bot Control Panel">
+#### Trigger Strike Price
 
-Long - Use this with a selected strategy to look for a long entry.
+The strike price to trigger the strategy to start looking for an entry. A threshold in the strategies properties section is set to allow for a buffer for triggering. The trigger strike price will only be considered if there is a value set in the input.
 
-Short - Use this with a selected strategy to look for a short entry.
+#### Long
 
-Long and Short - Use this with a selected strategy to look for either a long or short entry.
+Select this to look for long trades.
 
-Trend / Range - The default is Trend. Use this to select a Trend or Range market. Selecting trend will enter strategies as normal. Range will reverse the strategy. For example, if your strategy found a long entry with Range selected you will enter short instead of enter long.
+#### Short
 
-Close - This closes the current position with the ATM without disabling OrderFlowBot. The default NinjaTrade Close button will disable the OrderFlowBot.
+Select this to look for short trades.
 
-Strategies - Use a single or multiple strategies with the Long or Short button. Selecting multiple will look for an entry based on all selected strategies. It will enter based on the first valid strategy it finds.
+## Indicators
 
-### Backtesting
+#### Ratios
 
-You can backtest your strategies by enabling the backtesting. This will use the target and stop where you enabled the backtesting. This will backtest all the strategies and can be a way to automate OrderFlowBot, but it is not the primary focus. To backtest a single strategy, you can just comment out the other strategies in the `OrderFlowBot/StrategiesIndicators/StrategiesIndicatorsConfig` file.
+ <img src="./images/ratios.png" alt="OrderFlowBot Ratios" style="display: block; margin: 0 auto">
 
-Selecting `JSONFileEnabled` when backtesting will create two JSON files called `orderflowbot-winning-trades.json` and `orderflowbot-losing-trades.json` to the desktop. This will have the values for the OrderFlowBot entry databar and databar before it so that they can be used for any further analysis.
+This indicator shows the bottom divided bid ratios or top divided ask ratios. The ratios will be displayed in color, bold and larger font if it meets the threshold in `ValidExhaustionRatio` or `ValidAbsorptionRatio` properies.
 
-# Included Indicators
+## Strategies
 
-The below indicators are included for OrderFlowBot and can be used as examples to add any other indicators. The indicators are not loaded like the standard NinjaTrader indicators. You will need to disable or enable them through the strategy since they use the data from the strategy.
+<img src="./images/deltachaser.png" alt="OrderFlowBot Delta Chaser" style="display: block; margin: 0 auto">
 
-### Ratios
+This section contains the custom created strategies and are dynamically created from the `StrategiesConfig`. The default strategies here can be used as examples to create your own custom strategy. More strategies will be considered in the future. Note that a strategy will trigger when the requirements are met, but the requirement may become invalid before the bar completes.
 
-Made popular by Mike from OrderFlows, this shows the bottom divided bid ratios or top divided ask ratios. The ratios will be displayed in color, bold and larger font if it meets the threshold in `ValidExhaustionRatio` or `ValidAbsorptionRatio` properies.
+#### Delta Chaser
 
-<img src="./images/ratios.png" alt="Ratios" width="600" height="500">
+<img src="./images/deltachaser.png" alt="OrderFlowBot Delta Chaser" style="display: block; margin: 0 auto">
 
-### Last Exhaustion Absorption Price
+This strategy is designed for trading pullbacks on a trend or larger price ranges. Trade the structure with appropriate targets on higher volatility times.
 
-This shows the prices for the last valid exhaustion or valid absorption ratios for the bid and ask.
+#### Long
 
-<img src="./images/lastratioprice.png" alt="Ratios" width="600" height="500">
+- Bullish bar
+- Open above trigger strike price and within `DeltaChaserValidEntryTicks` if trigger strike price is used
+- Max delta >= `DeltaChaserMinMaxDifferenceMultiplier` \* Min delta
+- Delta > `DeltaChaserDelta`
 
-### Single Print
+#### Short
 
-This draws a bold red rectangle for single prints on the top and bottom of the bar. You may need to adjust the bar width and bar width shift when using the volume profile for the bar. A bar width of 4 and bar width shift of 1.58 might be a good starting point to start adjusting for your chart.
+- Bearish bar
+- Open below trigger strike price and wihtin `DeltaChaserValidEntryTicks` if trigger strike price is used
+- Min delta >= `DeltaChaserMinMaxDifferenceMultiplier` \* Max delta
+- Delta < -`DeltaChaserDelta`
 
-<img src="./images/singleprint.png" alt="Ratios" width="600" height="500">
+#### Range Rebound
 
-# Included Strategies
+<img src="./images/rangerebound.png" alt="OrderFlowBot Range Rebound" style="display: block; margin: 0 auto">
 
-The below are included for OrderFlowBot and can be used as an example to add any other strategies. Note that there is a check to not re-enter on the same bar in the main program so a strategy doesn't re-enter on the same bar. This will prevent multiple entries on a bar, to prevent any false entries.
+This strategy is designed for trading smaller price ranges aiming to capitalize on reversion with quicker entries based on deltas. Trade the edges with smaller targets on lower volatility times.
 
-### Stacked Imbalances
+#### Long
 
-Long Position: Bullish bar with ask stacked imbalances.
+- Bullish bar
+- Open above trigger strike price and within `RangeReboundValidEntryTicks` if trigger strike price is used
+- Min delta > -`RangeReboundMinMaxDelta`
+- Max delta > `RangeReboundMinMaxDelta`
 
-Short Position: Bearish bar with bid stacked imbalances.
+#### Short
 
-<img src="./images/stackedimbalances.png" alt="Stacked Imbalances" width="600" height="500">
+- Bearish bar
+- Open below trigger strike price and within `RangeReboundValidEntryTicks` if trigger strike price is used
+- Min delta < -`RangeReboundMinMaxDelta`
+- Max delta < `RangeReboundMinMaxDelta`
 
-### Delta Divergence
+#### Stacked Imbalances
 
-Long Position: Bullish bar, positive delta and new low based on last number of LookBackBars.
+<img src="./images/stackedimbalances.png" alt="OrderFlowBot Stacked Imbalances" style="display: block; margin: 0 auto">
 
-Short Position: Bearish bar, negative delta and new high based on last number of LookBackBars.
+This strategy is the common stacked imbalances strategy.
 
-<img src="./images/deltadivergence.png" alt="Delta Divergence" width="600" height="500">
+#### Long
 
-### Volume Sequencing
+- Bullish bar
+- Open above trigger strike price if trigger strike price is used
+- Has valid ask stacked imbalances
 
-Long Position: Bullish bar with sequential increasing volume on ask from bottom of bar.
+#### Short
 
-Short Position: Bearish bar with sequential decreasing volume on bid from top of bar.
+- Bearish bar
+- Open below trigger strike price if trigger strike price is used
+- Has valid bid stacked imbalances
 
-<img src="./images/volumesequencing.png" alt="Volume Sequencing" width="600" height="500">
+#### Volume Sequencing
 
-# Adding Strategies and Indicators
+<img src="./images/volumesequencing.png" alt="OrderFlowBot Volume Sequencing" style="display: block; margin: 0 auto">
 
-The custom DataBar should be used if you are considering adding strategies and indicators. It takes some of the data from the volumetric bars and creates custom bars that you can also add any additional information to.
+This strategy is triggered based on the sequential increasing volume starting from the top or bottom.
 
-- Add your strategy or indicator into the config `StrategiesIndicatorsConfigList` in `OrderFlowBot/StrategiesIndicators/StrategiesIndicatorsConfig` file.
-- Create the class for your strategy or indicator and add it in `OrderFlowBot/StrategiesIndicators/Strategies/` or `OrderFlowBot/StrategiesIndicators/Indicators/`.
-- The strategies are dynamically instantiated based on the config. Make sure to inherit the `StrategyBase` class similar to the `StackedImbalances` strategy.
-- For an indicator, you can copy one of the existing indicators and make sure to also modify the NinjaScript generated code to reflect your indicator class. Go to `OrderFlowBot/OrderFlowBot` and add the option to enable or disable it in the `Indicators Properties`. Make sure to set the default value in `OnStateChange()` and add a check in `AddIndicators()`.
+#### Long
 
-# Unit Testing
+- Bullish bar
+- Open above trigger strike price if trigger strike price is used
+- Has sequential increasing volume on ask starting from the bottom of bar
 
-Not the greatest way to go about it, but essentially just copying over code and testing them with mock data. This is really just used to make sure some of the values are as expected.
+#### Short
+
+- Bearish bar
+- Open below trigger strike price if trigger strike price is used
+- Has sequential increasing volume on bid starting from the top of bar
+
+## Backtesting
+
+You can backtest your strategies by enabling the backtesting. This will use the backtest file name, target and stop where you enabled the backtesting.
+
+## Adding Strategies and Indicators
+
+The custom DataBar should be used if you are considering adding strategies and indicators. It takes some of the data from the volumetric bars and creates custom bars that you can also add any additional information to. The default strategies and indicators can be used as a reference.

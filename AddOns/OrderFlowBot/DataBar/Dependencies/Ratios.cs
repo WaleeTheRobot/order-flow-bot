@@ -12,8 +12,6 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies
         public bool HasValidBidExhaustionRatio { get; set; }
         public bool HasValidAskAbsorptionRatio { get; set; }
         public bool HasValidBidAbsorptionRatio { get; set; }
-        public double LastValidAskRatioPrice { get; set; }
-        public double LastValidBidRatioPrice { get; set; }
 
         public void SetRatios(List<BidAskVolume> bidAskVolumes, bool validBidAskVolumes, BarType dataBarType)
         {
@@ -57,9 +55,6 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies
                     break;
                 }
             }
-
-            this.LastValidBidRatioPrice = lastBidPrice;
-            this.LastValidAskRatioPrice = lastAskPrice;
         }
 
         private void GetBottomBidVolumes(List<BidAskVolume> bidAskVolumes, out double secondBottomBid, out double bottomBid)
@@ -91,12 +86,12 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies
 
         private bool IsValidExhaustedRatio(double ratio)
         {
-            return ratio > OrderFlowBotProperties.ValidExhaustionRatio;
+            return ratio > OrderFlowBotDataBarConfig.ValidExhaustionRatio;
         }
 
         private bool IsValidAbsorptionRatio(double ratio)
         {
-            return ratio < OrderFlowBotProperties.ValidAbsorptionRatio;
+            return ratio < OrderFlowBotDataBarConfig.ValidAbsorptionRatio;
         }
     }
 }

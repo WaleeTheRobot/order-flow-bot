@@ -1,6 +1,6 @@
 ﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar;
 
-namespace NinjaTrader.Custom.AddOns.OrderFlowBot.StrategiesIndicators.Strategies
+namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 {
     public class VolumeSequencing : StrategyBase
     {
@@ -10,7 +10,6 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.StrategiesIndicators.Strategies
         public VolumeSequencing(OrderFlowBotState orderFlowBotState, OrderFlowBotDataBars dataBars, string name)
         : base(orderFlowBotState, dataBars, name)
         {
-            // This can be used to initialize other values.
         }
 
         public override void CheckStrategy()
@@ -26,19 +25,17 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.StrategiesIndicators.Strategies
             }
         }
 
-        // Has sequential ask volume from last ValidVolumeSequencing starting from the bottom.
         public override void CheckLong()
         {
-            if (IsBullishBar() && HasAskVolumeSequencing())
+            if (IsBullishBar() && HasAskVolumeSequencing() && IsOpenAboveTriggerStrikePrice())
             {
                 ValidStrategyDirection = Direction.Long;
             }
         }
 
-        // Has sequential bid volume from first ValidVolumeSequencing starting from the top.
         public override void CheckShort()
         {
-            if (IsBearishBar() && HasBidVolumeSequencing())
+            if (IsBearishBar() && HasBidVolumeSequencing() && IsOpenBelowTriggerStrikePrice())
             {
                 ValidStrategyDirection = Direction.Short;
             }
@@ -62,6 +59,26 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.StrategiesIndicators.Strategies
         private bool HasBidVolumeSequencing()
         {
             return dataBars.Bar.Volumes.HasBidVolumeSequencing;
+        }
+
+        private bool IsOpenAboveTriggerStrikePrice()
+        {
+            if (orderFlowBotState.TriggerStrikePrice == 0 || !OrderFlowBotStrategiesProperties.VolumeSequencingValidOpenTSP)
+            {
+                return true;
+            }
+
+            return dataBars.Bar.Prices.Open > orderFlowBotState.TriggerStrikePrice;
+        }
+
+        private bool IsOpenBelowTriggerStrikePrice()
+        {
+            if (orderFlowBotState.TriggerStrikePrice == 0 || !OrderFlowBotStrategiesProperties.VolumeSequencingValidOpenTSP)
+            {
+                return true;
+            }
+
+            return dataBars.Bar.Prices.Open < orderFlowBotState.TriggerStrikePrice;
         }
     }
 }

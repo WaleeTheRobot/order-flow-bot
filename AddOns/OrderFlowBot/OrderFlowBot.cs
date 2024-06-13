@@ -2,13 +2,10 @@
 using NinjaTrader.Cbi;
 using NinjaTrader.Custom.AddOns;
 using NinjaTrader.Custom.AddOns.OrderFlowBot;
-using NinjaTrader.Custom.AddOns.OrderFlowBot.BackTesting;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar;
-using NinjaTrader.Custom.AddOns.OrderFlowBot.StrategiesIndicators;
-using NinjaTrader.Custom.AddOns.OrderFlowBot.StrategiesIndicators.Strategies;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies;
 using NinjaTrader.NinjaScript.Indicators;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 #endregion
 
@@ -17,32 +14,31 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
     public static class GroupConstants
     {
-        public const string GROUP_NAME_STRATEGY = "Order Flow Bot";
+        public const string GROUP_NAME_GENERAL = "Order Flow Bot";
         public const string GROUP_NAME_DATA_BAR = "Data Bar";
+        public const string GROUP_NAME_STRATEGIES = "Strategies";
         public const string GROUP_NAME_INDICATORS = "Indicators";
         public const string GROUP_NAME_TESTING = "Testing";
     }
 
-    [Gui.CategoryOrder(GroupConstants.GROUP_NAME_STRATEGY, 1)]
-    [Gui.CategoryOrder(GroupConstants.GROUP_NAME_DATA_BAR, 2)]
+    [Gui.CategoryOrder(GroupConstants.GROUP_NAME_GENERAL, 0)]
+    [Gui.CategoryOrder(GroupConstants.GROUP_NAME_DATA_BAR, 1)]
+    [Gui.CategoryOrder(GroupConstants.GROUP_NAME_STRATEGIES, 2)]
     [Gui.CategoryOrder(GroupConstants.GROUP_NAME_INDICATORS, 3)]
+    [Gui.CategoryOrder(GroupConstants.GROUP_NAME_TESTING, 4)]
     public partial class OrderFlowBot : Strategy
     {
         #region Variables
 
         private OrderFlowBotState _orderFlowBotState;
         private OrderFlowBotDataBars _dataBars;
-        private StrategiesIndicatorsConfig _strategiesIndicatorsConfig;
-        private StrategiesController _strategiesController;
-        private OrderFlowBotPropertiesConfig _config;
 
-        private OrderFlowBotJsonFile _jsonFile;
+        private StrategiesConfig _strategiesConfig;
+        private StrategiesController _strategiesController;
 
         private bool _entryLong;
         private bool _entryShort;
         private string _entryName;
-        private List<string> _winningTradesExecutionIds;
-        private List<string> _losingTradesExecutionIds;
         private string _atmStrategyId;
         private bool _isAtmStrategyCreated;
         // Prevent entry on same bar
@@ -50,11 +46,99 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         #endregion
 
-        #region Properties
+        #region General Properties
 
         [NinjaScriptProperty]
-        [Display(Name = "ATM Template Name", Description = "The ATM template name to use.", Order = 0, GroupName = GroupConstants.GROUP_NAME_STRATEGY)]
-        public string AtmTemplateName { get; set; }
+        [Display(Name = "Version", Description = "OrderFlowBot version.", Order = 0, GroupName = GroupConstants.GROUP_NAME_GENERAL)]
+        public string Version
+        {
+            get { return "2.0.0"; }
+            private set { }
+        }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Min Bars Required To Trade", Description = "The minimum bars required to trade.", Order = 1, GroupName = GroupConstants.GROUP_NAME_GENERAL)]
+        public int MinBarsRequiredToTrade { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Trigger Strike Price Threshold Ticks", Description = "The threshold above and below the trigger strike price for triggering in ticks.", Order = 2, GroupName = GroupConstants.GROUP_NAME_GENERAL)]
+        public int TriggerStrikePriceThresholdTicks { get; set; }
+
+        #endregion
+
+        #region DataBar Properties
+
+        [NinjaScriptProperty]
+        [Display(Name = "Imbalance Ratio", Description = "The minimum imbalance ratio.", Order = 0, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
+        public double ImbalanceRatio { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Stacked Imbalance", Description = "The minimum number for a stacked imbalance.", Order = 1, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
+        public int StackedImbalance { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Valid Imbalance Volume", Description = "The minimum number of volume for a valid imbalance.", Order = 2, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
+        public long ValidImbalanceVolume { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Valid Exhaustion Ratio", Description = "The valid exhaustion ratio for comparing top and bottom.", Order = 3, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
+        public double ValidExhaustionRatio { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Valid Absorption Ratio", Description = "The valid absorption ratio for comparing top and bottom.", Order = 4, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
+        public double ValidAbsorptionRatio { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Valid Volume Sequencing", Description = "The valid number of price to check for volume sequencing.", Order = 5, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
+        public int ValidVolumeSequencing { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Valid Volume Sequencing Minimum Volume", Description = "The valid number of volume to check for volume sequencing.", Order = 6, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
+        public long ValidVolumeSequencingMinimumVolume { get; set; }
+
+        #endregion
+
+        #region Strategies Properties
+
+        [NinjaScriptProperty]
+        [Display(Name = "Delta Chaser Delta", Description = "Min delta will be less than this number as negative for bearish. Max delta will be more than this number as positive for bullish.", Order = 0, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
+        public int DeltaChaserDelta { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Delta Chaser Min Max Difference Delta", Description = "Min delta will be greater than this number as negative for bullish. Max delta will be less than this number as positive for bearish.", Order = 1, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
+        public int DeltaChaserMinMaxDifferenceDelta { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Delta Chaser Min Max Difference Multiplier", Description = "Min delta will be multiplied by this number for bearish. Max delta will be multiplied by this for bullish.", Order = 2, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
+        public double DeltaChaserMinMaxDifferenceMultiplier { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Delta Chaser Valid Entry Ticks", Description = "Spot price has to be equal to within this for a valid entry in ticks.", Order = 3, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
+        public int DeltaChaserValidEntryTicks { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Range Rebound Min Max Delta", Description = "Min delta will be less than this number as negative for bearish. Max delta will be more than this number as positive for bullish.", Order = 4, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
+        public int RangeReboundMinMaxDelta { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Range Rebound Valid Entry Ticks", Description = "Spot price has to be equal to within this for a valid entry in ticks.", Order = 5, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
+        public int RangeReboundValidEntryTicks { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Stacked Imbalance Valid Open TSP", Description = "Enable to enter only if open above Trigger Strike Price for long or below it for short if TSP exist.", Order = 6, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
+        public bool StackedImbalanceValidOpenTSP { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Volume Sequencing Valid Open TSP", Description = "Enable to enter only if open above Trigger Strike Price for long or below it for short if TSP exist.", Order = 7, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
+        public bool VolumeSequencingValidOpenTSP { get; set; }
+
+        #endregion
+
+        #region Indicators Properties
+
+        [NinjaScriptProperty]
+        [Display(Name = "Ratios Enabled", Description = "Enable to display ratios indicator", Order = 0, GroupName = GroupConstants.GROUP_NAME_INDICATORS)]
+        public bool RatiosEnabled { get; set; }
 
         #endregion
 
@@ -65,8 +149,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         public bool BackTestingEnabled { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "JSON File Enabled", Description = "Enable this to create a JSON file of trades to the desktop.", Order = 1, GroupName = GroupConstants.GROUP_NAME_TESTING)]
-        public bool JsonFileEnabled { get; set; }
+        [Display(Name = "Back Testing Strategy Name", Description = "The strategy name to back test. This should be the same as the file name.", Order = 1, GroupName = GroupConstants.GROUP_NAME_TESTING)]
+        public string BackTestingStrategyName { get; set; }
 
         [NinjaScriptProperty]
         [Display(Name = "Quantity", Description = "The name order quantity.", Order = 2, GroupName = GroupConstants.GROUP_NAME_TESTING)]
@@ -79,70 +163,6 @@ namespace NinjaTrader.NinjaScript.Strategies
         [NinjaScriptProperty]
         [Display(Name = "Stop", Description = "The stop in ticks.", Order = 4, GroupName = GroupConstants.GROUP_NAME_TESTING)]
         public int Stop { get; set; }
-
-        #endregion
-
-        #region Indicators Properties
-
-        [NinjaScriptProperty]
-        [Display(Name = "Ratios Enabled", Description = "Enable ratios.", Order = 0, GroupName = GroupConstants.GROUP_NAME_INDICATORS)]
-        public bool RatiosEnabled { get; set; }
-
-        [NinjaScriptProperty]
-        [Display(Name = "Last Ratios Price Enabled", Description = "Enable the last bid/ask ratios price.", Order = 1, GroupName = GroupConstants.GROUP_NAME_INDICATORS)]
-        public bool LastRatiosPriceEnabled { get; set; }
-
-        [NinjaScriptProperty]
-        [Display(Name = "Single Print Enabled", Description = "Enable single print.", Order = 2, GroupName = GroupConstants.GROUP_NAME_INDICATORS)]
-        public bool SinglePrintEnabled { get; set; }
-
-        [NinjaScriptProperty]
-        [Display(Name = "Single Print Bar Width", Description = "Adjust bar width for single print box.", Order = 3, GroupName = GroupConstants.GROUP_NAME_INDICATORS)]
-        public double SinglePrintBarWidth { get; set; }
-
-        [NinjaScriptProperty]
-        [Display(Name = "Single Print Enabled", Description = "Adjust bar width shift for single print box.", Order = 4, GroupName = GroupConstants.GROUP_NAME_INDICATORS)]
-        public double SinglePrintBarWidthShift { get; set; }
-
-        #endregion
-
-        #region DataBar Properties
-
-        [NinjaScriptProperty]
-        [Display(Name = "Look Back Bars", Description = "The maximum bars to look back.", Order = 0, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
-        public int LookBackBars { get; set; }
-
-        [NinjaScriptProperty]
-        [Display(Name = "Imbalance Ratio", Description = "The minimum imbalance ratio.", Order = 1, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
-        public double ImbalanceRatio { get; set; }
-
-        [NinjaScriptProperty]
-        [Display(Name = "Stacked Imbalance", Description = "The minimum number for a stacked imbalance.", Order = 2, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
-        public int StackedImbalance { get; set; }
-
-        [NinjaScriptProperty]
-        [Display(Name = "Valid Bid Volume", Description = "The valid bid volume.", Order = 3, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
-        public long ValidBidVolume { get; set; }
-
-        [NinjaScriptProperty]
-        [Display(Name = "Valid Ask Volume", Description = "The valid ask volume.", Order = 4, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
-        public long ValidAskVolume { get; set; }
-
-        [NinjaScriptProperty]
-        [Display(Name = "Valid Exhaustion Ratio", Description = "The valid exhaustion ratio for comparing top and bottom.", Order = 5, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
-        public double ValidExhaustionRatio { get; set; }
-
-        [NinjaScriptProperty]
-        [Display(Name = "Valid Absorption Ratio", Description = "The valid absorption ratio for comparing top and bottom.", Order = 6, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
-        public double ValidAbsorptionRatio { get; set; }
-
-        [NinjaScriptProperty]
-        [Display(Name = "Valid Volume Sequencing", Description = "The valid number of price to check for volume sequencing.", Order = 7, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
-        public int ValidVolumeSequencing { get; set; }
-
-        [NinjaScriptProperty]
-        [Display(Name = "Valid Volume Sequencing Minimum Volume", Description = "The valid number of volume to check for volume sequencing.", Order = 8, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
-        public long ValidVolumeSequencingMinimumVolume { get; set; }
 
         #endregion
 
@@ -169,70 +189,81 @@ namespace NinjaTrader.NinjaScript.Strategies
                 // See the Help Guide for additional information
                 IsInstantiatedOnEachOptimizationIteration = true;
 
-                // Backtesting based on default settings
                 Slippage = 2;
                 IncludeCommission = true;
-                Quantity = 1;
-                Target = 16;
-                Stop = 16;
-                BackTestingEnabled = false;
-                JsonFileEnabled = false;
 
-                // OrderFlowBot
-                AtmTemplateName = "OrderFlowBot";
+                // General 
+                MinBarsRequiredToTrade = 20;
+                TriggerStrikePriceThresholdTicks = 4;
 
                 // DataBar
-                LookBackBars = 4;
                 ImbalanceRatio = 1.5;
-                ValidBidVolume = 0;
-                ValidAskVolume = 0;
                 StackedImbalance = 3;
+                ValidImbalanceVolume = 10;
                 ValidExhaustionRatio = 15;
                 ValidAbsorptionRatio = 1.4;
                 ValidVolumeSequencing = 4;
                 ValidVolumeSequencingMinimumVolume = 500;
 
+                // Strategies
+                DeltaChaserDelta = 150;
+                DeltaChaserMinMaxDifferenceDelta = 100;
+                DeltaChaserMinMaxDifferenceMultiplier = 2.5;
+                DeltaChaserValidEntryTicks = 10;
+
+                RangeReboundMinMaxDelta = 50;
+                RangeReboundValidEntryTicks = 8;
+
+                StackedImbalanceValidOpenTSP = true;
+
+                VolumeSequencingValidOpenTSP = true;
+
                 // Indicators
                 RatiosEnabled = true;
-                LastRatiosPriceEnabled = true;
-                SinglePrintEnabled = true;
-                SinglePrintBarWidth = 1;
-                SinglePrintBarWidthShift = 2;
-            }
-            else if (State == State.Configure)
-            {
-                _config = new OrderFlowBotPropertiesConfig
-                {
-                    TickSize = TickSize,
-                    LookBackBars = LookBackBars,
-                    ImbalanceRatio = ImbalanceRatio,
-                    ValidBidVolume = ValidBidVolume,
-                    ValidAskVolume = ValidAskVolume,
-                    StackedImbalance = StackedImbalance,
-                    ValidExhaustionRatio = ValidExhaustionRatio,
-                    ValidAbsorptionRatio = ValidAbsorptionRatio,
-                    ValidVolumeSequencing = ValidVolumeSequencing,
-                    ValidVolumeSequencingMinimumVolume = ValidVolumeSequencingMinimumVolume,
-                    SinglePrintBarWidth = SinglePrintBarWidth,
-                    SinglePrintBarWidthShift = SinglePrintBarWidthShift
-                };
 
-                OrderFlowBotProperties.Initialize(_config);
+                // Backtesting
+                BackTestingEnabled = false;
+                BackTestingStrategyName = "StackedImbalances";
+                Quantity = 1;
+                Target = 16;
+                Stop = 16;
             }
             else if (State == State.DataLoaded)
             {
-                _dataBars = new OrderFlowBotDataBars();
+                _dataBars = new OrderFlowBotDataBars(
+                    new OrderFlowBotDataBarConfigValues
+                    {
+                        TickSize = TickSize,
+                        ImbalanceRatio = ImbalanceRatio,
+                        StackedImbalance = StackedImbalance,
+                        ValidImbalanceVolume = ValidImbalanceVolume,
+                        ValidExhaustionRatio = ValidExhaustionRatio,
+                        ValidAbsorptionRatio = ValidAbsorptionRatio,
+                        ValidVolumeSequencing = ValidVolumeSequencing,
+                        ValidVolumeSequencingMinimumVolume = ValidVolumeSequencingMinimumVolume
+                    }
+                );
+
                 _orderFlowBotState = new OrderFlowBotState();
                 _orderFlowBotState.BackTestingEnabled = BackTestingEnabled;
-                _strategiesIndicatorsConfig = new StrategiesIndicatorsConfig();
-                _strategiesController = new StrategiesController(_orderFlowBotState, _dataBars, _strategiesIndicatorsConfig);
+                _orderFlowBotState.BackTestingStrategyName = BackTestingStrategyName;
 
-                if (JsonFileEnabled)
-                {
-                    _jsonFile = new OrderFlowBotJsonFile();
-                    _winningTradesExecutionIds = new List<string>();
-                    _losingTradesExecutionIds = new List<string>();
-                }
+                _strategiesConfig = new StrategiesConfig();
+                _strategiesController = new StrategiesController(_orderFlowBotState, _dataBars, _strategiesConfig);
+
+                OrderFlowBotStrategiesProperties.Initialize(
+                     new OrderFlowBotStrategiesPropertiesValues
+                     {
+                         DeltaChaserDelta = DeltaChaserDelta,
+                         DeltaChaserMinMaxDifferenceDelta = DeltaChaserMinMaxDifferenceDelta,
+                         DeltaChaserMinMaxDifferenceMultiplier = DeltaChaserMinMaxDifferenceMultiplier,
+                         DeltaChaserValidEntryTicks = DeltaChaserValidEntryTicks,
+                         RangeReboundMinMaxDelta = RangeReboundMinMaxDelta,
+                         RangeReboundValidEntryTicks = RangeReboundValidEntryTicks,
+                         StackedImbalanceValidOpenTSP = StackedImbalanceValidOpenTSP,
+                         VolumeSequencingValidOpenTSP = VolumeSequencingValidOpenTSP
+                     }
+                );
 
                 ControlPanelSetStateDataLoaded();
                 AddIndicators();
@@ -247,12 +278,6 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             if (Position.MarketPosition == MarketPosition.Flat)
             {
-                if (JsonFileEnabled)
-                {
-                    AppendWinningTradesToJsonFile();
-                    AppendLosingTradesToJsonFile();
-                }
-
                 Reset();
             }
         }
@@ -260,16 +285,44 @@ namespace NinjaTrader.NinjaScript.Strategies
         protected override void OnBarUpdate()
         {
             // Include all look back bars
-            if (CurrentBar < LookBackBars)
+            if (CurrentBar < MinBarsRequiredToTrade)
                 return;
 
             if (IsFirstTickOfBar)
             {
-                // Get previous bar since we can miss the top or bottom of the bar in the data
-                _dataBars.Bars.Add(GetDataBar(_dataBars.Bars, 1));
+                // Ensure we are setting the last bar in bars with the completed previous data
+                _dataBars.SetOrderFlowDataBarBase(GetOrderFlowDataBarBase(1));
+                _dataBars.UpdateDataBars();
             }
 
-            _dataBars.Bar = GetDataBar(_dataBars.Bars, 0);
+            _dataBars.SetOrderFlowDataBarBase(GetOrderFlowDataBarBase(0));
+            _dataBars.SetCurrentDataBar();
+
+            // Ensures that no trades will go through since the strategies will not be checked
+            if (_orderFlowBotState.DisableTrading)
+            {
+                return;
+            }
+
+            if (_orderFlowBotState.TriggerStrikePrice != 0 && !_orderFlowBotState.StrikePriceTriggered)
+            {
+                // Only allow strategy check when close is within threshold
+                double thresholdPrice = TickSize * TriggerStrikePriceThresholdTicks;
+                double upperLimit = _orderFlowBotState.TriggerStrikePrice + thresholdPrice;
+                double lowerLimit = _orderFlowBotState.TriggerStrikePrice - thresholdPrice;
+
+                if (Close[0] <= upperLimit && Close[0] >= lowerLimit)
+                {
+                    _orderFlowBotState.StrikePriceTriggered = true;
+                    PrintOutput(String.Format("Triggered | {0}", _orderFlowBotState.TriggerStrikePrice));
+                }
+                else
+                {
+                    return;
+                }
+            }
+
+            UpdateTriggerStrikeTextBoxBackground();
 
             if (Position.MarketPosition == MarketPosition.Flat && BackTestingEnabled)
             {
@@ -307,50 +360,6 @@ namespace NinjaTrader.NinjaScript.Strategies
                 ratios.InitializeWith(_dataBars);
                 AddChartIndicator(ratios);
             }
-
-            if (LastRatiosPriceEnabled)
-            {
-                RatiosLastExhaustionAbsorptionPrice ratiosLastExhaustionAbsorptionPrice = RatiosLastExhaustionAbsorptionPrice();
-                ratiosLastExhaustionAbsorptionPrice.InitializeWith(_dataBars);
-                AddChartIndicator(ratiosLastExhaustionAbsorptionPrice);
-            }
-
-            if (SinglePrintEnabled)
-            {
-                SinglePrint singlePrint = SinglePrint();
-                singlePrint.InitializeWith(_dataBars, _config);
-                AddChartIndicator(singlePrint);
-            }
-        }
-
-        private void AppendWinningTradesToJsonFile()
-        {
-            if (SystemPerformance.AllTrades.WinningTrades.Count > 0)
-            {
-                Trade lastTrade = SystemPerformance.AllTrades.WinningTrades[SystemPerformance.AllTrades.WinningTrades.Count - 1];
-                double pnl = lastTrade.ProfitCurrency;
-
-                if (!_winningTradesExecutionIds.Contains(lastTrade.Entry.ExecutionId))
-                {
-                    _winningTradesExecutionIds.Add(lastTrade.Entry.ExecutionId);
-                    _jsonFile.Append(_dataBars, _lastTradeBarNumber, pnl, lastTrade.Entry.MarketPosition.ToString());
-                }
-            }
-        }
-
-        private void AppendLosingTradesToJsonFile()
-        {
-            if (SystemPerformance.AllTrades.LosingTrades.Count > 0)
-            {
-                Trade lastTrade = SystemPerformance.AllTrades.LosingTrades[SystemPerformance.AllTrades.LosingTrades.Count - 1];
-                double pnl = lastTrade.ProfitCurrency;
-
-                if (!_losingTradesExecutionIds.Contains(lastTrade.Entry.ExecutionId))
-                {
-                    _losingTradesExecutionIds.Add(lastTrade.Entry.ExecutionId);
-                    _jsonFile.Append(_dataBars, _lastTradeBarNumber, pnl, lastTrade.Entry.MarketPosition.ToString());
-                }
-            }
         }
 
         private void Reset()
@@ -364,8 +373,25 @@ namespace NinjaTrader.NinjaScript.Strategies
             // Prevent re-entry on previous exit bar
             _lastTradeBarNumber = _dataBars.Bar.BarNumber + 1;
 
-            _strategiesController.ResetStrategies();
+            _strategiesController.ResetBackTestingStrategy();
             _orderFlowBotState.ValidStrategyDirection = Direction.Flat;
+        }
+
+        private void ResetAtm()
+        {
+            PrintOutput(String.Format("Exit | {0}", _entryName));
+
+            _entryLong = false;
+            _entryShort = false;
+            _entryName = "";
+
+            _atmStrategyId = null;
+            _isAtmStrategyCreated = false;
+
+            ResetTradeDirection();
+
+            // Prevent re-entry on previous exit bar
+            _lastTradeBarNumber = _dataBars.Bar.BarNumber + 1;
         }
 
         private bool AllowCheckStrategies()
@@ -376,6 +402,21 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
 
             return true;
+        }
+
+        private bool AllowAtmCheckStrategies()
+        {
+            if (_orderFlowBotState.SelectedTradeDirection == Direction.Flat || _dataBars.Bar.BarNumber <= _lastTradeBarNumber)
+            {
+                return false;
+            }
+
+            if (_orderFlowBotState.AutoTradeEnabled || _orderFlowBotState.SelectedTradeDirection != Direction.Flat)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private void CheckStrategies()
@@ -394,9 +435,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 
                 PrintOutput(String.Format("Enter Long | {0}", _entryName));
 
-
-                //PrintDataBar(_dataBars.Bar);
-
                 return;
             }
 
@@ -406,9 +444,6 @@ namespace NinjaTrader.NinjaScript.Strategies
                 _entryName = _orderFlowBotState.ValidStrategy.ToString();
 
                 PrintOutput(String.Format("Enter Short | {0}", _entryName));
-
-
-                //PrintDataBar(_dataBars.Bar);
 
                 return;
             }
@@ -423,18 +458,17 @@ namespace NinjaTrader.NinjaScript.Strategies
 
             if (_isAtmStrategyCreated)
             {
-                // Position was created and exited
-                if (AtmPosition() == MarketPosition.Flat && (_orderFlowBotState.ValidStrategyDirection == Direction.Long ||
+                if (AtmIsFlat() && (_orderFlowBotState.ValidStrategyDirection == Direction.Long ||
                     _orderFlowBotState.ValidStrategyDirection == Direction.Short))
                 {
-                    Reset();
+                    ResetAtm();
                     ControlPanelOnExecutionUpdate();
                 }
             }
 
-            if (AtmPosition() == MarketPosition.Flat)
+            if (AtmIsFlat())
             {
-                if (!AllowCheckStrategies())
+                if (!AllowAtmCheckStrategies())
                 {
                     return;
                 }
@@ -447,9 +481,12 @@ namespace NinjaTrader.NinjaScript.Strategies
                     _lastTradeBarNumber = _dataBars.Bar.BarNumber;
                     _entryName = _orderFlowBotState.ValidStrategy.ToString();
 
+                    string atmTemplateName = ChartControl.OwnerChart.ChartTrader.AtmStrategy.Template;
+
+                    Print(String.Format("***** {0} *****", atmTemplateName));
                     PrintOutput(String.Format("Enter Long | {0}", _entryName));
 
-                    AtmStrategyCreate(OrderAction.Buy, OrderType.Market, 0, 0, TimeInForce.Day, _atmStrategyId, AtmTemplateName, _atmStrategyId, (atmCallbackErrorCode, atmCallbackId) =>
+                    AtmStrategyCreate(OrderAction.Buy, OrderType.Market, 0, 0, TimeInForce.Day, _atmStrategyId, atmTemplateName, _atmStrategyId, (atmCallbackErrorCode, atmCallbackId) =>
                     {
                         if (atmCallbackId == _atmStrategyId)
                         {
@@ -467,9 +504,12 @@ namespace NinjaTrader.NinjaScript.Strategies
                     _lastTradeBarNumber = _dataBars.Bar.BarNumber;
                     _entryName = _orderFlowBotState.ValidStrategy.ToString();
 
+                    string atmTemplateName = ChartControl.OwnerChart.ChartTrader.AtmStrategy.Template;
+
+                    Print(String.Format("***** {0} *****", atmTemplateName));
                     PrintOutput(String.Format("Enter Short | {0}", _entryName));
 
-                    AtmStrategyCreate(OrderAction.Sell, OrderType.Market, 0, 0, TimeInForce.Day, _atmStrategyId, AtmTemplateName, _atmStrategyId, (atmCallbackErrorCode, atmCallbackId) =>
+                    AtmStrategyCreate(OrderAction.Sell, OrderType.Market, 0, 0, TimeInForce.Day, _atmStrategyId, atmTemplateName, _atmStrategyId, (atmCallbackErrorCode, atmCallbackId) =>
                     {
                         if (atmCallbackId == _atmStrategyId)
                         {
@@ -483,14 +523,14 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
         }
 
-        private MarketPosition AtmPosition()
+        private bool AtmIsFlat()
         {
-            if (_atmStrategyId == null)
+            if (_atmStrategyId == null || !_isAtmStrategyCreated)
             {
-                return MarketPosition.Flat;
+                return true;
             }
 
-            return GetAtmStrategyMarketPosition(_atmStrategyId);
+            return GetAtmStrategyMarketPosition(_atmStrategyId) == MarketPosition.Flat;
         }
 
         private void CloseAtmPosition()

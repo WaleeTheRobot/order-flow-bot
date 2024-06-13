@@ -1,6 +1,6 @@
 ﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar;
 
-namespace NinjaTrader.Custom.AddOns.OrderFlowBot.StrategiesIndicators.Strategies
+namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 {
     public class StackedImbalances : StrategyBase
     {
@@ -10,7 +10,6 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.StrategiesIndicators.Strategies
         public StackedImbalances(OrderFlowBotState orderFlowBotState, OrderFlowBotDataBars dataBars, string name)
         : base(orderFlowBotState, dataBars, name)
         {
-            // This can be used to initialize other values.
         }
 
         public override void CheckStrategy()
@@ -26,19 +25,17 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.StrategiesIndicators.Strategies
             }
         }
 
-        // Bar is bullish and has x ask stacked imbalances.
         public override void CheckLong()
         {
-            if (IsBullishBar() && HasValidAskStackedImbalance())
+            if (IsBullishBar() && HasValidAskStackedImbalance() && IsOpenAboveTriggerStrikePrice())
             {
                 ValidStrategyDirection = Direction.Long;
             }
         }
 
-        // Bar is bearish and has x bid stacked imbalances.
         public override void CheckShort()
         {
-            if (IsBearishBar() && HasValidBidStackedImbalance())
+            if (IsBearishBar() && HasValidBidStackedImbalance() && IsOpenBelowTriggerStrikePrice())
             {
                 ValidStrategyDirection = Direction.Short;
             }
@@ -62,6 +59,26 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.StrategiesIndicators.Strategies
         private bool HasValidBidStackedImbalance()
         {
             return dataBars.Bar.Imbalances.HasBidStackedImbalances;
+        }
+
+        private bool IsOpenAboveTriggerStrikePrice()
+        {
+            if (orderFlowBotState.TriggerStrikePrice == 0 || !OrderFlowBotStrategiesProperties.StackedImbalanceValidOpenTSP)
+            {
+                return true;
+            }
+
+            return dataBars.Bar.Prices.Open > orderFlowBotState.TriggerStrikePrice;
+        }
+
+        private bool IsOpenBelowTriggerStrikePrice()
+        {
+            if (orderFlowBotState.TriggerStrikePrice == 0 || !OrderFlowBotStrategiesProperties.StackedImbalanceValidOpenTSP)
+            {
+                return true;
+            }
+
+            return dataBars.Bar.Prices.Open < orderFlowBotState.TriggerStrikePrice;
         }
     }
 }

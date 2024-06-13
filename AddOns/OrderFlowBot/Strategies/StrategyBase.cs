@@ -1,6 +1,6 @@
 ﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar;
 
-namespace NinjaTrader.Custom.AddOns.OrderFlowBot.StrategiesIndicators.Strategies
+namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 {
     public abstract class StrategyBase : IStrategyInterface
     {
