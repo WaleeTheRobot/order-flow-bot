@@ -435,7 +435,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 return false;
             }
 
-            if (_orderFlowBotState.AutoTradeEnabled || _orderFlowBotState.SelectedTradeDirection != Direction.Flat)
+            if (_orderFlowBotState.AutoTradeEnabled)
             {
                 return true;
             }
