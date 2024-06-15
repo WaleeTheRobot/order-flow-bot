@@ -117,20 +117,36 @@ namespace NinjaTrader.NinjaScript.Strategies
         public int DeltaChaserValidEntryTicks { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Range Rebound Min Max Delta", Description = "Min delta will be less than this number as negative for bearish. Max delta will be more than this number as positive for bullish.", Order = 4, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
+        [Display(Name = "Delta Chaser Ratios Enabled", Description = "Enable to include the ratios for a valid check.", Order = 4, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
+        public bool DeltaChaserRatiosEnabled { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Range Rebound Min Max Delta", Description = "Min delta will be less than this number as negative for bearish. Max delta will be more than this number as positive for bullish.", Order = 5, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
         public int RangeReboundMinMaxDelta { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Range Rebound Valid Entry Ticks", Description = "Spot price has to be equal to within this for a valid entry in ticks.", Order = 5, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
+        [Display(Name = "Range Rebound Valid Entry Ticks", Description = "Spot price has to be equal to within this for a valid entry in ticks.", Order = 6, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
         public int RangeReboundValidEntryTicks { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Stacked Imbalance Valid Open TSP", Description = "Enable to enter only if open above Trigger Strike Price for long or below it for short if TSP exist.", Order = 6, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
+        [Display(Name = "Range Rebound Ratios Enabled", Description = "Enable to include the ratios for a valid check.", Order = 7, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
+        public bool RangeReboundRatiosEnabled { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Stacked Imbalance Valid Open TSP", Description = "Enable to enter only if open above Trigger Strike Price for long or below it for short if TSP exist.", Order = 8, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
         public bool StackedImbalanceValidOpenTSP { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Volume Sequencing Valid Open TSP", Description = "Enable to enter only if open above Trigger Strike Price for long or below it for short if TSP exist.", Order = 7, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
+        [Display(Name = "Stacked Imbalances Ratios Enabled", Description = "Enable to include the ratios for a valid check.", Order = 9, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
+        public bool StackedImbalancesRatiosEnabled { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Volume Sequencing Valid Open TSP", Description = "Enable to enter only if open above Trigger Strike Price for long or below it for short if TSP exist.", Order = 10, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
         public bool VolumeSequencingValidOpenTSP { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Volume Sequencing Ratios Enabled", Description = "Enable to include the ratios for a valid check.", Order = 11, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
+        public bool VolumeSequencingRatiosEnabled { get; set; }
 
         #endregion
 
@@ -210,13 +226,17 @@ namespace NinjaTrader.NinjaScript.Strategies
                 DeltaChaserMinMaxDifferenceDelta = 100;
                 DeltaChaserMinMaxDifferenceMultiplier = 2.5;
                 DeltaChaserValidEntryTicks = 10;
+                DeltaChaserRatiosEnabled = false;
 
                 RangeReboundMinMaxDelta = 50;
                 RangeReboundValidEntryTicks = 8;
+                RangeReboundRatiosEnabled = false;
 
                 StackedImbalanceValidOpenTSP = true;
+                StackedImbalancesRatiosEnabled = false;
 
                 VolumeSequencingValidOpenTSP = true;
+                VolumeSequencingRatiosEnabled = false;
 
                 // Indicators
                 RatiosEnabled = true;
@@ -257,11 +277,15 @@ namespace NinjaTrader.NinjaScript.Strategies
                          DeltaChaserDelta = DeltaChaserDelta,
                          DeltaChaserMinMaxDifferenceDelta = DeltaChaserMinMaxDifferenceDelta,
                          DeltaChaserMinMaxDifferenceMultiplier = DeltaChaserMinMaxDifferenceMultiplier,
+                         DeltaChaserRatiosEnabled = DeltaChaserRatiosEnabled,
                          DeltaChaserValidEntryTicks = DeltaChaserValidEntryTicks,
                          RangeReboundMinMaxDelta = RangeReboundMinMaxDelta,
                          RangeReboundValidEntryTicks = RangeReboundValidEntryTicks,
+                         RangeReboundRatiosEnabled = RangeReboundRatiosEnabled,
                          StackedImbalanceValidOpenTSP = StackedImbalanceValidOpenTSP,
-                         VolumeSequencingValidOpenTSP = VolumeSequencingValidOpenTSP
+                         StackedImbalancesRatiosEnabled = StackedImbalancesRatiosEnabled,
+                         VolumeSequencingValidOpenTSP = VolumeSequencingValidOpenTSP,
+                         VolumeSequencingRatiosEnabled = VolumeSequencingRatiosEnabled
                      }
                 );
 

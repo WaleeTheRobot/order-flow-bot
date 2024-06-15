@@ -29,7 +29,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 
         public override void CheckLong()
         {
-            if (IsBullishBar() && IsOpenAboveTriggerStrikePrice() && IsValidMinDelta() && IsValidWithinTriggerStrikePriceRange())
+            if (IsBullishBar() && IsOpenAboveTriggerStrikePrice() && IsValidMinDelta() && IsValidWithinTriggerStrikePriceRange() && HasValidBidRatio())
             {
                 ValidStrategyDirection = Direction.Long;
             }
@@ -37,7 +37,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 
         public override void CheckShort()
         {
-            if (IsBearishBar() && IsOpenBelowTriggerStrikePrice() && IsValidMaxDelta() && IsValidWithinTriggerStrikePriceRange())
+            if (IsBearishBar() && IsOpenBelowTriggerStrikePrice() && IsValidMaxDelta() && IsValidWithinTriggerStrikePriceRange() && HasValidAskRatio())
             {
                 ValidStrategyDirection = Direction.Short;
             }
@@ -91,6 +91,26 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
         private bool IsBearishBar()
         {
             return dataBars.Bar.BarType == BarType.Bearish;
+        }
+
+        private bool HasValidBidRatio()
+        {
+            if (!OrderFlowBotStrategiesProperties.RangeReboundRatiosEnabled)
+            {
+                return true;
+            }
+
+            return dataBars.Bar.Ratios.HasValidBidAbsorptionRatio || dataBars.Bar.Ratios.HasValidBidExhaustionRatio;
+        }
+
+        private bool HasValidAskRatio()
+        {
+            if (!OrderFlowBotStrategiesProperties.RangeReboundRatiosEnabled)
+            {
+                return true;
+            }
+
+            return dataBars.Bar.Ratios.HasValidAskAbsorptionRatio || dataBars.Bar.Ratios.HasValidAskExhaustionRatio;
         }
     }
 }
