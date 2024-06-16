@@ -435,12 +435,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 return false;
             }
 
-            if (_orderFlowBotState.AutoTradeEnabled)
-            {
-                return true;
-            }
-
-            return false;
+            return true;
         }
 
         private void CheckStrategies()
