@@ -102,6 +102,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar
         {
             SetCurrentDataBar();
             Bars.Add(Bar);
+
+            Bar = new OrderFlowBotDataBar();
         }
 
         private void PopulateBasic()
