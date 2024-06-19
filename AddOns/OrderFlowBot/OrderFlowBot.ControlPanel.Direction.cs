@@ -301,7 +301,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             ChartControl.Dispatcher.InvokeAsync(() =>
             {
-                _triggerStrikeTextBox.Background = _orderFlowBotState.StrikePriceTriggered ? Brushes.DarkGreen : GetSolidColorBrushFromHex(_inputTextBoxBackgroundColor);
+                if (_triggerStrikeTextBox != null && _orderFlowBotState != null)
+                {
+                    _triggerStrikeTextBox.Background = _orderFlowBotState.StrikePriceTriggered ? Brushes.DarkGreen : GetSolidColorBrushFromHex(_inputTextBoxBackgroundColor);
+                }
             });
         }
 
