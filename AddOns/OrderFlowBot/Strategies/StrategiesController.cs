@@ -11,13 +11,15 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
         private readonly OrderFlowBotDataBars _dataBars;
         private readonly StrategiesConfig _strategiesConfig;
         private readonly List<IStrategyInterface> _strategies;
+        private readonly TechnicalLevels _technicalLevels;
 
-        public StrategiesController(OrderFlowBotState orderFlowBotState, OrderFlowBotDataBars dataBars, StrategiesConfig strategiesConfig)
+        public StrategiesController(OrderFlowBotState orderFlowBotState, OrderFlowBotDataBars dataBars, StrategiesConfig strategiesConfig, TechnicalLevels technicalLevels)
         {
             _orderFlowBotState = orderFlowBotState;
             _dataBars = dataBars;
             _strategiesConfig = strategiesConfig;
             _strategies = new List<IStrategyInterface>();
+            _technicalLevels = technicalLevels;
 
             InitializeStrategies();
 
@@ -25,6 +27,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
             {
                 EnableBackTesting();
             }
+            _technicalLevels = technicalLevels;
         }
 
         private void InitializeStrategies()
@@ -38,7 +41,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 
                 if (strategyType != null && typeof(IStrategyInterface).IsAssignableFrom(strategyType))
                 {
-                    var strategyInstance = (IStrategyInterface)Activator.CreateInstance(strategyType, _orderFlowBotState, _dataBars, strategyConfig.Name);
+                    var strategyInstance = (IStrategyInterface)Activator.CreateInstance(strategyType, _orderFlowBotState, _dataBars, strategyConfig.Name, _technicalLevels);
 
                     if (strategyInstance != null)
                     {

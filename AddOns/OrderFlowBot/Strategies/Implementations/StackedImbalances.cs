@@ -7,8 +7,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
         public override string Name { get; set; }
         public override Direction ValidStrategyDirection { get; set; }
 
-        public StackedImbalances(OrderFlowBotState orderFlowBotState, OrderFlowBotDataBars dataBars, string name)
-        : base(orderFlowBotState, dataBars, name)
+        public StackedImbalances(OrderFlowBotState orderFlowBotState, OrderFlowBotDataBars dataBars, string name, TechnicalLevels technicalLevels)
+        : base(orderFlowBotState, dataBars, name, technicalLevels)
         {
         }
 
@@ -27,7 +27,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 
         public override void CheckLong()
         {
-            if (IsBullishBar() && HasValidAskStackedImbalance() && IsOpenAboveTriggerStrikePrice() && HasValidBidRatio())
+            if (IsBullishBar() && HasValidAskStackedImbalance() && IsOpenAboveTriggerStrikePrice())
             {
                 ValidStrategyDirection = Direction.Long;
             }
@@ -35,7 +35,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 
         public override void CheckShort()
         {
-            if (IsBearishBar() && HasValidBidStackedImbalance() && IsOpenBelowTriggerStrikePrice() && HasValidAskRatio())
+            if (IsBearishBar() && HasValidBidStackedImbalance() && IsOpenBelowTriggerStrikePrice())
             {
                 ValidStrategyDirection = Direction.Short;
             }
@@ -79,26 +79,6 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
             }
 
             return dataBars.Bar.Prices.Open < orderFlowBotState.TriggerStrikePrice;
-        }
-
-        private bool HasValidBidRatio()
-        {
-            if (!OrderFlowBotStrategiesProperties.StackedImbalancesRatiosEnabled)
-            {
-                return true;
-            }
-
-            return dataBars.Bar.Ratios.HasValidBidAbsorptionRatio || dataBars.Bar.Ratios.HasValidBidExhaustionRatio;
-        }
-
-        private bool HasValidAskRatio()
-        {
-            if (!OrderFlowBotStrategiesProperties.StackedImbalancesRatiosEnabled)
-            {
-                return true;
-            }
-
-            return dataBars.Bar.Ratios.HasValidAskAbsorptionRatio || dataBars.Bar.Ratios.HasValidAskExhaustionRatio;
         }
     }
 }
