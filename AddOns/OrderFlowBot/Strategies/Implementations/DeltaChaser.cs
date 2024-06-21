@@ -1,17 +1,16 @@
 ﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar;
-using System;
 
 namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 {
-    // This strategy is designed for trading pullbacks on a trend or larger price ranges.
-    // Trade the structure with appropriate targets on higher volatility times.
+    // This strategy is designed to chase the move after it exceeds a certain delta.
+    // Trade the structure with appropriate targets
     public class DeltaChaser : StrategyBase
     {
         public override string Name { get; set; }
         public override Direction ValidStrategyDirection { get; set; }
 
-        public DeltaChaser(OrderFlowBotState orderFlowBotState, OrderFlowBotDataBars dataBars, string name)
-        : base(orderFlowBotState, dataBars, name)
+        public DeltaChaser(OrderFlowBotState orderFlowBotState, OrderFlowBotDataBars dataBars, string name, TechnicalLevels technicalLevels)
+        : base(orderFlowBotState, dataBars, name, technicalLevels)
         {
         }
 
@@ -30,7 +29,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 
         public override void CheckLong()
         {
-            if (IsBullishBar() && IsOpenAboveTriggerStrikePrice() && IsBullishMinMaxDifference() && IsValidWithinTriggerStrikePriceRange() && HasValidBidRatio())
+            if (IsBarType() && IsValidSpotStrikePrice() && IsValidDelta())
             {
                 ValidStrategyDirection = Direction.Long;
             }
@@ -38,88 +37,47 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 
         public override void CheckShort()
         {
-            if (IsBearishBar() && IsOpenBelowTriggerStrikePrice() && IsBearishMinMaxDifference() && IsValidWithinTriggerStrikePriceRange() && HasValidAskRatio())
+            if (IsBarType(false) && IsValidSpotStrikePrice(false) && IsValidDelta(false))
             {
                 ValidStrategyDirection = Direction.Short;
             }
         }
 
-        private bool IsOpenAboveTriggerStrikePrice()
+        private bool IsBarType(bool longCheck = true)
         {
-            if (orderFlowBotState.TriggerStrikePrice == 0)
+            if (longCheck)
             {
-                return true;
+                return dataBars.Bar.BarType == BarType.Bullish;
             }
 
-            return dataBars.Bar.Prices.Open > orderFlowBotState.TriggerStrikePrice;
-        }
-
-        private bool IsOpenBelowTriggerStrikePrice()
-        {
-            if (orderFlowBotState.TriggerStrikePrice == 0)
-            {
-                return true;
-            }
-
-            return dataBars.Bar.Prices.Open < orderFlowBotState.TriggerStrikePrice;
-        }
-
-        private bool IsBullishMinMaxDifference()
-        {
-            long maxDelta = Math.Abs(dataBars.Bar.Deltas.MaxDelta);
-            long minDelta = Math.Abs(dataBars.Bar.Deltas.MinDelta);
-            bool validMinDelta = dataBars.Bar.Deltas.MinDelta > OrderFlowBotStrategiesProperties.DeltaChaserMinMaxDifferenceDelta * -1;
-
-            return maxDelta >= OrderFlowBotStrategiesProperties.DeltaChaserMinMaxDifferenceMultiplier * minDelta && validMinDelta && dataBars.Bar.Deltas.Delta > OrderFlowBotStrategiesProperties.DeltaChaserDelta;
-        }
-
-        private bool IsBearishMinMaxDifference()
-        {
-            long maxDelta = Math.Abs(dataBars.Bar.Deltas.MaxDelta);
-            long minDelta = Math.Abs(dataBars.Bar.Deltas.MinDelta);
-            bool validMaxDelta = dataBars.Bar.Deltas.MaxDelta < OrderFlowBotStrategiesProperties.DeltaChaserMinMaxDifferenceDelta;
-
-            return minDelta >= OrderFlowBotStrategiesProperties.DeltaChaserMinMaxDifferenceMultiplier * maxDelta && validMaxDelta && dataBars.Bar.Deltas.Delta < OrderFlowBotStrategiesProperties.DeltaChaserDelta * -1;
-        }
-
-        private bool IsValidWithinTriggerStrikePriceRange()
-        {
-            if (orderFlowBotState.TriggerStrikePrice == 0)
-            {
-                return true;
-            }
-
-            return orderFlowBotState.TriggerStrikePrice - dataBars.Bar.Prices.Close <= OrderFlowBotStrategiesProperties.DeltaChaserValidEntryTicks * OrderFlowBotDataBarConfig.TickSize;
-        }
-
-        private bool IsBullishBar()
-        {
-            return dataBars.Bar.BarType == BarType.Bullish;
-        }
-
-        private bool IsBearishBar()
-        {
             return dataBars.Bar.BarType == BarType.Bearish;
         }
 
-        private bool HasValidBidRatio()
+        private bool IsValidSpotStrikePrice(bool longCheck = true)
         {
-            if (!OrderFlowBotStrategiesProperties.DeltaChaserRatiosEnabled)
+            if (orderFlowBotState.TriggerStrikePrice == 0)
             {
                 return true;
             }
 
-            return dataBars.Bar.Ratios.HasValidBidAbsorptionRatio || dataBars.Bar.Ratios.HasValidBidExhaustionRatio;
+            // Is above trigger strike price
+            if (longCheck)
+            {
+                return dataBars.Bar.Prices.Close > orderFlowBotState.TriggerStrikePrice;
+            }
+
+            // Is below trigger strike price
+            return dataBars.Bar.Prices.Close < orderFlowBotState.TriggerStrikePrice;
         }
 
-        private bool HasValidAskRatio()
+        private bool IsValidDelta(bool longCheck = true)
         {
-            if (!OrderFlowBotStrategiesProperties.DeltaChaserRatiosEnabled)
+            if (longCheck)
             {
-                return true;
+                return dataBars.Bar.Deltas.Delta > OrderFlowBotStrategiesProperties.DeltaChaserDelta;
             }
 
-            return dataBars.Bar.Ratios.HasValidAskAbsorptionRatio || dataBars.Bar.Ratios.HasValidAskExhaustionRatio;
+            return dataBars.Bar.Deltas.Delta < OrderFlowBotStrategiesProperties.DeltaChaserDelta;
         }
     }
 }

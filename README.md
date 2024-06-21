@@ -86,41 +86,17 @@ This section contains the custom created strategies and are dynamically created 
 
 <img src="./images/deltachaser.png" alt="OrderFlowBot Delta Chaser" style="display: block; margin: 0 auto">
 
-This strategy is designed for trading pullbacks on a trend or larger price ranges. Trade the structure with appropriate targets on higher volatility times.
+This strategy is designed to enter a position based on the delta. Trade the structure with appropriate targets.
 
 #### Long
 
 - Bullish bar
-- Open above trigger strike price and within `DeltaChaserValidEntryTicks` if trigger strike price is used
-- Max delta >= `DeltaChaserMinMaxDifferenceMultiplier` \* Min delta
 - Delta > `DeltaChaserDelta`
 
 #### Short
 
 - Bearish bar
-- Open below trigger strike price and wihtin `DeltaChaserValidEntryTicks` if trigger strike price is used
-- Min delta >= `DeltaChaserMinMaxDifferenceMultiplier` \* Max delta
 - Delta < -`DeltaChaserDelta`
-
-#### Range Rebound
-
-<img src="./images/rangerebound.png" alt="OrderFlowBot Range Rebound" style="display: block; margin: 0 auto">
-
-This strategy is designed for trading smaller price ranges aiming to capitalize on reversion with quicker entries based on deltas. Trade the edges with smaller targets on lower volatility times.
-
-#### Long
-
-- Bullish bar
-- Open above trigger strike price and within `RangeReboundValidEntryTicks` if trigger strike price is used
-- Min delta > -`RangeReboundMinMaxDelta`
-- Max delta > `RangeReboundMinMaxDelta`
-
-#### Short
-
-- Bearish bar
-- Open below trigger strike price and within `RangeReboundValidEntryTicks` if trigger strike price is used
-- Min delta < -`RangeReboundMinMaxDelta`
-- Max delta < `RangeReboundMinMaxDelta`
 
 #### Stacked Imbalances
 
@@ -165,3 +141,17 @@ You can backtest your strategies by enabling the backtesting. This will use the 
 ## Adding Strategies and Indicators
 
 The custom DataBar should be used if you are considering adding strategies and indicators. It takes some of the data from the volumetric bars and creates custom bars that you can also add any additional information to. The default strategies and indicators can be used as a reference.
+
+## Advance
+
+#### OrderFlowBotDataBar
+
+This contains the information from the volumetric data and additional information such as checks for stacked imbalances, ratios, etc. You can use this to access the data to develop your own strategy.
+
+#### Technical Levels
+
+There is a class called TechnicalLevels that you can pass to your custom strategy for further analysis. There is an example in the strategy implementations folder called `PivotFader` that you can look at for example usage. It's not enabled and only exists for the example of using the technical levels.
+
+#### Pivots (Support/Resistance)
+
+This is integrated from https://github.com/WaleeTheRobot/open-auto-trend-support-resistance. Add that as an indicator if you want to visually see the pivots. The last item in the list is the current developing pivot point. The second to the last is the last high or low pivot point.

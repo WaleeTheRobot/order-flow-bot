@@ -25,11 +25,6 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
                 },
                 new StrategiesImplementation
                 {
-                    Name = "RangeRebound",
-                    ButtonLabel = "Range Rebound"
-                },
-                new StrategiesImplementation
-                {
                     Name = "StackedImbalances",
                     ButtonLabel = "Stacked Imbalances"
                 },

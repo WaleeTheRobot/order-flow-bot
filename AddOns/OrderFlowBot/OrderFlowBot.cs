@@ -18,6 +18,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         public const string GROUP_NAME_DATA_BAR = "Data Bar";
         public const string GROUP_NAME_STRATEGIES = "Strategies";
         public const string GROUP_NAME_INDICATORS = "Indicators";
+        public const string GROUP_NAME_TECHNICAL_LEVELS = "Technical Levels";
         public const string GROUP_NAME_TESTING = "Testing";
     }
 
@@ -25,13 +26,16 @@ namespace NinjaTrader.NinjaScript.Strategies
     [Gui.CategoryOrder(GroupConstants.GROUP_NAME_DATA_BAR, 1)]
     [Gui.CategoryOrder(GroupConstants.GROUP_NAME_STRATEGIES, 2)]
     [Gui.CategoryOrder(GroupConstants.GROUP_NAME_INDICATORS, 3)]
-    [Gui.CategoryOrder(GroupConstants.GROUP_NAME_TESTING, 4)]
+    [Gui.CategoryOrder(GroupConstants.GROUP_NAME_TECHNICAL_LEVELS, 4)]
+    [Gui.CategoryOrder(GroupConstants.GROUP_NAME_TESTING, 5)]
     public partial class OrderFlowBot : Strategy
     {
         #region Variables
 
         private OrderFlowBotState _orderFlowBotState;
         private OrderFlowBotDataBars _dataBars;
+
+        private TechnicalLevels _technicalLevels;
 
         private StrategiesConfig _strategiesConfig;
         private StrategiesController _strategiesController;
@@ -105,48 +109,12 @@ namespace NinjaTrader.NinjaScript.Strategies
         public int DeltaChaserDelta { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Delta Chaser Min Max Difference Delta", Description = "Min delta will be greater than this number as negative for bullish. Max delta will be less than this number as positive for bearish.", Order = 1, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
-        public int DeltaChaserMinMaxDifferenceDelta { get; set; }
-
-        [NinjaScriptProperty]
-        [Display(Name = "Delta Chaser Min Max Difference Multiplier", Description = "Min delta will be multiplied by this number for bearish. Max delta will be multiplied by this for bullish.", Order = 2, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
-        public double DeltaChaserMinMaxDifferenceMultiplier { get; set; }
-
-        [NinjaScriptProperty]
-        [Display(Name = "Delta Chaser Valid Entry Ticks", Description = "Spot price has to be equal to within this for a valid entry in ticks.", Order = 3, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
-        public int DeltaChaserValidEntryTicks { get; set; }
-
-        [NinjaScriptProperty]
-        [Display(Name = "Delta Chaser Ratios Enabled", Description = "Enable to include the ratios for a valid check.", Order = 4, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
-        public bool DeltaChaserRatiosEnabled { get; set; }
-
-        [NinjaScriptProperty]
-        [Display(Name = "Range Rebound Min Max Delta", Description = "Min delta will be less than this number as negative for bearish. Max delta will be more than this number as positive for bullish.", Order = 5, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
-        public int RangeReboundMinMaxDelta { get; set; }
-
-        [NinjaScriptProperty]
-        [Display(Name = "Range Rebound Valid Entry Ticks", Description = "Spot price has to be equal to within this for a valid entry in ticks.", Order = 6, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
-        public int RangeReboundValidEntryTicks { get; set; }
-
-        [NinjaScriptProperty]
-        [Display(Name = "Range Rebound Ratios Enabled", Description = "Enable to include the ratios for a valid check.", Order = 7, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
-        public bool RangeReboundRatiosEnabled { get; set; }
-
-        [NinjaScriptProperty]
-        [Display(Name = "Stacked Imbalance Valid Open TSP", Description = "Enable to enter only if open above Trigger Strike Price for long or below it for short if TSP exist.", Order = 8, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
+        [Display(Name = "Stacked Imbalance Valid Open TSP", Description = "Enable to enter only if open above Trigger Strike Price for long or below it for short if TSP exist.", Order = 5, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
         public bool StackedImbalanceValidOpenTSP { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Stacked Imbalances Ratios Enabled", Description = "Enable to include the ratios for a valid check.", Order = 9, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
-        public bool StackedImbalancesRatiosEnabled { get; set; }
-
-        [NinjaScriptProperty]
-        [Display(Name = "Volume Sequencing Valid Open TSP", Description = "Enable to enter only if open above Trigger Strike Price for long or below it for short if TSP exist.", Order = 10, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
+        [Display(Name = "Volume Sequencing Valid Open TSP", Description = "Enable to enter only if open above Trigger Strike Price for long or below it for short if TSP exist.", Order = 7, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
         public bool VolumeSequencingValidOpenTSP { get; set; }
-
-        [NinjaScriptProperty]
-        [Display(Name = "Volume Sequencing Ratios Enabled", Description = "Enable to include the ratios for a valid check.", Order = 11, GroupName = GroupConstants.GROUP_NAME_STRATEGIES)]
-        public bool VolumeSequencingRatiosEnabled { get; set; }
 
         #endregion
 
@@ -155,6 +123,14 @@ namespace NinjaTrader.NinjaScript.Strategies
         [NinjaScriptProperty]
         [Display(Name = "Ratios Enabled", Description = "Enable to display ratios indicator", Order = 0, GroupName = GroupConstants.GROUP_NAME_INDICATORS)]
         public bool RatiosEnabled { get; set; }
+
+        #endregion
+
+        #region Technical Levels
+
+        [NinjaScriptProperty]
+        [Display(Name = "Required Ticks for Broken", Description = "The required ticks to consider a level broken.", Order = 1, GroupName = GroupConstants.GROUP_NAME_TECHNICAL_LEVELS)]
+        public float RequiredTicksForBroken { get; set; }
 
         #endregion
 
@@ -210,7 +186,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
                 // General 
                 MinBarsRequiredToTrade = 20;
-                TriggerStrikePriceThresholdTicks = 4;
+                TriggerStrikePriceThresholdTicks = 16;
 
                 // DataBar
                 ImbalanceRatio = 1.5;
@@ -223,23 +199,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 
                 // Strategies
                 DeltaChaserDelta = 150;
-                DeltaChaserMinMaxDifferenceDelta = 100;
-                DeltaChaserMinMaxDifferenceMultiplier = 2.5;
-                DeltaChaserValidEntryTicks = 10;
-                DeltaChaserRatiosEnabled = false;
-
-                RangeReboundMinMaxDelta = 50;
-                RangeReboundValidEntryTicks = 8;
-                RangeReboundRatiosEnabled = false;
 
                 StackedImbalanceValidOpenTSP = true;
-                StackedImbalancesRatiosEnabled = false;
 
                 VolumeSequencingValidOpenTSP = true;
-                VolumeSequencingRatiosEnabled = false;
 
                 // Indicators
-                RatiosEnabled = true;
+                RatiosEnabled = false;
+
+                // Technical Levels
+                RequiredTicksForBroken = 4;
 
                 // Backtesting
                 BackTestingEnabled = false;
@@ -268,24 +237,17 @@ namespace NinjaTrader.NinjaScript.Strategies
                 _orderFlowBotState.BackTestingEnabled = BackTestingEnabled;
                 _orderFlowBotState.BackTestingStrategyName = BackTestingStrategyName;
 
+                _technicalLevels = new TechnicalLevels(CurrentBar, RequiredTicksForBroken * TickSize);
+
                 _strategiesConfig = new StrategiesConfig();
-                _strategiesController = new StrategiesController(_orderFlowBotState, _dataBars, _strategiesConfig);
+                _strategiesController = new StrategiesController(_orderFlowBotState, _dataBars, _strategiesConfig, _technicalLevels);
 
                 OrderFlowBotStrategiesProperties.Initialize(
                      new OrderFlowBotStrategiesPropertiesValues
                      {
                          DeltaChaserDelta = DeltaChaserDelta,
-                         DeltaChaserMinMaxDifferenceDelta = DeltaChaserMinMaxDifferenceDelta,
-                         DeltaChaserMinMaxDifferenceMultiplier = DeltaChaserMinMaxDifferenceMultiplier,
-                         DeltaChaserRatiosEnabled = DeltaChaserRatiosEnabled,
-                         DeltaChaserValidEntryTicks = DeltaChaserValidEntryTicks,
-                         RangeReboundMinMaxDelta = RangeReboundMinMaxDelta,
-                         RangeReboundValidEntryTicks = RangeReboundValidEntryTicks,
-                         RangeReboundRatiosEnabled = RangeReboundRatiosEnabled,
                          StackedImbalanceValidOpenTSP = StackedImbalanceValidOpenTSP,
-                         StackedImbalancesRatiosEnabled = StackedImbalancesRatiosEnabled,
                          VolumeSequencingValidOpenTSP = VolumeSequencingValidOpenTSP,
-                         VolumeSequencingRatiosEnabled = VolumeSequencingRatiosEnabled
                      }
                 );
 
@@ -314,9 +276,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 
             if (IsFirstTickOfBar)
             {
+                UpdateSupportResistanceLevels();
+
                 // Ensure we are setting the last bar in bars with the completed previous data
                 _dataBars.SetOrderFlowDataBarBase(GetOrderFlowDataBarBase(1));
                 _dataBars.UpdateDataBars();
+
+                //PrintDataBar(_dataBars.Bars.Last());
             }
 
             _dataBars.SetOrderFlowDataBarBase(GetOrderFlowDataBarBase(0));
@@ -360,13 +326,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 
                     _lastTradeBarNumber = _dataBars.Bar.BarNumber;
                 }
-
                 if (_entryShort)
                 {
                     SetProfitTarget(_entryName, CalculationMode.Ticks, Target);
                     SetStopLoss(_entryName, CalculationMode.Ticks, Stop, false);
                     EnterShort(Quantity, _entryName);
-
                     _lastTradeBarNumber = _dataBars.Bar.BarNumber;
                 }
 

@@ -6,15 +6,17 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
     {
         protected readonly OrderFlowBotState orderFlowBotState;
         protected readonly OrderFlowBotDataBars dataBars;
+        protected readonly TechnicalLevels technicalLevels;
         public abstract string Name { get; set; }
         public abstract Direction ValidStrategyDirection { get; set; }
 
-        protected StrategyBase(OrderFlowBotState orderFlowBotState, OrderFlowBotDataBars dataBars, string name)
+        protected StrategyBase(OrderFlowBotState orderFlowBotState, OrderFlowBotDataBars dataBars, string name, TechnicalLevels technicalLevels)
         {
             this.orderFlowBotState = orderFlowBotState;
             this.dataBars = dataBars;
             Name = name;
             ValidStrategyDirection = Direction.Flat;
+            this.technicalLevels = technicalLevels;
         }
 
         public virtual void CheckStrategy()

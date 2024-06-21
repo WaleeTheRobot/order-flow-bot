@@ -11,11 +11,27 @@ namespace NinjaTrader.NinjaScript.Strategies
             Print(string.Format("{0}", ToDay(Time[0])));
             Print(string.Format("Time: {0}", dataBar.Time));
             Print(string.Format("Bar Number: {0}", dataBar.BarNumber));
-
-            /*
             Print(string.Format("Volume: {0}", dataBar.Volumes.Volume));
 
-            
+            /*
+            // Technical Levels Example
+            Print("Count: " + _technicalLevels.Pivots.Count);
+            Print("Current Looking For High: " + _technicalLevels.IsLookingForHigh);
+            Print("Current Pivot: ");
+            Print("BarNumber: " + _technicalLevels.CurrentPivot.BarNumber + ", Price: " + _technicalLevels.CurrentPivot.Price + ", DisplayLevel: " + _technicalLevels.CurrentPivot.DisplayLevel + ", IsHigh: " + _technicalLevels.CurrentPivot.IsHigh);
+            Print("\n");
+
+            var lastPivots = _technicalLevels.Pivots.Skip(Math.Max(0, _technicalLevels.Pivots.Count - 6)).Take(6).ToList();
+
+            foreach (var pivot in lastPivots)
+            {
+                Print("BarNumber: " + pivot.BarNumber + ", Price: " + pivot.Price + ", DisplayLevel: " + pivot.DisplayLevel + "IsHigh: " + pivot.IsHigh);
+            }
+
+            Print("***************");
+            Print("\n");
+            */
+            /*
             Print(string.Format("Bid Imbalances: {0}", dataBar.Imbalances.BidImbalances.Count));
             Print(string.Format("Ask Imbalances: {0}", dataBar.Imbalances.AskImbalances.Count));
             Print(string.Format("Bid Stacked Imbalances: {0}", dataBar.Imbalances.BidStackedImbalances.Count));
