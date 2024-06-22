@@ -150,7 +150,7 @@ This contains the information from the volumetric data and additional informatio
 
 #### Technical Levels
 
-There is a class called TechnicalLevels that you can pass to your custom strategy for further analysis. There is an example in the strategy implementations folder called `PivotFader` that you can look at for example usage. It's not enabled and only exists for the example of using the technical levels.
+There is a class called TechnicalLevels that you can pass to your custom strategy for further analysis. There is an example in the strategy implementations folder called `PivotFader` that you can look at for example usage. It's not enabled and only exists for the example of using the technical levels. By default, it includes a second data series (5 min). This has to be hard coded and not depdendent on run-time variables per NinjaTrader.
 
 #### Pivots (Support/Resistance)
 
