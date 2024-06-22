@@ -11,9 +11,9 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
         private readonly OrderFlowBotDataBars _dataBars;
         private readonly StrategiesConfig _strategiesConfig;
         private readonly List<IStrategyInterface> _strategies;
-        private readonly TechnicalLevels _technicalLevels;
+        private readonly List<TechnicalLevels> _technicalLevels;
 
-        public StrategiesController(OrderFlowBotState orderFlowBotState, OrderFlowBotDataBars dataBars, StrategiesConfig strategiesConfig, TechnicalLevels technicalLevels)
+        public StrategiesController(OrderFlowBotState orderFlowBotState, OrderFlowBotDataBars dataBars, StrategiesConfig strategiesConfig, List<TechnicalLevels> technicalLevels)
         {
             _orderFlowBotState = orderFlowBotState;
             _dataBars = dataBars;

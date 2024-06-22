@@ -1,4 +1,5 @@
 ﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar;
+using System.Collections.Generic;
 
 namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
 {
@@ -7,7 +8,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
         public override string Name { get; set; }
         public override Direction ValidStrategyDirection { get; set; }
 
-        public VolumeSequencing(OrderFlowBotState orderFlowBotState, OrderFlowBotDataBars dataBars, string name, TechnicalLevels technicalLevels)
+        public VolumeSequencing(OrderFlowBotState orderFlowBotState, OrderFlowBotDataBars dataBars, string name, List<TechnicalLevels> technicalLevels)
         : base(orderFlowBotState, dataBars, name, technicalLevels)
         {
         }

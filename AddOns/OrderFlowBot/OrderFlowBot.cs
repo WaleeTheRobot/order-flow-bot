@@ -4,8 +4,10 @@ using NinjaTrader.Custom.AddOns;
 using NinjaTrader.Custom.AddOns.OrderFlowBot;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies;
+using NinjaTrader.Data;
 using NinjaTrader.NinjaScript.Indicators;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 #endregion
 
@@ -35,7 +37,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         private OrderFlowBotState _orderFlowBotState;
         private OrderFlowBotDataBars _dataBars;
 
-        private TechnicalLevels _technicalLevels;
+        private List<TechnicalLevels> _technicalLevels;
 
         private StrategiesConfig _strategiesConfig;
         private StrategiesController _strategiesController;
@@ -237,7 +239,11 @@ namespace NinjaTrader.NinjaScript.Strategies
                 _orderFlowBotState.BackTestingEnabled = BackTestingEnabled;
                 _orderFlowBotState.BackTestingStrategyName = BackTestingStrategyName;
 
-                _technicalLevels = new TechnicalLevels(CurrentBar, RequiredTicksForBroken * TickSize);
+                _technicalLevels = new List<TechnicalLevels>
+                {
+                    new TechnicalLevels(CurrentBars[0], RequiredTicksForBroken * TickSize),
+                    new TechnicalLevels(CurrentBars[1], RequiredTicksForBroken * TickSize)
+                };
 
                 _strategiesConfig = new StrategiesConfig();
                 _strategiesController = new StrategiesController(_orderFlowBotState, _dataBars, _strategiesConfig, _technicalLevels);
@@ -258,6 +264,10 @@ namespace NinjaTrader.NinjaScript.Strategies
             {
                 ControlPanelSetStateTerminated();
             }
+            else if (State == State.Configure)
+            {
+                AddDataSeries(BarsPeriodType.Minute, 5);
+            }
         }
 
         protected override void OnExecutionUpdate(Execution execution, string executionId, double price, int quantity, MarketPosition marketPosition, string orderId, DateTime time)
@@ -274,7 +284,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (CurrentBar < MinBarsRequiredToTrade)
                 return;
 
-            if (IsFirstTickOfBar)
+            if (BarsInProgress == 0 && IsFirstTickOfBar)
             {
                 UpdateSupportResistanceLevels();
 
@@ -283,6 +293,12 @@ namespace NinjaTrader.NinjaScript.Strategies
                 _dataBars.UpdateDataBars();
 
                 //PrintDataBar(_dataBars.Bars.Last());
+            }
+
+            // 5 Minute
+            if (BarsInProgress == 1 && IsFirstTickOfBar)
+            {
+                UpdateSupportResistanceLevels(1);
             }
 
             _dataBars.SetOrderFlowDataBarBase(GetOrderFlowDataBarBase(0));
