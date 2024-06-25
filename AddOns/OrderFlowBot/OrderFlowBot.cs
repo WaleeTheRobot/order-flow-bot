@@ -4,7 +4,6 @@ using NinjaTrader.Custom.AddOns;
 using NinjaTrader.Custom.AddOns.OrderFlowBot;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies;
-using NinjaTrader.Data;
 using NinjaTrader.NinjaScript.Indicators;
 using System;
 using System.Collections.Generic;
@@ -241,8 +240,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 
                 _technicalLevels = new List<TechnicalLevels>
                 {
-                    new TechnicalLevels(CurrentBars[0], RequiredTicksForBroken * TickSize),
-                    new TechnicalLevels(CurrentBars[1], RequiredTicksForBroken * TickSize)
+                    new TechnicalLevels(CurrentBars[0], RequiredTicksForBroken * TickSize)
+                    //new TechnicalLevels(CurrentBars[1], RequiredTicksForBroken * TickSize)
                 };
 
                 _strategiesConfig = new StrategiesConfig();
@@ -266,7 +265,9 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
             else if (State == State.Configure)
             {
-                AddDataSeries(BarsPeriodType.Minute, 5);
+                // Make sure to add the BarsInProgress for the second data series
+                // Make sure to add second TechnicalLevels instance for the list
+                //AddDataSeries(BarsPeriodType.Minute, 5);
             }
         }
 
@@ -296,10 +297,10 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
 
             // 5 Minute
-            if (BarsInProgress == 1 && IsFirstTickOfBar)
-            {
-                UpdateSupportResistanceLevels(1);
-            }
+            //if (BarsInProgress == 1 && IsFirstTickOfBar)
+            //{
+            //    UpdateSupportResistanceLevels(1);
+            //}
 
             _dataBars.SetOrderFlowDataBarBase(GetOrderFlowDataBarBase(0));
             _dataBars.SetCurrentDataBar();
