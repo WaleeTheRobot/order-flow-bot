@@ -3,6 +3,7 @@ using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar;
 using NinjaTrader.Gui.Chart;
 using SharpDX.Direct2D1;
 using SharpDX.DirectWrite;
+using System;
 using System.Collections.Generic;
 
 namespace NinjaTrader.NinjaScript.Indicators
@@ -26,6 +27,7 @@ namespace NinjaTrader.NinjaScript.Indicators
         private Dictionary<int, BidAskRatio> _bidAskRatios;
         private List<int> _drawnBars;
         private bool _isFirstOnRender;
+        private bool _shouldUpdateCurrentBar;
 
         protected override void OnStateChange()
         {
@@ -50,6 +52,7 @@ namespace NinjaTrader.NinjaScript.Indicators
                 _bidAskRatios = new Dictionary<int, BidAskRatio>();
                 _drawnBars = new List<int>();
                 _isFirstOnRender = true;
+                _shouldUpdateCurrentBar = true;
             }
         }
 
@@ -66,6 +69,16 @@ namespace NinjaTrader.NinjaScript.Indicators
 
         protected override void OnRender(ChartControl chartControl, ChartScale chartScale)
         {
+            // Limit rendering to within 4 ticks of open to prevent performance issues with some tickers
+            if (Math.Abs(_dataBars.Bar.Prices.Close - _dataBars.Bar.Prices.Open) > (TickSize * 4))
+            {
+                _shouldUpdateCurrentBar = false;
+            }
+            else
+            {
+                _shouldUpdateCurrentBar = true;
+            }
+
             UpdateBidAskRatios();
 
             base.OnRender(chartControl, chartScale);
@@ -92,6 +105,17 @@ namespace NinjaTrader.NinjaScript.Indicators
             foreach (var idx in _drawnBars)
             {
                 DrawBarDetails(idx, chartControl, chartScale, regularTextFormat, boldTextFormat, textHeight, gap);
+            }
+
+            // Draw the current bar and add it to the list if it should be updated
+            if (_shouldUpdateCurrentBar)
+            {
+                DrawBarDetails(ChartBars.ToIndex, chartControl, chartScale, regularTextFormat, boldTextFormat, textHeight, gap);
+
+                if (!_drawnBars.Contains(ChartBars.ToIndex))
+                {
+                    _drawnBars.Add(ChartBars.ToIndex);
+                }
             }
 
             // Draw the current bar and add it to the list
