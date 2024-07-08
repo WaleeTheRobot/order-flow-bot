@@ -13,6 +13,12 @@ namespace NinjaTrader.NinjaScript.Strategies
             Print(string.Format("Bar Number: {0}", dataBar.BarNumber));
             Print(string.Format("Volume: {0}", dataBar.Volumes.Volume));
 
+
+            //Print(string.Format("CDB High: {0}", dataBar.CumulativeDeltaBar.High));
+            //Print(string.Format("CDB Low: {0}", dataBar.CumulativeDeltaBar.Low));
+            //Print(string.Format("CDB Open: {0}", dataBar.CumulativeDeltaBar.Open));
+            //Print(string.Format("CDB Close: {0}", dataBar.CumulativeDeltaBar.Close));
+
             /*
             // Technical Levels Example
             Print("Count: " + _technicalLevels.Pivots.Count);

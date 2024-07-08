@@ -51,6 +51,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar
         public double Low { get; set; }
         public double Open { get; set; }
         public double Close { get; set; }
+        public CumulativeDeltaBar CumulativeDeltaBar { get; set; }
 
         public OrderFlowDataBarBase()
         {
@@ -62,6 +63,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar
             Low = 0;
             Open = 0;
             Close = 0;
+            CumulativeDeltaBar = null;
         }
     }
 
@@ -96,6 +98,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar
             PopulatePrices();
             PopulateVolumeAndImbalances();
             PopulateDeltas();
+            PopulateCumulativeDeltaBar();
         }
 
         public void UpdateDataBars()
@@ -181,6 +184,11 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar
             Bar.Deltas.MinMaxDeltaRatio = CalculateRatio(Math.Abs(minDelta), Math.Abs(maxDelta));
             Bar.Deltas.MaxMinDeltaRatio = CalculateRatio(Math.Abs(maxDelta), Math.Abs(minDelta));
             Bar.Deltas.DeltaChange = volumes.BarDelta - _baseBar.VolumetricBar.Volumes[_baseBar.CurrentBar - _baseBar.BarsAgo - 1].BarDelta;
+        }
+
+        private void PopulateCumulativeDeltaBar()
+        {
+            Bar.CumulativeDeltaBar = _baseBar.CumulativeDeltaBar;
         }
 
         private double CalculateRatio(double numerator, double denominator)

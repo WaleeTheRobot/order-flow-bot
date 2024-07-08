@@ -14,6 +14,7 @@ namespace NinjaTrader.NinjaScript.AddOns.OrderFlowBot
         public Volumes Volumes { get; set; }
         public Deltas Deltas { get; set; }
         public Imbalances Imbalances { get; set; }
+        public CumulativeDeltaBar CumulativeDeltaBar { get; set; }
 
         public OrderFlowBotDataBar()
         {
@@ -22,6 +23,7 @@ namespace NinjaTrader.NinjaScript.AddOns.OrderFlowBot
             Volumes = new Volumes();
             Deltas = new Deltas();
             Imbalances = new Imbalances();
+            CumulativeDeltaBar = new CumulativeDeltaBar();
         }
 
         public void SetBarType()

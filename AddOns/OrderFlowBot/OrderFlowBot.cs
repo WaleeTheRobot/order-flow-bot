@@ -49,6 +49,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         private bool _allowAtmStrategyCheck;
         // Prevent entry on same bar
         private int _lastTradeBarNumber;
+        private OrderFlowCumulativeDelta _cumulativeDelta;
 
         #endregion
 
@@ -223,6 +224,9 @@ namespace NinjaTrader.NinjaScript.Strategies
             {
                 _allowAtmStrategyCheck = true;
 
+                // Couldn't suppress this
+                _cumulativeDelta = OrderFlowCumulativeDelta(CumulativeDeltaType.BidAsk, CumulativeDeltaPeriod.Session, 0);
+
                 _dataBars = new OrderFlowBotDataBars(
                     new OrderFlowBotDataBarConfigValues
                     {
@@ -268,7 +272,10 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
             else if (State == State.Configure)
             {
-                // Make sure to add the BarsInProgress for the second data series
+                // Required for the cumulative delta bar
+                AddDataSeries(Data.BarsPeriodType.Tick, 1);
+
+                // Make sure to add the BarsInProgress for the additional data series
                 // Make sure to add second TechnicalLevels instance for the list
                 //AddDataSeries(BarsPeriodType.Minute, 5);
             }
@@ -288,24 +295,30 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (CurrentBar < MinBarsRequiredToTrade)
                 return;
 
+            // First index data series should be the tick to support the cumulative delta bar
+            if (BarsInProgress == 1)
+            {
+                _cumulativeDelta.Update(_cumulativeDelta.BarsArray[1].Count - 1, 1);
+            }
+
             if (BarsInProgress == 0 && IsFirstTickOfBar)
             {
                 UpdateSupportResistanceLevels();
 
                 // Ensure we are setting the last bar in bars with the completed previous data
-                _dataBars.SetOrderFlowDataBarBase(GetOrderFlowDataBarBase(1));
+                _dataBars.SetOrderFlowDataBarBase(GetOrderFlowDataBarBase(1, _cumulativeDelta));
                 _dataBars.UpdateDataBars();
 
                 //PrintDataBar(_dataBars.Bars.Last());
             }
 
-            // Secondary data series
+            // Additional data series
             //if (BarsInProgress == 1 && IsFirstTickOfBar)
             //{
             //    UpdateSupportResistanceLevels(1);
             //}
 
-            _dataBars.SetOrderFlowDataBarBase(GetOrderFlowDataBarBase(0));
+            _dataBars.SetOrderFlowDataBarBase(GetOrderFlowDataBarBase(0, _cumulativeDelta));
             _dataBars.SetCurrentDataBar();
 
             // Ensures that no trades will go through since the strategies will not be checked
