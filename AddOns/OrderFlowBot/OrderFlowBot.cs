@@ -46,6 +46,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         private string _entryName;
         private string _atmStrategyId;
         private bool _isAtmStrategyCreated;
+        private bool _allowAtmStrategyCheck;
         // Prevent entry on same bar
         private int _lastTradeBarNumber;
 
@@ -220,6 +221,8 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
             else if (State == State.DataLoaded)
             {
+                _allowAtmStrategyCheck = true;
+
                 _dataBars = new OrderFlowBotDataBars(
                     new OrderFlowBotDataBarConfigValues
                     {
@@ -296,7 +299,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 //PrintDataBar(_dataBars.Bars.Last());
             }
 
-            // 5 Minute
+            // Secondary data series
             //if (BarsInProgress == 1 && IsFirstTickOfBar)
             //{
             //    UpdateSupportResistanceLevels(1);
@@ -392,6 +395,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
             _atmStrategyId = null;
             _isAtmStrategyCreated = false;
+            _allowAtmStrategyCheck = true;
 
             ResetTradeDirection();
 
@@ -416,7 +420,12 @@ namespace NinjaTrader.NinjaScript.Strategies
                 return false;
             }
 
-            return true;
+            if (_orderFlowBotState.AutoTradeEnabled)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private void CheckStrategies()
@@ -468,7 +477,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 
             if (AtmIsFlat())
             {
-                if (!AllowAtmCheckStrategies())
+                // It seems that the AtmIsFlat sometimes return true with live data and auto mode even if there is an ATM entry active.
+                // The _allowAtmStrategyCheck variable adds an extra check
+                if (!AllowAtmCheckStrategies() && _allowAtmStrategyCheck)
                 {
                     return;
                 }
@@ -493,6 +504,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                             if (atmCallbackErrorCode == ErrorCode.NoError)
                             {
                                 _isAtmStrategyCreated = true;
+                                _allowAtmStrategyCheck = false;
                             }
                         }
                     });
@@ -516,6 +528,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                             if (atmCallbackErrorCode == ErrorCode.NoError)
                             {
                                 _isAtmStrategyCreated = true;
+                                _allowAtmStrategyCheck = false;
                             }
                         }
                     });
