@@ -13,21 +13,23 @@ namespace NinjaTrader.NinjaScript.Strategies
             Print(string.Format("Bar Number: {0}", dataBar.BarNumber));
             Print(string.Format("Volume: {0}", dataBar.Volumes.Volume));
 
-
-            //Print(string.Format("CDB High: {0}", dataBar.CumulativeDeltaBar.High));
-            //Print(string.Format("CDB Low: {0}", dataBar.CumulativeDeltaBar.Low));
-            //Print(string.Format("CDB Open: {0}", dataBar.CumulativeDeltaBar.Open));
-            //Print(string.Format("CDB Close: {0}", dataBar.CumulativeDeltaBar.Close));
+            /*
+            Print(string.Format("CDB High: {0}", dataBar.CumulativeDeltaBar.High));
+            Print(string.Format("CDB Low: {0}", dataBar.CumulativeDeltaBar.Low));
+            Print(string.Format("CDB Open: {0}", dataBar.CumulativeDeltaBar.Open));
+            Print(string.Format("CDB Close: {0}", dataBar.CumulativeDeltaBar.Close));
+            Print(string.Format("CDB Fast: {0}", dataBar.CumulativeDeltaBar.FastEMA));
+            Print(string.Format("CDB Slow: {0}", dataBar.CumulativeDeltaBar.SlowEMA));
+            */
 
             /*
             // Technical Levels Example
-            Print("Count: " + _technicalLevels.Pivots.Count);
-            Print("Current Looking For High: " + _technicalLevels.IsLookingForHigh);
+            Print("Count: " + _technicalLevels[0].Pivots.Count);
+            Print("Current Looking For High: " + _technicalLevels[0].IsLookingForHigh);
             Print("Current Pivot: ");
-            Print("BarNumber: " + _technicalLevels.CurrentPivot.BarNumber + ", Price: " + _technicalLevels.CurrentPivot.Price + ", DisplayLevel: " + _technicalLevels.CurrentPivot.DisplayLevel + ", IsHigh: " + _technicalLevels.CurrentPivot.IsHigh);
+            Print("BarNumber: " + _technicalLevels[0].CurrentPivot.BarNumber + ", Price: " + _technicalLevels[0].CurrentPivot.Price + ", DisplayLevel: " + _technicalLevels[0].CurrentPivot.DisplayLevel + ", IsHigh: " + _technicalLevels[0].CurrentPivot.IsHigh);
             Print("\n");
-
-            var lastPivots = _technicalLevels.Pivots.Skip(Math.Max(0, _technicalLevels.Pivots.Count - 6)).Take(6).ToList();
+            Pivots = _technicalLevels.Pivots.Skip(Math.Max(0, _technicalLevels.Pivots.Count - 6)).Take(6).ToList();
 
             foreach (var pivot in lastPivots)
             {

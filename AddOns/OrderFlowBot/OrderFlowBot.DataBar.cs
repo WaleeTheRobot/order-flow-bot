@@ -1,6 +1,7 @@
 ﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar.Dependencies;
 using NinjaTrader.NinjaScript.Indicators;
+using System;
 
 namespace NinjaTrader.NinjaScript.Strategies
 {
@@ -11,12 +12,15 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             NinjaTrader.NinjaScript.BarsTypes.VolumetricBarsType volumetricBar = Bars.BarsSeries.BarsType as NinjaTrader.NinjaScript.BarsTypes.VolumetricBarsType;
 
+            // Change EMA to whatever you want if you use it
             CumulativeDeltaBar cumulativeDeltaBar = new CumulativeDeltaBar
             {
                 Open = cumulativeDelta.DeltaOpen[barsAgo],
                 Close = cumulativeDelta.DeltaClose[barsAgo],
                 High = cumulativeDelta.DeltaHigh[barsAgo],
                 Low = cumulativeDelta.DeltaLow[barsAgo],
+                FastEMA = Math.Round(EMA(cumulativeDelta, 9)[barsAgo], 2),
+                SlowEMA = Math.Round(EMA(cumulativeDelta, 20)[barsAgo], 2)
             };
 
             OrderFlowDataBarBase baseBar = new OrderFlowDataBarBase
