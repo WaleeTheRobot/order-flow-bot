@@ -71,6 +71,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Display(Name = "Trigger Strike Price Threshold Ticks", Description = "The threshold above and below the trigger strike price for triggering in ticks.", Order = 2, GroupName = GroupConstants.GROUP_NAME_GENERAL)]
         public int TriggerStrikePriceThresholdTicks { get; set; }
 
+        [NinjaScriptProperty]
+        [Display(Name = "Ticks Per Level", Description = "The ticks per level for aggregating in OrderFlowBotDataBar. This should match what you set for the data series.", Order = 3, GroupName = GroupConstants.GROUP_NAME_GENERAL)]
+        public int TicksPerLevel { get; set; }
+
         #endregion
 
         #region DataBar Properties
@@ -190,6 +194,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 // General 
                 MinBarsRequiredToTrade = 20;
                 TriggerStrikePriceThresholdTicks = 16;
+                TicksPerLevel = 1;
 
                 // DataBar
                 ImbalanceRatio = 1.5;
@@ -231,6 +236,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     new OrderFlowBotDataBarConfigValues
                     {
                         TickSize = TickSize,
+                        TicksPerLevel = TicksPerLevel != 0 ? TicksPerLevel : 1,
                         ImbalanceRatio = ImbalanceRatio,
                         StackedImbalance = StackedImbalance,
                         ValidImbalanceVolume = ValidImbalanceVolume,
