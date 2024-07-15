@@ -46,7 +46,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         private string _entryName;
         private string _atmStrategyId;
         private bool _isAtmStrategyCreated;
-        private bool _allowAtmStrategyCheck;
+        private bool _nonBlockingAtmIsFlat;
         // Prevent entry on same bar
         private int _lastTradeBarNumber;
         private OrderFlowCumulativeDelta _cumulativeDelta;
@@ -227,7 +227,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
             else if (State == State.DataLoaded)
             {
-                _allowAtmStrategyCheck = true;
+                _nonBlockingAtmIsFlat = true;
 
                 // Couldn't suppress this
                 _cumulativeDelta = OrderFlowCumulativeDelta(CumulativeDeltaType.BidAsk, CumulativeDeltaPeriod.Session, 0);
@@ -414,7 +414,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
             _atmStrategyId = null;
             _isAtmStrategyCreated = false;
-            _allowAtmStrategyCheck = true;
+            _nonBlockingAtmIsFlat = true;
 
             ResetTradeDirection();
 
@@ -434,17 +434,20 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         private bool AllowAtmCheckStrategies()
         {
+            // Should have existing ATM Strategy position
+            if (_orderFlowBotState.AutoTradeEnabled && _orderFlowBotState.ValidStrategyDirection == Direction.Long ||
+                    _orderFlowBotState.ValidStrategyDirection == Direction.Short)
+            {
+                return false;
+            }
+
+            // Flat should be for manual since auto mode is Any
             if (_orderFlowBotState.SelectedTradeDirection == Direction.Flat || _dataBars.Bar.BarNumber <= _lastTradeBarNumber)
             {
                 return false;
             }
 
-            if (_orderFlowBotState.AutoTradeEnabled)
-            {
-                return true;
-            }
-
-            return false;
+            return true;
         }
 
         private void CheckStrategies()
@@ -484,80 +487,83 @@ namespace NinjaTrader.NinjaScript.Strategies
                 return;
             }
 
-            if (_isAtmStrategyCreated)
+            if (_nonBlockingAtmIsFlat)
             {
-                if (AtmIsFlat() && (_orderFlowBotState.ValidStrategyDirection == Direction.Long ||
-                    _orderFlowBotState.ValidStrategyDirection == Direction.Short))
-                {
-                    ResetAtm();
-                    ControlPanelOnExecutionUpdate();
-                }
-            }
-
-            if (AtmIsFlat())
-            {
-                // It seems that the AtmIsFlat sometimes return true with live data and auto mode even if there is an ATM entry active.
-                // The _allowAtmStrategyCheck variable adds an extra check
-                if (!AllowAtmCheckStrategies() && _allowAtmStrategyCheck)
-                {
-                    return;
-                }
-
+                // ATM strategy inactive
                 _strategiesController.CheckStrategies();
 
                 if (_orderFlowBotState.ValidStrategyDirection == Direction.Long)
                 {
-                    _atmStrategyId = GetAtmStrategyUniqueId();
-                    _lastTradeBarNumber = _dataBars.Bar.BarNumber;
-                    _entryName = _orderFlowBotState.ValidStrategy.ToString();
-
-                    string atmTemplateName = ChartControl.OwnerChart.ChartTrader.AtmStrategy.Template;
-
-                    Print(String.Format("***** {0} *****", atmTemplateName));
-                    PrintOutput(String.Format("Enter Long | {0}", _entryName));
-
-                    AtmStrategyCreate(OrderAction.Buy, OrderType.Market, 0, 0, TimeInForce.Day, _atmStrategyId, atmTemplateName, _atmStrategyId, (atmCallbackErrorCode, atmCallbackId) =>
-                    {
-                        if (atmCallbackId == _atmStrategyId)
-                        {
-                            if (atmCallbackErrorCode == ErrorCode.NoError)
-                            {
-                                _isAtmStrategyCreated = true;
-                                _allowAtmStrategyCheck = false;
-                            }
-                        }
-                    });
+                    EnterAtmPosition(true);
                 }
 
                 if (_orderFlowBotState.ValidStrategyDirection == Direction.Short)
                 {
-                    _atmStrategyId = GetAtmStrategyUniqueId();
-                    _lastTradeBarNumber = _dataBars.Bar.BarNumber;
-                    _entryName = _orderFlowBotState.ValidStrategy.ToString();
-
-                    string atmTemplateName = ChartControl.OwnerChart.ChartTrader.AtmStrategy.Template;
-
-                    Print(String.Format("***** {0} *****", atmTemplateName));
-                    PrintOutput(String.Format("Enter Short | {0}", _entryName));
-
-                    AtmStrategyCreate(OrderAction.Sell, OrderType.Market, 0, 0, TimeInForce.Day, _atmStrategyId, atmTemplateName, _atmStrategyId, (atmCallbackErrorCode, atmCallbackId) =>
-                    {
-                        if (atmCallbackId == _atmStrategyId)
-                        {
-                            if (atmCallbackErrorCode == ErrorCode.NoError)
-                            {
-                                _isAtmStrategyCreated = true;
-                                _allowAtmStrategyCheck = false;
-                            }
-                        }
-                    });
+                    EnterAtmPosition(false);
                 }
+            }
+            else
+            {
+                // ATM strategy active
+                if (_isAtmStrategyCreated)
+                {
+                    // ATM strategy exited. Reset
+                    if (AtmIsFlat() && (_orderFlowBotState.ValidStrategyDirection == Direction.Long ||
+                      _orderFlowBotState.ValidStrategyDirection == Direction.Short))
+                    {
+                        ResetAtm();
+                        ControlPanelOnExecutionUpdate();
+                    }
+                }
+            }
+        }
+
+        private void EnterAtmPosition(bool isLong)
+        {
+            string entryPositionName = isLong ? "Long" : "Short";
+
+            _atmStrategyId = GetAtmStrategyUniqueId();
+            _lastTradeBarNumber = _dataBars.Bar.BarNumber;
+            _entryName = _orderFlowBotState.ValidStrategy.ToString();
+
+            string atmTemplateName = ChartControl.OwnerChart.ChartTrader.AtmStrategy.Template;
+
+            Print(String.Format("***** {0} *****", atmTemplateName));
+            PrintOutput(String.Format("Enter {0} | {1}", entryPositionName, _entryName));
+
+            _nonBlockingAtmIsFlat = false;
+
+            if (isLong)
+            {
+                AtmStrategyCreate(OrderAction.Buy, OrderType.Market, 0, 0, TimeInForce.Day, _atmStrategyId, atmTemplateName, _atmStrategyId, (atmCallbackErrorCode, atmCallbackId) =>
+                {
+                    if (atmCallbackId == _atmStrategyId)
+                    {
+                        if (atmCallbackErrorCode == ErrorCode.NoError)
+                        {
+                            _isAtmStrategyCreated = true;
+                        }
+                    }
+                });
+            }
+            else
+            {
+                AtmStrategyCreate(OrderAction.Sell, OrderType.Market, 0, 0, TimeInForce.Day, _atmStrategyId, atmTemplateName, _atmStrategyId, (atmCallbackErrorCode, atmCallbackId) =>
+                {
+                    if (atmCallbackId == _atmStrategyId)
+                    {
+                        if (atmCallbackErrorCode == ErrorCode.NoError)
+                        {
+                            _isAtmStrategyCreated = true;
+                        }
+                    }
+                });
             }
         }
 
         private bool AtmIsFlat()
         {
-            if (_atmStrategyId == null || !_isAtmStrategyCreated)
+            if (_atmStrategyId == null || _nonBlockingAtmIsFlat)
             {
                 return true;
             }
@@ -570,6 +576,8 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (_atmStrategyId != null)
             {
                 AtmStrategyClose(_atmStrategyId);
+                ResetAtm();
+                PrintOutput("ATM Position Closed");
             }
         }
     }
