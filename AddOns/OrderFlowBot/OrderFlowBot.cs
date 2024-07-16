@@ -4,7 +4,6 @@ using NinjaTrader.Custom.AddOns;
 using NinjaTrader.Custom.AddOns.OrderFlowBot;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies;
-using NinjaTrader.Data;
 using NinjaTrader.NinjaScript.Indicators;
 using System;
 using System.Collections.Generic;
@@ -47,8 +46,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         private string _entryName;
         private string _atmStrategyId;
         private bool _isAtmStrategyCreated;
+        private bool _blockingAtmIsFlat;
         // Prevent entry on same bar
         private int _lastTradeBarNumber;
+        private OrderFlowCumulativeDelta _cumulativeDelta;
 
         #endregion
 
@@ -69,6 +70,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         [NinjaScriptProperty]
         [Display(Name = "Trigger Strike Price Threshold Ticks", Description = "The threshold above and below the trigger strike price for triggering in ticks.", Order = 2, GroupName = GroupConstants.GROUP_NAME_GENERAL)]
         public int TriggerStrikePriceThresholdTicks { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Ticks Per Level", Description = "The ticks per level for aggregating in OrderFlowBotDataBar. This should match what you set for the data series.", Order = 3, GroupName = GroupConstants.GROUP_NAME_GENERAL)]
+        public int TicksPerLevel { get; set; }
 
         #endregion
 
@@ -189,6 +194,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 // General 
                 MinBarsRequiredToTrade = 20;
                 TriggerStrikePriceThresholdTicks = 16;
+                TicksPerLevel = 1;
 
                 // DataBar
                 ImbalanceRatio = 1.5;
@@ -221,10 +227,16 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
             else if (State == State.DataLoaded)
             {
+                _blockingAtmIsFlat = true;
+
+                // Couldn't suppress this
+                _cumulativeDelta = OrderFlowCumulativeDelta(CumulativeDeltaType.BidAsk, CumulativeDeltaPeriod.Session, 0);
+
                 _dataBars = new OrderFlowBotDataBars(
                     new OrderFlowBotDataBarConfigValues
                     {
                         TickSize = TickSize,
+                        TicksPerLevel = TicksPerLevel != 0 ? TicksPerLevel : 1,
                         ImbalanceRatio = ImbalanceRatio,
                         StackedImbalance = StackedImbalance,
                         ValidImbalanceVolume = ValidImbalanceVolume,
@@ -241,8 +253,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 
                 _technicalLevels = new List<TechnicalLevels>
                 {
-                    new TechnicalLevels(CurrentBars[0], RequiredTicksForBroken * TickSize),
-                    new TechnicalLevels(CurrentBars[1], RequiredTicksForBroken * TickSize)
+                    new TechnicalLevels(CurrentBars[0], RequiredTicksForBroken * TickSize)
+                    //new TechnicalLevels(CurrentBars[1], RequiredTicksForBroken * TickSize)
                 };
 
                 _strategiesConfig = new StrategiesConfig();
@@ -266,7 +278,12 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
             else if (State == State.Configure)
             {
-                AddDataSeries(BarsPeriodType.Minute, 5);
+                // Required for the cumulative delta bar
+                AddDataSeries(Data.BarsPeriodType.Tick, 1);
+
+                // Make sure to add the BarsInProgress for the additional data series
+                // Make sure to add second TechnicalLevels instance for the list
+                //AddDataSeries(BarsPeriodType.Minute, 5);
             }
         }
 
@@ -284,24 +301,30 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (CurrentBar < MinBarsRequiredToTrade)
                 return;
 
+            // First index data series should be the tick to support the cumulative delta bar
+            if (BarsInProgress == 1)
+            {
+                _cumulativeDelta.Update(_cumulativeDelta.BarsArray[1].Count - 1, 1);
+            }
+
             if (BarsInProgress == 0 && IsFirstTickOfBar)
             {
                 UpdateSupportResistanceLevels();
 
                 // Ensure we are setting the last bar in bars with the completed previous data
-                _dataBars.SetOrderFlowDataBarBase(GetOrderFlowDataBarBase(1));
+                _dataBars.SetOrderFlowDataBarBase(GetOrderFlowDataBarBase(1, _cumulativeDelta));
                 _dataBars.UpdateDataBars();
 
                 //PrintDataBar(_dataBars.Bars.Last());
             }
 
-            // 5 Minute
-            if (BarsInProgress == 1 && IsFirstTickOfBar)
-            {
-                UpdateSupportResistanceLevels(1);
-            }
+            // Additional data series
+            //if (BarsInProgress == 1 && IsFirstTickOfBar)
+            //{
+            //    UpdateSupportResistanceLevels(1);
+            //}
 
-            _dataBars.SetOrderFlowDataBarBase(GetOrderFlowDataBarBase(0));
+            _dataBars.SetOrderFlowDataBarBase(GetOrderFlowDataBarBase(0, _cumulativeDelta));
             _dataBars.SetCurrentDataBar();
 
             // Ensures that no trades will go through since the strategies will not be checked
@@ -391,6 +414,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
             _atmStrategyId = null;
             _isAtmStrategyCreated = false;
+            _blockingAtmIsFlat = true;
 
             ResetTradeDirection();
 
@@ -410,6 +434,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         private bool AllowAtmCheckStrategies()
         {
+            // Should have existing ATM Strategy position
+            if (_orderFlowBotState.AutoTradeEnabled && _orderFlowBotState.ValidStrategyDirection == Direction.Long ||
+                    _orderFlowBotState.ValidStrategyDirection == Direction.Short)
+            {
+                return false;
+            }
+
+            // Flat should be for manual since auto mode is Any
             if (_orderFlowBotState.SelectedTradeDirection == Direction.Flat || _dataBars.Bar.BarNumber <= _lastTradeBarNumber)
             {
                 return false;
@@ -455,76 +487,88 @@ namespace NinjaTrader.NinjaScript.Strategies
                 return;
             }
 
-            if (_isAtmStrategyCreated)
-            {
-                if (AtmIsFlat() && (_orderFlowBotState.ValidStrategyDirection == Direction.Long ||
-                    _orderFlowBotState.ValidStrategyDirection == Direction.Short))
-                {
-                    ResetAtm();
-                    ControlPanelOnExecutionUpdate();
-                }
-            }
-
-            if (AtmIsFlat())
+            if (_blockingAtmIsFlat)
             {
                 if (!AllowAtmCheckStrategies())
                 {
                     return;
                 }
 
+                // ATM strategy inactive
                 _strategiesController.CheckStrategies();
 
                 if (_orderFlowBotState.ValidStrategyDirection == Direction.Long)
                 {
-                    _atmStrategyId = GetAtmStrategyUniqueId();
-                    _lastTradeBarNumber = _dataBars.Bar.BarNumber;
-                    _entryName = _orderFlowBotState.ValidStrategy.ToString();
-
-                    string atmTemplateName = ChartControl.OwnerChart.ChartTrader.AtmStrategy.Template;
-
-                    Print(String.Format("***** {0} *****", atmTemplateName));
-                    PrintOutput(String.Format("Enter Long | {0}", _entryName));
-
-                    AtmStrategyCreate(OrderAction.Buy, OrderType.Market, 0, 0, TimeInForce.Day, _atmStrategyId, atmTemplateName, _atmStrategyId, (atmCallbackErrorCode, atmCallbackId) =>
-                    {
-                        if (atmCallbackId == _atmStrategyId)
-                        {
-                            if (atmCallbackErrorCode == ErrorCode.NoError)
-                            {
-                                _isAtmStrategyCreated = true;
-                            }
-                        }
-                    });
+                    EnterAtmPosition(true);
                 }
 
                 if (_orderFlowBotState.ValidStrategyDirection == Direction.Short)
                 {
-                    _atmStrategyId = GetAtmStrategyUniqueId();
-                    _lastTradeBarNumber = _dataBars.Bar.BarNumber;
-                    _entryName = _orderFlowBotState.ValidStrategy.ToString();
-
-                    string atmTemplateName = ChartControl.OwnerChart.ChartTrader.AtmStrategy.Template;
-
-                    Print(String.Format("***** {0} *****", atmTemplateName));
-                    PrintOutput(String.Format("Enter Short | {0}", _entryName));
-
-                    AtmStrategyCreate(OrderAction.Sell, OrderType.Market, 0, 0, TimeInForce.Day, _atmStrategyId, atmTemplateName, _atmStrategyId, (atmCallbackErrorCode, atmCallbackId) =>
-                    {
-                        if (atmCallbackId == _atmStrategyId)
-                        {
-                            if (atmCallbackErrorCode == ErrorCode.NoError)
-                            {
-                                _isAtmStrategyCreated = true;
-                            }
-                        }
-                    });
+                    EnterAtmPosition(false);
                 }
+            }
+            else
+            {
+                // ATM strategy active
+                if (_isAtmStrategyCreated)
+                {
+                    // ATM strategy exited. Reset
+                    if (AtmIsFlat() && (_orderFlowBotState.ValidStrategyDirection == Direction.Long ||
+                      _orderFlowBotState.ValidStrategyDirection == Direction.Short))
+                    {
+                        ResetAtm();
+                        ControlPanelOnExecutionUpdate();
+                    }
+                }
+            }
+        }
+
+        private void EnterAtmPosition(bool isLong)
+        {
+            string entryPositionName = isLong ? "Long" : "Short";
+
+            _atmStrategyId = GetAtmStrategyUniqueId();
+            _lastTradeBarNumber = _dataBars.Bar.BarNumber;
+            _entryName = _orderFlowBotState.ValidStrategy.ToString();
+
+            string atmTemplateName = ChartControl.OwnerChart.ChartTrader.AtmStrategy.Template;
+
+            Print(String.Format("***** {0} *****", atmTemplateName));
+            PrintOutput(String.Format("Enter {0} | {1}", entryPositionName, _entryName));
+
+            _blockingAtmIsFlat = false;
+
+            if (isLong)
+            {
+                AtmStrategyCreate(OrderAction.Buy, OrderType.Market, 0, 0, TimeInForce.Day, _atmStrategyId, atmTemplateName, _atmStrategyId, (atmCallbackErrorCode, atmCallbackId) =>
+                {
+                    if (atmCallbackId == _atmStrategyId)
+                    {
+                        if (atmCallbackErrorCode == ErrorCode.NoError)
+                        {
+                            _isAtmStrategyCreated = true;
+                        }
+                    }
+                });
+            }
+            else
+            {
+                AtmStrategyCreate(OrderAction.Sell, OrderType.Market, 0, 0, TimeInForce.Day, _atmStrategyId, atmTemplateName, _atmStrategyId, (atmCallbackErrorCode, atmCallbackId) =>
+                {
+                    if (atmCallbackId == _atmStrategyId)
+                    {
+                        if (atmCallbackErrorCode == ErrorCode.NoError)
+                        {
+                            _isAtmStrategyCreated = true;
+                        }
+                    }
+                });
             }
         }
 
         private bool AtmIsFlat()
         {
-            if (_atmStrategyId == null || !_isAtmStrategyCreated)
+            if (_atmStrategyId == null || _blockingAtmIsFlat)
             {
                 return true;
             }
@@ -537,6 +581,8 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (_atmStrategyId != null)
             {
                 AtmStrategyClose(_atmStrategyId);
+                ResetAtm();
+                PrintOutput("ATM Position Closed");
             }
         }
     }

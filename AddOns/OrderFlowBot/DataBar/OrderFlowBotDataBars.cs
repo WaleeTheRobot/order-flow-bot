@@ -8,6 +8,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar
     public struct OrderFlowBotDataBarConfigValues
     {
         public double TickSize { get; set; }
+        public int TicksPerLevel { get; set; }
         public double ImbalanceRatio { get; set; }
         public int StackedImbalance { get; set; }
         public long ValidImbalanceVolume { get; set; }
@@ -20,6 +21,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar
     public static class OrderFlowBotDataBarConfig
     {
         public static double TickSize { get; private set; }
+        public static int TicksPerLevel { get; private set; }
         public static double ImbalanceRatio { get; private set; }
         public static int StackedImbalance { get; private set; }
         public static long ValidImbalanceVolume { get; private set; }
@@ -31,6 +33,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar
         public static void Initialize(OrderFlowBotDataBarConfigValues config)
         {
             TickSize = config.TickSize;
+            TicksPerLevel = config.TicksPerLevel;
             ImbalanceRatio = config.ImbalanceRatio;
             StackedImbalance = config.StackedImbalance;
             ValidImbalanceVolume = config.ValidImbalanceVolume;
@@ -51,6 +54,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar
         public double Low { get; set; }
         public double Open { get; set; }
         public double Close { get; set; }
+        public CumulativeDeltaBar CumulativeDeltaBar { get; set; }
 
         public OrderFlowDataBarBase()
         {
@@ -62,6 +66,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar
             Low = 0;
             Open = 0;
             Close = 0;
+            CumulativeDeltaBar = null;
         }
     }
 
@@ -96,6 +101,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar
             PopulatePrices();
             PopulateVolumeAndImbalances();
             PopulateDeltas();
+            PopulateCumulativeDeltaBar();
         }
 
         public void UpdateDataBars()
@@ -141,16 +147,31 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar
             // Get bid/ask volume for each price in bar
             List<BidAskVolume> bidAskVolumeList = new List<BidAskVolume>();
 
+            int counter = 0;
+
             while (high >= low)
             {
-                BidAskVolume bidAskVolume = new BidAskVolume
+                // Values are the same up to TicksPerLevel so we just need to and the initial and skip until the next interval
+                if (counter == 0)
                 {
-                    Price = high,
-                    BidVolume = volumes.GetBidVolumeForPrice(high),
-                    AskVolume = volumes.GetAskVolumeForPrice(high)
-                };
+                    BidAskVolume bidAskVolume = new BidAskVolume
+                    {
+                        Price = high,
+                        BidVolume = volumes.GetBidVolumeForPrice(high),
+                        AskVolume = volumes.GetAskVolumeForPrice(high)
+                    };
 
-                bidAskVolumeList.Add(bidAskVolume);
+                    bidAskVolumeList.Add(bidAskVolume);
+                }
+
+                if (counter == OrderFlowBotDataBarConfig.TicksPerLevel - 1)
+                {
+                    counter = 0;
+                }
+                else
+                {
+                    counter++;
+                }
 
                 high -= OrderFlowBotDataBarConfig.TickSize;
             }
@@ -181,6 +202,11 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar
             Bar.Deltas.MinMaxDeltaRatio = CalculateRatio(Math.Abs(minDelta), Math.Abs(maxDelta));
             Bar.Deltas.MaxMinDeltaRatio = CalculateRatio(Math.Abs(maxDelta), Math.Abs(minDelta));
             Bar.Deltas.DeltaChange = volumes.BarDelta - _baseBar.VolumetricBar.Volumes[_baseBar.CurrentBar - _baseBar.BarsAgo - 1].BarDelta;
+        }
+
+        private void PopulateCumulativeDeltaBar()
+        {
+            Bar.CumulativeDeltaBar = _baseBar.CumulativeDeltaBar;
         }
 
         private double CalculateRatio(double numerator, double denominator)

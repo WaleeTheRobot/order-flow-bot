@@ -66,9 +66,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
                 IsValidBarType() &&
                 IsValidBars() &&
                 IsValidMaxDelta() &&
-                IsValidMinDelta() &&
-                IsValidPreviousLevel() &&
-                IsValidCurrentPivot2()
+                IsValidMinDelta()
                 )
             {
                 ValidStrategyDirection = Direction.Long;
@@ -83,9 +81,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
                 IsValidBarType(false) &&
                 IsValidBars(false) &&
                 IsValidMaxDelta(false) &&
-                IsValidMinDelta(false) &&
-                IsValidPreviousLevel(false) &&
-                IsValidCurrentPivot2(false)
+                IsValidMinDelta(false)
                 )
             {
                 ValidStrategyDirection = Direction.Short;
@@ -135,6 +131,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies
             return isValidShortRejection && isValidShortReversal && isValidShortReversalContinuation;
         }
 
+        // Example for second data series
         private bool IsValidCurrentPivot2(bool checkLong = true)
         {
             if (checkLong)

@@ -147,9 +147,6 @@ namespace NinjaTrader.NinjaScript.Strategies
         private void CloseButtonClick(object sender, RoutedEventArgs e)
         {
             CloseAtmPosition();
-            PrintOutput("ATM Position Closed");
-
-            ResetTradeDirection();
         }
 
         private void ResetDirectionButtonClick(object sender, RoutedEventArgs e)
