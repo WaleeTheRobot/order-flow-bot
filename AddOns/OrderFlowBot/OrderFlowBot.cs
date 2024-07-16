@@ -7,6 +7,7 @@ using NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies;
 using NinjaTrader.NinjaScript.Indicators;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 #endregion
 
@@ -57,10 +58,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         [NinjaScriptProperty]
         [Display(Name = "Version", Description = "OrderFlowBot version.", Order = 0, GroupName = GroupConstants.GROUP_NAME_GENERAL)]
+        [ReadOnly(true)]
         public string Version
         {
             get { return "2.2.0"; }
-            private set { }
+            set { }
         }
 
         [NinjaScriptProperty]
