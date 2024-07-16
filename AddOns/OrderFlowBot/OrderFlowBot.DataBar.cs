@@ -12,16 +12,27 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             NinjaTrader.NinjaScript.BarsTypes.VolumetricBarsType volumetricBar = Bars.BarsSeries.BarsType as NinjaTrader.NinjaScript.BarsTypes.VolumetricBarsType;
 
-            // Change EMA to whatever you want if you use it
-            CumulativeDeltaBar cumulativeDeltaBar = new CumulativeDeltaBar
+            CumulativeDeltaBar cumulativeDeltaBar = new CumulativeDeltaBar();
+
+            // Sometimes this randomly errors out for index being out of range.
+            // This will slightly not match the EMA with the whats visually there, but it's not a big difference.
+            try
             {
-                Open = cumulativeDelta.DeltaOpen[barsAgo],
-                Close = cumulativeDelta.DeltaClose[barsAgo],
-                High = cumulativeDelta.DeltaHigh[barsAgo],
-                Low = cumulativeDelta.DeltaLow[barsAgo],
-                FastEMA = Math.Round(EMA(cumulativeDelta, 9)[barsAgo], 2),
-                SlowEMA = Math.Round(EMA(cumulativeDelta, 20)[barsAgo], 2)
-            };
+                cumulativeDeltaBar = new CumulativeDeltaBar
+                {
+                    Open = cumulativeDelta.DeltaOpen[barsAgo],
+                    Close = cumulativeDelta.DeltaClose[barsAgo],
+                    High = cumulativeDelta.DeltaHigh[barsAgo],
+                    Low = cumulativeDelta.DeltaLow[barsAgo],
+                    FastEMA = Math.Round(EMA(cumulativeDelta, 9)[barsAgo], 2),
+                    SlowEMA = Math.Round(EMA(cumulativeDelta, 20)[barsAgo], 2)
+                };
+            }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                // Fallback
+                cumulativeDeltaBar = new CumulativeDeltaBar();
+            }
 
             OrderFlowDataBarBase baseBar = new OrderFlowDataBarBase
             {
