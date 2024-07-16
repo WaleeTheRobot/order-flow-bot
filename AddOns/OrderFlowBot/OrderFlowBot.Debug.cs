@@ -13,6 +13,13 @@ namespace NinjaTrader.NinjaScript.Strategies
             Print(string.Format("Bar Number: {0}", dataBar.BarNumber));
             Print(string.Format("Volume: {0}", dataBar.Volumes.Volume));
 
+            Print("Bid/Ask Volume Per Bar:");
+            Print(string.Format("Count: {0}", dataBar.Volumes.BidAskVolumes.Count));
+            foreach (var kvp in dataBar.Volumes.BidAskVolumes)
+            {
+                Print(string.Format("{0} : {1}", kvp.BidVolume, kvp.AskVolume));
+            }
+
             /*
             Print(string.Format("CDB High: {0}", dataBar.CumulativeDeltaBar.High));
             Print(string.Format("CDB Low: {0}", dataBar.CumulativeDeltaBar.Low));

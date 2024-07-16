@@ -59,7 +59,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Display(Name = "Version", Description = "OrderFlowBot version.", Order = 0, GroupName = GroupConstants.GROUP_NAME_GENERAL)]
         public string Version
         {
-            get { return "2.1.2"; }
+            get { return "2.2.0"; }
             private set { }
         }
 
