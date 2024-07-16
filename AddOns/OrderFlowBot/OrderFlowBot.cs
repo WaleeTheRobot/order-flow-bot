@@ -61,7 +61,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         [ReadOnly(true)]
         public string Version
         {
-            get { return "2.2.0"; }
+            get { return "2.2.1"; }
             set { }
         }
 
