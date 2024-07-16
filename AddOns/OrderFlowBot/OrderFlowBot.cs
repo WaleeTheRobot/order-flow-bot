@@ -46,7 +46,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         private string _entryName;
         private string _atmStrategyId;
         private bool _isAtmStrategyCreated;
-        private bool _nonBlockingAtmIsFlat;
+        private bool _blockingAtmIsFlat;
         // Prevent entry on same bar
         private int _lastTradeBarNumber;
         private OrderFlowCumulativeDelta _cumulativeDelta;
@@ -227,7 +227,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
             else if (State == State.DataLoaded)
             {
-                _nonBlockingAtmIsFlat = true;
+                _blockingAtmIsFlat = true;
 
                 // Couldn't suppress this
                 _cumulativeDelta = OrderFlowCumulativeDelta(CumulativeDeltaType.BidAsk, CumulativeDeltaPeriod.Session, 0);
@@ -414,7 +414,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
             _atmStrategyId = null;
             _isAtmStrategyCreated = false;
-            _nonBlockingAtmIsFlat = true;
+            _blockingAtmIsFlat = true;
 
             ResetTradeDirection();
 
@@ -487,8 +487,13 @@ namespace NinjaTrader.NinjaScript.Strategies
                 return;
             }
 
-            if (_nonBlockingAtmIsFlat)
+            if (_blockingAtmIsFlat)
             {
+                if (!AllowAtmCheckStrategies())
+                {
+                    return;
+                }
+
                 // ATM strategy inactive
                 _strategiesController.CheckStrategies();
 
@@ -531,7 +536,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             Print(String.Format("***** {0} *****", atmTemplateName));
             PrintOutput(String.Format("Enter {0} | {1}", entryPositionName, _entryName));
 
-            _nonBlockingAtmIsFlat = false;
+            _blockingAtmIsFlat = false;
 
             if (isLong)
             {
@@ -563,7 +568,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         private bool AtmIsFlat()
         {
-            if (_atmStrategyId == null || _nonBlockingAtmIsFlat)
+            if (_atmStrategyId == null || _blockingAtmIsFlat)
             {
                 return true;
             }
