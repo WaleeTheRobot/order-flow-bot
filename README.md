@@ -54,6 +54,10 @@ Resets the Strategies section.
 
 Closes any ATM positions created by OrderFlowBot and resets the Trade Direction section.
 
+#### Alert
+
+This alerts you of the trade by playing a sound and painting triangles instead of executing the trade. Using this will alert you to further analyze the valid trade entry from your strategy and manually enter.
+
 ## Trade Direction
 
 This section contains the inputs for triggering a trade direction.
