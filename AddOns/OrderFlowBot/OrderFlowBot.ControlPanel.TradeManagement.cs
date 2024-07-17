@@ -17,6 +17,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         private Button _resetStrategiesButton;
         private Button _autoButton;
         private Button _closeButton;
+        private Button _alertButton;
         private Dictionary<string, ButtonInfo> _tradeManagementButtons;
 
         private const string DISABLE_BUTTON_LABEL = "Enabled";
@@ -24,6 +25,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         private const string CLOSE_BUTTON_LABEL = "Close";
         private const string RESET_DIRECTION_BUTTON_LABEL = "Reset Direction";
         private const string RESET_STRATEGIES_BUTTON_LABEL = "Reset Strategies";
+        private const string ALERT_BUTTON_LABEL = "Alert";
 
         private void TradeManagementGrid()
         {
@@ -46,12 +48,14 @@ namespace NinjaTrader.NinjaScript.Strategies
             _resetDirectionButton = CreateButton(RESET_DIRECTION_BUTTON_LABEL, ResetDirectionButtonClick, 1, 0);
             _resetStrategiesButton = CreateButton(RESET_STRATEGIES_BUTTON_LABEL, ResetStrategiesButtonClick, 1, 1);
             _closeButton = CreateButton(CLOSE_BUTTON_LABEL, CloseButtonClick, 2, 0);
+            _alertButton = CreateButton(ALERT_BUTTON_LABEL, AlertButtonClick, 2, 1);
 
             _tradeManagementGrid.Children.Add(_disableButton);
             _tradeManagementGrid.Children.Add(_autoButton);
             _tradeManagementGrid.Children.Add(_resetDirectionButton);
             _tradeManagementGrid.Children.Add(_resetStrategiesButton);
             _tradeManagementGrid.Children.Add(_closeButton);
+            _tradeManagementGrid.Children.Add(_alertButton);
 
 
             TextBlock headerText = GetHeaderText("Trade Management");
@@ -70,7 +74,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 { AUTO_BUTTON_LABEL, new ButtonInfo(AutoButtonClick, false, AUTO_BUTTON_LABEL) },
                 { CLOSE_BUTTON_LABEL, new ButtonInfo(DisableButtonClick, false, CLOSE_BUTTON_LABEL) },
                 { RESET_DIRECTION_BUTTON_LABEL, new ButtonInfo(AutoButtonClick, false, RESET_DIRECTION_BUTTON_LABEL) },
-                { RESET_STRATEGIES_BUTTON_LABEL, new ButtonInfo(AutoButtonClick, false, RESET_STRATEGIES_BUTTON_LABEL) }
+                { RESET_STRATEGIES_BUTTON_LABEL, new ButtonInfo(AutoButtonClick, false, RESET_STRATEGIES_BUTTON_LABEL) },
+                { ALERT_BUTTON_LABEL, new ButtonInfo(AlertButtonClick, false, ALERT_BUTTON_LABEL) }
             };
         }
 
@@ -195,6 +200,22 @@ namespace NinjaTrader.NinjaScript.Strategies
 
                 ForceRefresh();
             }
+        }
+
+        private void AlertButtonClick(object sender, RoutedEventArgs e)
+        {
+            bool currentDisableState = !_tradeManagementButtons[ALERT_BUTTON_LABEL].IsActive;
+
+            _orderFlowBotState.AlertEnabled = currentDisableState;
+            _tradeManagementButtons[ALERT_BUTTON_LABEL].IsActive = _orderFlowBotState.AlertEnabled;
+
+            // Update alert button
+            Button alertButton = FindChild<Button>(_tradeManagementGrid, ALERT_BUTTON_LABEL);
+            alertButton.Background = _orderFlowBotState.AlertEnabled ? GetSolidColorBrushFromHex(_buttonActive) : GetSolidColorBrushFromHex(_buttonNeutral);
+
+            PrintOutput(_orderFlowBotState.AlertEnabled ? "Alert Enabled" : "Alert Disabled");
+
+            ForceRefresh();
         }
     }
 }
