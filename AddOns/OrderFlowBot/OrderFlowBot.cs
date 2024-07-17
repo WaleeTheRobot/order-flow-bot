@@ -4,11 +4,14 @@ using NinjaTrader.Custom.AddOns;
 using NinjaTrader.Custom.AddOns.OrderFlowBot;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBar;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Strategies;
+using NinjaTrader.NinjaScript.DrawingTools;
 using NinjaTrader.NinjaScript.Indicators;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
+using System.Windows.Media;
 #endregion
 
 //This namespace holds Strategies in this folder and is required. Do not change it. 
@@ -51,6 +54,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         // Prevent entry on same bar
         private int _lastTradeBarNumber;
         private OrderFlowCumulativeDelta _cumulativeDelta;
+
+        private string _alertSoundFilePath;
 
         #endregion
 
@@ -229,6 +234,10 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
             else if (State == State.DataLoaded)
             {
+                // Media
+                string baseDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "NinjaTrader 8", "bin", "Custom", "AddOns", "OrderFlowBot", "Media");
+                _alertSoundFilePath = Path.Combine(baseDirectory, "alert.wav");
+
                 _blockingAtmIsFlat = true;
 
                 // Couldn't suppress this
@@ -536,12 +545,25 @@ namespace NinjaTrader.NinjaScript.Strategies
             string atmTemplateName = ChartControl.OwnerChart.ChartTrader.AtmStrategy.Template;
 
             Print(String.Format("***** {0} *****", atmTemplateName));
+
+            if (_orderFlowBotState.AlertEnabled)
+            {
+                Print("Alert");
+            }
+
             PrintOutput(String.Format("Enter {0} | {1}", entryPositionName, _entryName));
 
             _blockingAtmIsFlat = false;
 
             if (isLong)
             {
+                if (_orderFlowBotState.AlertEnabled)
+                {
+                    TradeAlert(true);
+
+                    return;
+                }
+
                 AtmStrategyCreate(OrderAction.Buy, OrderType.Market, 0, 0, TimeInForce.Day, _atmStrategyId, atmTemplateName, _atmStrategyId, (atmCallbackErrorCode, atmCallbackId) =>
                 {
                     if (atmCallbackId == _atmStrategyId)
@@ -555,6 +577,13 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
             else
             {
+                if (_orderFlowBotState.AlertEnabled)
+                {
+                    TradeAlert(false);
+
+                    return;
+                }
+
                 AtmStrategyCreate(OrderAction.Sell, OrderType.Market, 0, 0, TimeInForce.Day, _atmStrategyId, atmTemplateName, _atmStrategyId, (atmCallbackErrorCode, atmCallbackId) =>
                 {
                     if (atmCallbackId == _atmStrategyId)
@@ -566,6 +595,30 @@ namespace NinjaTrader.NinjaScript.Strategies
                     }
                 });
             }
+        }
+
+        private void TradeAlert(bool longEntry)
+        {
+            if (longEntry)
+            {
+                Draw.TriangleUp(this, "AlertTriangleUp" + CurrentBar, true, 0, Close[0] - TickSize, Brushes.Blue);
+            }
+            else
+            {
+                Draw.TriangleDown(this, "AlertTriangleDown" + CurrentBar, true, 0, Close[0] + TickSize, Brushes.Red);
+            }
+
+            if (File.Exists(_alertSoundFilePath))
+            {
+                PlaySound(_alertSoundFilePath);
+            }
+            else
+            {
+                // Fallback
+                PlaySound(@"C:\Program Files\NinjaTrader 8\sounds\Alert2.wav");
+            }
+
+            ResetAtm();
         }
 
         private bool AtmIsFlat()
