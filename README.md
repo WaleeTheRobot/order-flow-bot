@@ -140,7 +140,7 @@ This strategy is triggered based on the sequential increasing volume starting fr
 
 ## Backtesting
 
-You can backtest your strategies by enabling the backtesting. This will use the backtest file name, target and stop where you enabled the backtesting.
+You can backtest your strategies by enabling the backtesting. This will use the backtest file name, target and stop where you enabled the backtesting. This will disable the control panel.
 
 ## Adding Strategies and Indicators
 
