@@ -6,6 +6,8 @@ A bot used for trading order flow with a selected ATM strategy. The recommended 
 
 OrderFlowBot uses the selected ATM strategy. Just create your ATM strategies and select the one you want to use for the trade. You can create your own strategies and easily hook it to OrderFlowBot for semi-automated or fully automated trading. Indicators can also be created with data from the OrderFlowBot DataBar for usage when the OrderFlowBot is enabled.
 
+Considering that there are some interest in this project, I would like to refactored this project some time and will probably not continue to contribute to this version.
+
 # Important
 
 Requires the lifetime NinjaTrader license for the volumetric data or the Order Flow + subscription.
