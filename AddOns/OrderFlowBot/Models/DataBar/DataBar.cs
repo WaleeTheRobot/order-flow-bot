@@ -30,8 +30,10 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBar
             Imbalances = new Imbalances();
         }
 
-        public void SetCurrentDataBar()
+        public void SetCurrentDataBar(DataBarDataProvider dataBarDataProvider)
         {
+            DataBarDataProvider = dataBarDataProvider;
+
             if (DataBarDataProvider.VolumetricBar == null)
             {
                 return;
