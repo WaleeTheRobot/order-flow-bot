@@ -21,5 +21,6 @@
         public int StackedImbalance { get; set; }
         public double ImbalanceRatio { get; set; }
         public long ImbalanceMinDelta { get; set; }
+        public double ValueAreaPercentage { get; set; }
     }
 }

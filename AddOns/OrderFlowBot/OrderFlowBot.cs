@@ -1,6 +1,5 @@
 ﻿#region Using declarations
 using NinjaTrader.Cbi;
-using NinjaTrader.Custom.AddOns.OrderFlowBot.Configs;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBarConfigs;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Events;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBar;
@@ -59,6 +58,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Display(Name = "Imbalance Min Delta", Description = "The minimum number of delta for a valid imbalance.", Order = 3, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
         public long ImbalanceMinDelta { get; set; }
 
+        [NinjaScriptProperty]
+        [Display(Name = "Value Area Percentage", Description = "The percent to determine the value area.", Order = 4, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
+        public double ValueAreaPercentage { get; set; }
+
         #endregion
 
         protected override void OnStateChange()
@@ -90,6 +93,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 ImbalanceRatio = 1.5;
                 StackedImbalance = 3;
                 ImbalanceMinDelta = 10;
+                ValueAreaPercentage = 70;
             }
             else if (State == State.Configure)
             {
@@ -121,6 +125,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 {
                     _dataBarEvents.UpdateCurrentDataBarList();
 
+                    /*
                     _dataBarEvents.PrintDataBar(new DataBarPrintConfig
                     {
                         BarsAgo = 1,
@@ -132,6 +137,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                         ShowVolumes = true,
                         ShowBidAskVolumePerBar = true,
                     });
+                    */
                 }
                 else
                 {
@@ -165,6 +171,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             DataBarConfig.Instance.StackedImbalance = StackedImbalance;
             DataBarConfig.Instance.ImbalanceRatio = ImbalanceRatio;
             DataBarConfig.Instance.ImbalanceMinDelta = ImbalanceMinDelta;
+            DataBarConfig.Instance.ValueAreaPercentage = ValueAreaPercentage;
         }
 
         // Used for debugging event messages

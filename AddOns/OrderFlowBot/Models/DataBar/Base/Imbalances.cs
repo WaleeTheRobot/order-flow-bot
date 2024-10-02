@@ -18,6 +18,10 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBar.Base
         public List<ImbalancePrice> AskStackedImbalances { get; set; }
         public bool HasBidStackedImbalances { get; set; }
         public bool HasAskStackedImbalances { get; set; }
+        public double TickSize { get; set; }
+        public double ImbalanceRatio { get; set; }
+        public long ImbalanceMinDelta { get; set; }
+        public int StackedImbalance { get; set; }
 
         public Imbalances()
         {
@@ -25,17 +29,20 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBar.Base
             BidImbalances = new List<ImbalancePrice>();
             AskStackedImbalances = new List<ImbalancePrice>();
             BidStackedImbalances = new List<ImbalancePrice>();
+
+            TickSize = DataBarConfig.Instance.TickSize * DataBarConfig.Instance.TicksPerLevel;
+            ImbalanceRatio = DataBarConfig.Instance.ImbalanceRatio;
+            ImbalanceMinDelta = DataBarConfig.Instance.ImbalanceMinDelta;
+            StackedImbalance = DataBarConfig.Instance.StackedImbalance;
         }
 
         private bool IsValidBidImbalance(List<BidAskVolume> bidAskVolumes, int index)
         {
-            double imbalanceRatio = DataBarConfig.Instance.ImbalanceRatio;
-            long imbalanceMinDelta = DataBarConfig.Instance.ImbalanceMinDelta;
             long ask = bidAskVolumes[index - 1].AskVolume;
             long bid = bidAskVolumes[index].BidVolume;
 
             // Needs to have more than imbalance min delta requirement
-            if (bid - ask < imbalanceMinDelta)
+            if (bid - ask < ImbalanceMinDelta)
             {
                 return false;
             }
@@ -43,21 +50,19 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBar.Base
             // Diagonal calculations
             if (ask == 0)
             {
-                return bid >= imbalanceRatio;
+                return bid >= ImbalanceRatio;
             }
 
-            return (double)bid / ask >= imbalanceRatio;
+            return (double)bid / ask >= ImbalanceRatio;
         }
 
         private bool IsValidAskImbalance(List<BidAskVolume> bidAskVolumes, int index)
         {
-            double imbalanceRatio = DataBarConfig.Instance.ImbalanceRatio;
-            long imbalanceMinDelta = DataBarConfig.Instance.ImbalanceMinDelta;
             long ask = bidAskVolumes[index].AskVolume;
             long bid = bidAskVolumes[index + 1].BidVolume;
 
             // Needs to have more than imbalance min delta requirement
-            if (ask - bid < imbalanceMinDelta)
+            if (ask - bid < ImbalanceMinDelta)
             {
                 return false;
             }
@@ -65,10 +70,10 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBar.Base
             // Diagonal calculations
             if (bid == 0)
             {
-                return ask >= imbalanceRatio;
+                return ask >= ImbalanceRatio;
             }
 
-            return (double)ask / bid >= imbalanceRatio;
+            return (double)ask / bid >= ImbalanceRatio;
         }
 
         public void SetImbalances(List<BidAskVolume> bidAskVolumes)
@@ -148,9 +153,6 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBar.Base
 
         private void ProcessStackedImbalances(List<ImbalancePrice> imbalancePriceList, bool isBid)
         {
-            int stackedImbalance = DataBarConfig.Instance.StackedImbalance;
-            double tickSize = DataBarConfig.Instance.TickSize * DataBarConfig.Instance.TicksPerLevel;
-
             List<ImbalancePrice> tempImbalanceList = new List<ImbalancePrice>();
 
             for (int i = 0; i < imbalancePriceList.Count; i++)
@@ -158,11 +160,11 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBar.Base
                 tempImbalanceList.Add(imbalancePriceList[i]);
 
                 bool isLastItem = i == imbalancePriceList.Count - 1;
-                bool isNextItemWithinTickSize = !isLastItem && Math.Abs(imbalancePriceList[i + 1].Price - imbalancePriceList[i].Price) <= tickSize;
+                bool isNextItemWithinTickSize = !isLastItem && Math.Abs(imbalancePriceList[i + 1].Price - imbalancePriceList[i].Price) <= TickSize;
 
                 if (!isNextItemWithinTickSize || isLastItem)
                 {
-                    if (tempImbalanceList.Count >= stackedImbalance)
+                    if (tempImbalanceList.Count >= StackedImbalance)
                     {
                         if (isBid)
                             BidStackedImbalances.AddRange(tempImbalanceList);

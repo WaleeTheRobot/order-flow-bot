@@ -139,6 +139,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBar
 
             Volumes.BidAskVolumes = bidAskVolumeList;
             Volumes.SetBidAskPriceVolumeAndVolumeDelta();
+            Volumes.SetValueArea();
 
             if (bidAskVolumeList.Count > 2)
             {
