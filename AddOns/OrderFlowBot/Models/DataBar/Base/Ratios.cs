@@ -8,11 +8,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBar.Base
         public double AskRatio { get; set; }
         public double BidRatio { get; set; }
 
-        public void SetRatios(List<BidAskVolume> bidAskVolumes, bool validBidAskVolumes)
+        public void SetRatios(List<BidAskVolume> bidAskVolumes)
         {
-            if (!validBidAskVolumes)
-                return;
-
             double secondBottomBid, bottomBid;
             GetBottomBidVolumes(bidAskVolumes, out secondBottomBid, out bottomBid);
             BidRatio = BarUtils.CalculateRatio(secondBottomBid, bottomBid);

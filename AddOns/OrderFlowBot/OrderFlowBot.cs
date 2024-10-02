@@ -56,8 +56,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         public int StackedImbalance { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Valid Imbalance Volume", Description = "The minimum number of volume for a valid imbalance.", Order = 3, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
-        public long ValidImbalanceVolume { get; set; }
+        [Display(Name = "Imbalance Min Delta", Description = "The minimum number of delta for a valid imbalance.", Order = 3, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
+        public long ImbalanceMinDelta { get; set; }
 
         #endregion
 
@@ -87,6 +87,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                 IsInstantiatedOnEachOptimizationIteration = true;
 
                 TicksPerLevel = 1;
+                ImbalanceRatio = 1.5;
+                StackedImbalance = 3;
+                ImbalanceMinDelta = 10;
             }
             else if (State == State.Configure)
             {
@@ -161,7 +164,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             DataBarConfig.Instance.TickSize = TickSize;
             DataBarConfig.Instance.StackedImbalance = StackedImbalance;
             DataBarConfig.Instance.ImbalanceRatio = ImbalanceRatio;
-            DataBarConfig.Instance.ValidImbalanceVolume = ValidImbalanceVolume;
+            DataBarConfig.Instance.ImbalanceMinDelta = ImbalanceMinDelta;
         }
 
         // Used for debugging event messages

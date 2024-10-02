@@ -26,11 +26,6 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBar.Base
             BidAskVolumes = new List<BidAskVolume>();
         }
 
-        public bool ValidBidAskVolumes()
-        {
-            return BidAskVolumes.Count > 2;
-        }
-
         public void SetBidAskPriceVolumeAndVolumeDelta()
         {
             if (BidAskVolumes == null || BidAskVolumes.Count == 0)

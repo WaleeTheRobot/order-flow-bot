@@ -20,6 +20,6 @@
         public int TicksPerLevel { get; set; }
         public int StackedImbalance { get; set; }
         public double ImbalanceRatio { get; set; }
-        public long ValidImbalanceVolume { get; set; }
+        public long ImbalanceMinDelta { get; set; }
     }
 }

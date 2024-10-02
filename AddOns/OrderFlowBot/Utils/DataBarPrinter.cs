@@ -73,13 +73,13 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Utils
         private static void PrintImbalances(DataBar dataBar)
         {
             Print("**** Imbalances ****");
-            Print("Bid Imbalances");
+            Print("Bid Imbalances:");
             foreach (var kvp in dataBar.Imbalances.BidImbalances)
             {
                 Print(string.Format("{0} : {1}", kvp.Price, kvp.Volume));
             }
 
-            Print("Ask Imbalances");
+            Print("Ask Imbalances:");
             foreach (var kvp in dataBar.Imbalances.AskImbalances)
             {
                 Print(string.Format("{0} : {1}", kvp.Price, kvp.Volume));
@@ -88,13 +88,13 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Utils
             Print(string.Format("Has Bid Stacked Imbalances {0}", dataBar.Imbalances.HasBidStackedImbalances));
             Print(string.Format("Has Ask Stacked Imbalances {0}", dataBar.Imbalances.HasAskStackedImbalances));
 
-            Print("Stacked Bid Imbalances");
+            Print("Stacked Bid Imbalances:");
             foreach (var kvp in dataBar.Imbalances.BidStackedImbalances)
             {
                 Print(string.Format("{0} : {1}", kvp.Price, kvp.Volume));
             }
 
-            Print("Stacked Ask Imbalances");
+            Print("Stacked Ask Imbalances:");
             foreach (var kvp in dataBar.Imbalances.AskStackedImbalances)
             {
                 Print(string.Format("{0} : {1}", kvp.Price, kvp.Volume));
@@ -126,6 +126,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Utils
             Print(string.Format("Point Of Control: {0}", dataBar.Volumes.PointOfControl));
             Print(string.Format("Value Area High: {0}", dataBar.Volumes.ValueAreaHighPrice));
             Print(string.Format("Value Area Low: {0}", dataBar.Volumes.ValueAreaLowPrice));
+
 
             if (config.ShowBidAskVolumePerBar)
             {
