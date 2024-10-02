@@ -96,11 +96,14 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBar
             // Get bid/ask volume for each price in bar
             List<BidAskVolume> bidAskVolumeList = new List<BidAskVolume>();
 
+            int ticksPerLevel = DataBarConfig.Instance.TicksPerLevel;
+
+            int totalLevels = 0;
+
             int counter = 0;
 
             while (high >= low)
             {
-                // Values are the same up to TicksPerLevel so we just need to and the initial and skip until the next interval
                 if (counter == 0)
                 {
                     BidAskVolume bidAskVolume = new BidAskVolume
@@ -122,13 +125,26 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBar
                     counter++;
                 }
 
+                totalLevels++;
                 high -= DataBarConfig.Instance.TickSize;
+            }
+
+            // Remove the first item if total levels are not divisible by ticksPerLevel and more than 4 levels
+            // Sometimes bidAskVolumeList doesn't correlate visually due to an extra level or lack of a level
+            // This seems to resolve probably many of the realistic scenarios
+            if (totalLevels % ticksPerLevel > 0 && bidAskVolumeList.Count > 4)
+            {
+                bidAskVolumeList.RemoveAt(0);
             }
 
             Volumes.BidAskVolumes = bidAskVolumeList;
             Volumes.SetBidAskPriceVolumeAndVolumeDelta();
-            Imbalances.SetImbalances(bidAskVolumeList, Volumes.ValidBidAskVolumes());
-            Ratios.SetRatios(bidAskVolumeList, Volumes.ValidBidAskVolumes());
+
+            if (bidAskVolumeList.Count > 2)
+            {
+                Imbalances.SetImbalances(bidAskVolumeList);
+                Ratios.SetRatios(bidAskVolumeList);
+            }
         }
 
         private void PopulateDeltas()
