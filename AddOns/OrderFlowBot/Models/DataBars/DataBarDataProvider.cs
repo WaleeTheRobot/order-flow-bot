@@ -1,6 +1,6 @@
 ﻿using NinjaTrader.NinjaScript.BarsTypes;
 
-namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBar
+namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars
 {
     public class DataBarDataProvider
     {

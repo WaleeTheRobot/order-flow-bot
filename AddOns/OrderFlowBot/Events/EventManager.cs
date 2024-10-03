@@ -42,6 +42,27 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
             }
         }
 
+        public T InvokeEvent<T>(Func<T> eventHandler)
+        {
+            try
+            {
+                if (eventHandler != null)
+                {
+                    return eventHandler();
+                }
+                else
+                {
+                    PrintMessage("Event handler is null");
+                    return default;
+                }
+            }
+            catch (Exception ex)
+            {
+                PrintMessage($"Error invoking event: {ex.Message}");
+                return default;
+            }
+        }
+
         public void PrintMessage(string eventMessage)
         {
             InvokeEvent(OnPrintMessage, eventMessage);

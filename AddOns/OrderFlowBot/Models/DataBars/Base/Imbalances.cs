@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBar.Base
+namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars.Base
 {
     public struct ImbalancePrice
     {
