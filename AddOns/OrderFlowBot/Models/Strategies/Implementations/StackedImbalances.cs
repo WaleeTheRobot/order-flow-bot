@@ -6,7 +6,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies.Implementatio
     public class StackedImbalances : StrategyBase
     {
         public override string Name { get; set; }
-        public override Direction ValidStrategyDirection { get; set; }
+        public override bool StrategyTriggered { get; set; }
 
         public StackedImbalances(EventsContainer eventsContainer) : base(eventsContainer)
         {
@@ -17,7 +17,10 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies.Implementatio
         {
             if (IsBullishBar() && HasValidAskStackedImbalance())
             {
-                ValidStrategyDirection = Direction.Long;
+                eventsContainer.TradingEvents.StrategyTriggered(new StrategyTriggeredDataProvider(
+                    Name,
+                    Direction.Long
+                ));
             }
         }
 
@@ -25,7 +28,10 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies.Implementatio
         {
             if (IsBearishBar() && HasValidBidStackedImbalance())
             {
-                ValidStrategyDirection = Direction.Short;
+                eventsContainer.TradingEvents.StrategyTriggered(new StrategyTriggeredDataProvider(
+                    Name,
+                    Direction.Short
+                ));
             }
         }
 

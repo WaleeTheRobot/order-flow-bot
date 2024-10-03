@@ -3,6 +3,7 @@ using NinjaTrader.Cbi;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Containers;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBarConfigs;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.States;
 using NinjaTrader.NinjaScript.BarsTypes;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -19,11 +20,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 
     [Gui.CategoryOrder(GroupConstants.GROUP_NAME_GENERAL, 0)]
     [Gui.CategoryOrder(GroupConstants.GROUP_NAME_DATA_BAR, 1)]
-    public class OrderFlowBot : Strategy
+    public partial class OrderFlowBot : Strategy
     {
         private EventsContainer _eventsContainer;
 
         private DataBarDataProvider _dataBarDataProvider;
+        private DataBar _currentDataBar;
+        private TradingState _currentTradingState;
 
         #region General Properties
 
@@ -96,6 +99,8 @@ namespace NinjaTrader.NinjaScript.Strategies
             else if (State == State.Configure)
             {
                 _dataBarDataProvider = new DataBarDataProvider();
+                _currentDataBar = new DataBar();
+                _currentTradingState = new TradingState();
 
                 SetConfigs();
 
@@ -103,6 +108,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 new ServicesContainer(_eventsContainer);
 
                 _eventsContainer.EventManager.OnPrintMessage += HandlePrintMessage;
+                _eventsContainer.TradingEvents.OnStrategyTriggeredProcessed += HandleStrategyTriggeredProcessed;
             }
         }
 
@@ -135,12 +141,14 @@ namespace NinjaTrader.NinjaScript.Strategies
                 }
                 else
                 {
-
+                    CheckStrategies();
                 }
             }
 
             _eventsContainer.DataBarEvents.UpdateCurrentDataBar(GetDataBarDataProvider());
         }
+
+        #region DataBar Setup and Debugging
 
         private DataBarDataProvider GetDataBarDataProvider(int barsAgo = 0)
         {
@@ -172,6 +180,19 @@ namespace NinjaTrader.NinjaScript.Strategies
         private void HandlePrintMessage(string eventMessage)
         {
             Print(eventMessage);
+        }
+
+        #endregion
+
+        private void UpdateCurrentDataBarAndTradingState()
+        {
+            _currentDataBar = _eventsContainer.DataBarEvents.GetCurrentDataBar();
+            _currentTradingState = _currentTradingState = _eventsContainer.TradingEvents.GetTradingState();
+        }
+
+        private void HandleStrategyTriggeredProcessed()
+        {
+            UpdateCurrentDataBarAndTradingState();
         }
     }
 }
