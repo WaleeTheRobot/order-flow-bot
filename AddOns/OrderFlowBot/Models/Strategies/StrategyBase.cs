@@ -12,7 +12,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies
         protected DataBar currentDataBar;
         protected List<DataBar> currentDataBars;
         public abstract string Name { get; set; }
-        public abstract Direction ValidStrategyDirection { get; set; }
+        public abstract bool StrategyTriggered { get; set; }
 
         protected StrategyBase(EventsContainer eventsContainer)
         {
@@ -20,7 +20,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies
             currentDataBar = new DataBar();
             currentDataBars = new List<DataBar>();
             Name = "";
-            ValidStrategyDirection = Direction.Flat;
+            StrategyTriggered = false;
         }
 
         public virtual void CheckStrategy()
@@ -28,12 +28,12 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies
             currentDataBar = GetCurrentDataBar();
             currentDataBars = GetDataBars();
 
-            if (IsValidLongDirection() && ValidStrategyDirection == Direction.Flat)
+            if (IsValidLongDirection() && !StrategyTriggered)
             {
                 CheckLong();
             }
 
-            if (IsValidShortDirection() && ValidStrategyDirection == Direction.Flat)
+            if (IsValidShortDirection() && !StrategyTriggered)
             {
                 CheckShort();
             }
