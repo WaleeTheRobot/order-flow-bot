@@ -1,11 +1,11 @@
 ﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.Configs;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBarConfigs;
-using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBar.Base;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars.Base;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Utils;
 using System;
 using System.Collections.Generic;
 
-namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBar
+namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars
 {
     public class DataBar
     {

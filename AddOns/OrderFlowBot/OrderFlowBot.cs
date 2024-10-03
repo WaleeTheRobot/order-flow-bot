@@ -1,9 +1,8 @@
 ﻿#region Using declarations
 using NinjaTrader.Cbi;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.Containers;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBarConfigs;
-using NinjaTrader.Custom.AddOns.OrderFlowBot.Events;
-using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBar;
-using NinjaTrader.Custom.AddOns.OrderFlowBot.Services;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars;
 using NinjaTrader.NinjaScript.BarsTypes;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -22,8 +21,7 @@ namespace NinjaTrader.NinjaScript.Strategies
     [Gui.CategoryOrder(GroupConstants.GROUP_NAME_DATA_BAR, 1)]
     public class OrderFlowBot : Strategy
     {
-        private EventManager _eventManager;
-        private DataBarEvents _dataBarEvents;
+        private EventsContainer _eventsContainer;
 
         private DataBarDataProvider _dataBarDataProvider;
 
@@ -55,7 +53,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         public int StackedImbalance { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Imbalance Min Delta", Description = "The minimum number of delta for a valid imbalance.", Order = 3, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
+        [Display(Name = "Imbalance Min Delta", Description = "The minimum number of delta between the bid and ask for a valid imbalance.", Order = 3, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
         public long ImbalanceMinDelta { get; set; }
 
         [NinjaScriptProperty]
@@ -101,14 +99,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 
                 SetConfigs();
 
-                // Initialize Events
-                _eventManager = new EventManager();
-                _eventManager.OnPrintMessage += HandlePrintMessage;
+                _eventsContainer = new EventsContainer();
+                new ServicesContainer(_eventsContainer);
 
-                _dataBarEvents = new DataBarEvents(_eventManager);
-
-                // Initialize Services
-                new DataBarService(_eventManager, _dataBarEvents);
+                _eventsContainer.EventManager.OnPrintMessage += HandlePrintMessage;
             }
         }
 
@@ -123,7 +117,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             {
                 if (IsFirstTickOfBar)
                 {
-                    _dataBarEvents.UpdateCurrentDataBarList();
+                    _eventsContainer.DataBarEvents.UpdateCurrentDataBarList();
 
                     /*
                     _dataBarEvents.PrintDataBar(new DataBarPrintConfig
@@ -145,7 +139,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 }
             }
 
-            _dataBarEvents.UpdateCurrentDataBar(GetDataBarDataProvider());
+            _eventsContainer.DataBarEvents.UpdateCurrentDataBar(GetDataBarDataProvider());
         }
 
         private DataBarDataProvider GetDataBarDataProvider(int barsAgo = 0)

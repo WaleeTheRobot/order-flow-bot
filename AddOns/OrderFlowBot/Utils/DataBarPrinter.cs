@@ -1,6 +1,6 @@
 ﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.Configs;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Events;
-using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBar;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars;
 
 namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Utils
 {
