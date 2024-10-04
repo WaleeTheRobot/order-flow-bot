@@ -14,7 +14,7 @@ Thank you for your interest in contributing to the OrderFlowBot NinjaTrader AddO
 
 To contribute to this project, you will need:
 
-- [NinjaTrader 8](https://ninjatrader.com/)
+- [NinjaTrader 8](https://ninjatrader.com/) (you'll need the lifetime license or the OrderFlow+ package to work with the volumetric data)
 - [Visual Studio](https://visualstudio.microsoft.com/) (the Community version works great)
 - C#6 and NinjaScript knowledge
 
