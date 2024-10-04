@@ -1,10 +1,8 @@
-﻿using NinjaTrader.NinjaScript.BarsTypes;
-
-namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars
+﻿namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars
 {
     public class DataBarDataProvider
     {
-        public VolumetricBarsType VolumetricBar { get; set; }
+        public CustomVolumetricBar VolumetricBar { get; set; }
         public int Time { get; set; }
         public int CurrentBar { get; set; }
         public int BarsAgo { get; set; }

@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Tests\**\*.cs" />
+    <Compile Include="Tests\Mocks\**\*.cs" />
+    
+    <!-- Include the source code, but only the files that don't depend on NinjaTrader -->
+    <Compile Include="..\NinjaTrader\Custom\AddOns\OrderFlowBot\Models\Configs\**\*.cs" />
+    <Compile Include="..\NinjaTrader\Custom\AddOns\OrderFlowBot\Models\Containers\**\*.cs" />
+    <Compile Include="..\NinjaTrader\Custom\AddOns\OrderFlowBot\Models\Events\**\*.cs" />
+    <Compile Include="..\NinjaTrader\Custom\AddOns\OrderFlowBot\Models\Models\**\*.cs" />
+    <Compile Include="..\NinjaTrader\Custom\AddOns\OrderFlowBot\Models\Services\**\*.cs" />
+    <Compile Include="..\NinjaTrader\Custom\AddOns\OrderFlowBot\Models\States\**\*.cs" />
+    <Compile Include="..\NinjaTrader\Custom\AddOns\OrderFlowBot\Models\Utils\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.collector" Version="3.0.2">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>
