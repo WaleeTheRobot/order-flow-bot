@@ -3,8 +3,11 @@ using NinjaTrader.Cbi;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Containers;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBarConfigs;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars.Base;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.States;
 using NinjaTrader.NinjaScript.BarsTypes;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 #endregion
@@ -126,7 +129,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     _eventsContainer.DataBarEvents.UpdateCurrentDataBarList();
 
                     /*
-                    _dataBarEvents.PrintDataBar(new DataBarPrintConfig
+                    _eventsContainer.DataBarEvents.PrintDataBar(new DataBarPrintConfig
                     {
                         BarsAgo = 1,
                         ShowBasic = true,
@@ -152,9 +155,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         private DataBarDataProvider GetDataBarDataProvider(int barsAgo = 0)
         {
-            VolumetricBarsType volumetricBar = Bars.BarsSeries.BarsType as VolumetricBarsType;
-
-            _dataBarDataProvider.VolumetricBar = volumetricBar;
             _dataBarDataProvider.Time = ToTime(Time[barsAgo]);
             _dataBarDataProvider.CurrentBar = CurrentBars[0];
             _dataBarDataProvider.BarsAgo = barsAgo;
@@ -163,7 +163,83 @@ namespace NinjaTrader.NinjaScript.Strategies
             _dataBarDataProvider.Open = Open[barsAgo];
             _dataBarDataProvider.Close = Close[barsAgo];
 
+            VolumetricBarsType volumetricBar = Bars.BarsSeries.BarsType as VolumetricBarsType;
+            _dataBarDataProvider.VolumetricBar = PopulateCustomVolumetricBar(volumetricBar);
+
             return _dataBarDataProvider;
+        }
+
+        private CustomVolumetricBar PopulateCustomVolumetricBar(VolumetricBarsType volumetricBar)
+        {
+            CustomVolumetricBar customBar = new CustomVolumetricBar();
+
+            double high = _dataBarDataProvider.High;
+            double low = _dataBarDataProvider.Low;
+
+            var volumes = volumetricBar.Volumes[_dataBarDataProvider.CurrentBar - _dataBarDataProvider.BarsAgo];
+
+            customBar.TotalVolume = volumes.TotalVolume;
+            customBar.TotalBuyingVolume = volumes.TotalBuyingVolume;
+            customBar.TotalSellingVolume = volumes.TotalSellingVolume;
+
+            double pointOfControl;
+            volumes.GetMaximumVolume(null, out pointOfControl);
+            customBar.PointOfControl = pointOfControl;
+
+            // Get bid/ask volume for each price in bar
+            List<BidAskVolume> bidAskVolumeList = new List<BidAskVolume>();
+            int ticksPerLevel = DataBarConfig.Instance.TicksPerLevel;
+            int totalLevels = 0;
+            int counter = 0;
+
+            while (high >= low)
+            {
+                if (counter == 0)
+                {
+                    BidAskVolume bidAskVolume = new BidAskVolume
+                    {
+                        Price = high,
+                        BidVolume = volumes.GetBidVolumeForPrice(high),
+                        AskVolume = volumes.GetAskVolumeForPrice(high)
+                    };
+
+                    bidAskVolumeList.Add(bidAskVolume);
+                }
+
+                if (counter == ticksPerLevel - 1)
+                {
+                    counter = 0;
+                }
+                else
+                {
+                    counter++;
+                }
+
+                totalLevels++;
+                high -= DataBarConfig.Instance.TickSize;
+            }
+
+            // Remove the first item if total levels are not divisible by ticksPerLevel and more than 4 levels
+            // Sometimes bidAskVolumeList doesn't correlate visually due to an extra level or lack of a level
+            // This seems to resolve probably many of the realistic scenarios
+            if (totalLevels % ticksPerLevel > 0 && bidAskVolumeList.Count > 4)
+            {
+                bidAskVolumeList.RemoveAt(0);
+            }
+
+            customBar.BidAskVolumes = bidAskVolumeList;
+
+            // Deltas
+            customBar.BarDelta = volumes.BarDelta;
+            customBar.MinSeenDelta = volumes.MinSeenDelta;
+            customBar.MaxSeenDelta = volumes.MaxSeenDelta;
+            customBar.DeltaSh = volumes.DeltaSh;
+            customBar.DeltaSl = volumes.DeltaSl;
+            customBar.CumulativeDelta = volumes.CumulativeDelta;
+            customBar.DeltaPercentage = Math.Round(volumes.GetDeltaPercent(), 2);
+            customBar.DeltaChange = volumes.BarDelta - volumetricBar.Volumes[_dataBarDataProvider.CurrentBar - _dataBarDataProvider.BarsAgo - 1].BarDelta;
+
+            return customBar;
         }
 
         private void SetConfigs()
