@@ -133,7 +133,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Utils
                 Print("Bid/Ask Volume Per Bar:");
                 foreach (var kvp in dataBar.Volumes.BidAskVolumes)
                 {
-                    Print(string.Format("{0} : {1}", kvp.BidVolume, kvp.AskVolume));
+                    Print(string.Format("{0} : {1} : {2}", kvp.BidVolume, kvp.AskVolume, kvp.Price));
                 }
             }
         }

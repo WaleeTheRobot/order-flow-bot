@@ -1,4 +1,5 @@
-﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBarConfigs;
+﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.Configs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -24,10 +25,10 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars.Base
         public double ValueAreaHighPrice { get; set; }
         public double ValueAreaLowPrice { get; set; }
 
-        public Volumes()
+        public Volumes(IDataBarConfig config)
         {
             BidAskVolumes = new List<BidAskVolume>();
-            ValueAreaPercentage = DataBarConfig.Instance.ValueAreaPercentage * 0.01;
+            ValueAreaPercentage = Math.Round(config.ValueAreaPercentage * 0.01, 2);
         }
 
         public void SetBidAskPriceVolumeAndVolumeDelta()

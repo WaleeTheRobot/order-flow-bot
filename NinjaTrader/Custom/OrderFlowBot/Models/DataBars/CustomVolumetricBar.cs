@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars
 {
-    public class CustomVolumetricBar
+    public class CustomVolumetricBar : ICustomVolumetricBar
     {
         public long TotalVolume { get; set; }
         public long TotalBuyingVolume { get; set; }

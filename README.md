@@ -1,5 +1,7 @@
 # OrderFlowBot
 
+[![Actions Status](https://github.com/WaleeTheRobot/order-flow-bot/workflows/Build%20and%20Test/badge.svg)](https://github.com/WaleeTheRobot/order-flow-bot/actions)
+
 <img src="./images/screenshot.png" alt="OrderFlowBot" style="display: block; margin: 0 auto">
 
 A bot used for trading order flow with a selected ATM strategy. The recommended way to use OrderFlowBot is semi-automated trading to **ASSIST** with entries, but fully automated is an option.

@@ -1,7 +1,7 @@
 ﻿#region Using declarations
 using NinjaTrader.Cbi;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.Configs;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Containers;
-using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBarConfigs;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars.Base;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.States;
@@ -101,11 +101,13 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
             else if (State == State.Configure)
             {
-                _dataBarDataProvider = new DataBarDataProvider();
-                _currentDataBar = new DataBar();
-                _currentTradingState = new TradingState();
-
                 SetConfigs();
+            }
+            else if (State == State.DataLoaded)
+            {
+                _dataBarDataProvider = new DataBarDataProvider();
+                _currentDataBar = new DataBar(DataBarConfig.Instance);
+                _currentTradingState = new TradingState();
 
                 _eventsContainer = new EventsContainer();
                 new ServicesContainer(_eventsContainer);
@@ -128,7 +130,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 {
                     _eventsContainer.DataBarEvents.UpdateCurrentDataBarList();
 
-                    /*
+
                     _eventsContainer.DataBarEvents.PrintDataBar(new DataBarPrintConfig
                     {
                         BarsAgo = 1,
@@ -140,7 +142,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                         ShowVolumes = true,
                         ShowBidAskVolumePerBar = true,
                     });
-                    */
+
                 }
                 else
                 {
@@ -148,12 +150,12 @@ namespace NinjaTrader.NinjaScript.Strategies
                 }
             }
 
-            _eventsContainer.DataBarEvents.UpdateCurrentDataBar(GetDataBarDataProvider());
+            _eventsContainer.DataBarEvents.UpdateCurrentDataBar(GetDataBarDataProvider(DataBarConfig.Instance));
         }
 
         #region DataBar Setup and Debugging
 
-        private DataBarDataProvider GetDataBarDataProvider(int barsAgo = 0)
+        private IDataBarDataProvider GetDataBarDataProvider(IDataBarConfig config, int barsAgo = 0)
         {
             _dataBarDataProvider.Time = ToTime(Time[barsAgo]);
             _dataBarDataProvider.CurrentBar = CurrentBars[0];
@@ -164,14 +166,14 @@ namespace NinjaTrader.NinjaScript.Strategies
             _dataBarDataProvider.Close = Close[barsAgo];
 
             VolumetricBarsType volumetricBar = Bars.BarsSeries.BarsType as VolumetricBarsType;
-            _dataBarDataProvider.VolumetricBar = PopulateCustomVolumetricBar(volumetricBar);
+            _dataBarDataProvider.VolumetricBar = PopulateCustomVolumetricBar(volumetricBar, config);
 
             return _dataBarDataProvider;
         }
 
-        private CustomVolumetricBar PopulateCustomVolumetricBar(VolumetricBarsType volumetricBar)
+        private ICustomVolumetricBar PopulateCustomVolumetricBar(VolumetricBarsType volumetricBar, IDataBarConfig config)
         {
-            CustomVolumetricBar customBar = new CustomVolumetricBar();
+            ICustomVolumetricBar customBar = new CustomVolumetricBar();
 
             double high = _dataBarDataProvider.High;
             double low = _dataBarDataProvider.Low;
@@ -188,7 +190,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
             // Get bid/ask volume for each price in bar
             List<BidAskVolume> bidAskVolumeList = new List<BidAskVolume>();
-            int ticksPerLevel = DataBarConfig.Instance.TicksPerLevel;
+            int ticksPerLevel = config.TicksPerLevel;
             int totalLevels = 0;
             int counter = 0;
 
@@ -216,7 +218,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 }
 
                 totalLevels++;
-                high -= DataBarConfig.Instance.TickSize;
+                high -= config.TickSize;
             }
 
             // Remove the first item if total levels are not divisible by ticksPerLevel and more than 4 levels
