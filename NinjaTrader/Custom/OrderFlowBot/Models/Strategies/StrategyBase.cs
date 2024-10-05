@@ -17,7 +17,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies
         protected StrategyBase(EventsContainer eventsContainer)
         {
             this.eventsContainer = eventsContainer;
-            currentDataBar = new DataBar();
+            currentDataBar = new DataBar(DataBarConfig.Instance);
             currentDataBars = new List<DataBar>();
             Name = "";
             StrategyTriggered = false;

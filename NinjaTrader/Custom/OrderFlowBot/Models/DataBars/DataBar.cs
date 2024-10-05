@@ -7,7 +7,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars
 {
     public class DataBar
     {
-        public DataBarDataProvider DataBarDataProvider { get; set; }
+        public IDataBarDataProvider DataBarDataProvider { get; set; }
         public BarType BarType { get; set; }
         public int Time { get; set; }
         public int BarNumber { get; set; }
@@ -18,17 +18,17 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars
         public Deltas Deltas { get; set; }
         public Imbalances Imbalances { get; set; }
 
-        public DataBar()
+        public DataBar(IDataBarConfig config)
         {
             DataBarDataProvider = new DataBarDataProvider();
             Prices = new Prices();
             Ratios = new Ratios();
-            Volumes = new Volumes();
+            Volumes = new Volumes(config);
             Deltas = new Deltas();
-            Imbalances = new Imbalances();
+            Imbalances = new Imbalances(config);
         }
 
-        public void SetCurrentDataBar(DataBarDataProvider dataBarDataProvider)
+        public void SetCurrentDataBar(IDataBarDataProvider dataBarDataProvider)
         {
             DataBarDataProvider = dataBarDataProvider;
 
@@ -85,7 +85,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars
             Volumes.PointOfControl = volumes.PointOfControl;
             Volumes.BidAskVolumes = volumes.BidAskVolumes;
             Volumes.SetBidAskPriceVolumeAndVolumeDelta();
-            Volumes.SetValueArea();
+            // Commented out for now due to bug
+            //Volumes.SetValueArea();
 
             if (volumes.BidAskVolumes.Count > 2)
             {

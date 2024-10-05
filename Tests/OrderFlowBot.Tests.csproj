@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
@@ -10,13 +10,13 @@
     <Compile Include="Tests\Mocks\**\*.cs" />
     
     <!-- Include the source code, but only the files that don't depend on NinjaTrader -->
-    <Compile Include="..\NinjaTrader\Custom\AddOns\OrderFlowBot\Models\Configs\**\*.cs" />
-    <Compile Include="..\NinjaTrader\Custom\AddOns\OrderFlowBot\Models\Containers\**\*.cs" />
-    <Compile Include="..\NinjaTrader\Custom\AddOns\OrderFlowBot\Models\Events\**\*.cs" />
-    <Compile Include="..\NinjaTrader\Custom\AddOns\OrderFlowBot\Models\Models\**\*.cs" />
-    <Compile Include="..\NinjaTrader\Custom\AddOns\OrderFlowBot\Models\Services\**\*.cs" />
-    <Compile Include="..\NinjaTrader\Custom\AddOns\OrderFlowBot\Models\States\**\*.cs" />
-    <Compile Include="..\NinjaTrader\Custom\AddOns\OrderFlowBot\Models\Utils\**\*.cs" />
+    <Compile Include="..\NinjaTrader\Custom\AddOns\OrderFlowBot\Configs\**\*.cs" />
+    <Compile Include="..\NinjaTrader\Custom\AddOns\OrderFlowBot\Containers\**\*.cs" />
+    <Compile Include="..\NinjaTrader\Custom\AddOns\OrderFlowBot\Events\**\*.cs" />
+    <Compile Include="..\NinjaTrader\Custom\AddOns\OrderFlowBot\Models\**\*.cs" />
+    <Compile Include="..\NinjaTrader\Custom\AddOns\OrderFlowBot\Services\**\*.cs" />
+    <Compile Include="..\NinjaTrader\Custom\AddOns\OrderFlowBot\States\**\*.cs" />
+    <Compile Include="..\NinjaTrader\Custom\AddOns\OrderFlowBot\Utils\**\*.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,6 +30,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Moq" Version="4.16.1" />
   </ItemGroup>
 
 </Project>
