@@ -146,10 +146,15 @@ namespace OrderFlowBot.Tests
                 var expectedItem = expectedList[i];
                 var actualItem = actualList[i];
 
+                // Print for debugging
+                Console.WriteLine($"Expected: {expectedItem.Price}, {expectedItem.BidVolume}, {expectedItem.AskVolume}");
+                Console.WriteLine($"Actual: {actualItem.Price}, {actualItem.BidVolume}, {actualItem.AskVolume}");
+
                 Assert.Equal(expectedItem.Price, actualItem.Price);
                 Assert.Equal(expectedItem.BidVolume, actualItem.BidVolume);
                 Assert.Equal(expectedItem.AskVolume, actualItem.AskVolume);
             }
+
         }
 
         /*[Fact]
