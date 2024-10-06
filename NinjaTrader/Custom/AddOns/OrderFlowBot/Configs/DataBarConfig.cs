@@ -1,6 +1,6 @@
-﻿namespace NinjaTrader.Custom.AddOns.OrderFlowBot.DataBarConfigs
+﻿namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Configs
 {
-    public class DataBarConfig
+    public class DataBarConfig : IDataBarConfig
     {
         private static readonly DataBarConfig _instance = new DataBarConfig();
 

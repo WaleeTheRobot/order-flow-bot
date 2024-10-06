@@ -8,7 +8,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
     public class DataBarEvents
     {
         private readonly EventManager _eventManager;
-        public event Action<DataBarDataProvider> OnUpdateCurrentDataBar;
+        public event Action<IDataBarDataProvider> OnUpdateCurrentDataBar;
         public event Action OnUpdateCurrentDataBarList;
         public event Action<DataBarPrintConfig> OnPrintDataBar;
         public event Action<DataBar, List<DataBar>> OnUpdatedCurrentDataBar;
@@ -20,7 +20,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
             _eventManager = eventManager;
         }
 
-        public void UpdateCurrentDataBar(DataBarDataProvider dataBarDataProvider)
+        public void UpdateCurrentDataBar(IDataBarDataProvider dataBarDataProvider)
         {
             _eventManager.InvokeEvent(OnUpdateCurrentDataBar, dataBarDataProvider);
         }

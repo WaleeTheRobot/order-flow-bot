@@ -1,10 +1,13 @@
 ﻿#region Using declarations
 using NinjaTrader.Cbi;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.Configs;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Containers;
-using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBarConfigs;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars.Base;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.States;
 using NinjaTrader.NinjaScript.BarsTypes;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 #endregion
@@ -98,11 +101,13 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
             else if (State == State.Configure)
             {
-                _dataBarDataProvider = new DataBarDataProvider();
-                _currentDataBar = new DataBar();
-                _currentTradingState = new TradingState();
-
                 SetConfigs();
+            }
+            else if (State == State.DataLoaded)
+            {
+                _dataBarDataProvider = new DataBarDataProvider();
+                _currentDataBar = new DataBar(DataBarConfig.Instance);
+                _currentTradingState = new TradingState();
 
                 _eventsContainer = new EventsContainer();
                 new ServicesContainer(_eventsContainer);
@@ -126,7 +131,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     _eventsContainer.DataBarEvents.UpdateCurrentDataBarList();
 
                     /*
-                    _dataBarEvents.PrintDataBar(new DataBarPrintConfig
+                    _eventsContainer.DataBarEvents.PrintDataBar(new DataBarPrintConfig
                     {
                         BarsAgo = 1,
                         ShowBasic = true,
@@ -145,16 +150,13 @@ namespace NinjaTrader.NinjaScript.Strategies
                 }
             }
 
-            _eventsContainer.DataBarEvents.UpdateCurrentDataBar(GetDataBarDataProvider());
+            _eventsContainer.DataBarEvents.UpdateCurrentDataBar(GetDataBarDataProvider(DataBarConfig.Instance));
         }
 
         #region DataBar Setup and Debugging
 
-        private DataBarDataProvider GetDataBarDataProvider(int barsAgo = 0)
+        private IDataBarDataProvider GetDataBarDataProvider(IDataBarConfig config, int barsAgo = 0)
         {
-            VolumetricBarsType volumetricBar = Bars.BarsSeries.BarsType as VolumetricBarsType;
-
-            _dataBarDataProvider.VolumetricBar = volumetricBar;
             _dataBarDataProvider.Time = ToTime(Time[barsAgo]);
             _dataBarDataProvider.CurrentBar = CurrentBars[0];
             _dataBarDataProvider.BarsAgo = barsAgo;
@@ -163,7 +165,83 @@ namespace NinjaTrader.NinjaScript.Strategies
             _dataBarDataProvider.Open = Open[barsAgo];
             _dataBarDataProvider.Close = Close[barsAgo];
 
+            VolumetricBarsType volumetricBar = Bars.BarsSeries.BarsType as VolumetricBarsType;
+            _dataBarDataProvider.VolumetricBar = PopulateCustomVolumetricBar(volumetricBar, config);
+
             return _dataBarDataProvider;
+        }
+
+        private ICustomVolumetricBar PopulateCustomVolumetricBar(VolumetricBarsType volumetricBar, IDataBarConfig config)
+        {
+            ICustomVolumetricBar customBar = new CustomVolumetricBar();
+
+            double high = _dataBarDataProvider.High;
+            double low = _dataBarDataProvider.Low;
+
+            var volumes = volumetricBar.Volumes[_dataBarDataProvider.CurrentBar - _dataBarDataProvider.BarsAgo];
+
+            customBar.TotalVolume = volumes.TotalVolume;
+            customBar.TotalBuyingVolume = volumes.TotalBuyingVolume;
+            customBar.TotalSellingVolume = volumes.TotalSellingVolume;
+
+            double pointOfControl;
+            volumes.GetMaximumVolume(null, out pointOfControl);
+            customBar.PointOfControl = pointOfControl;
+
+            // Get bid/ask volume for each price in bar
+            List<BidAskVolume> bidAskVolumeList = new List<BidAskVolume>();
+            int ticksPerLevel = config.TicksPerLevel;
+            int totalLevels = 0;
+            int counter = 0;
+
+            while (high >= low)
+            {
+                if (counter == 0)
+                {
+                    BidAskVolume bidAskVolume = new BidAskVolume
+                    {
+                        Price = high,
+                        BidVolume = volumes.GetBidVolumeForPrice(high),
+                        AskVolume = volumes.GetAskVolumeForPrice(high)
+                    };
+
+                    bidAskVolumeList.Add(bidAskVolume);
+                }
+
+                if (counter == ticksPerLevel - 1)
+                {
+                    counter = 0;
+                }
+                else
+                {
+                    counter++;
+                }
+
+                totalLevels++;
+                high -= config.TickSize;
+            }
+
+            // Remove the first item if total levels are not divisible by ticksPerLevel and more than 4 levels
+            // Sometimes bidAskVolumeList doesn't correlate visually due to an extra level or lack of a level
+            // This seems to resolve probably many of the realistic scenarios
+            if (totalLevels % ticksPerLevel > 0 && bidAskVolumeList.Count > 4)
+            {
+                bidAskVolumeList.RemoveAt(0);
+            }
+
+            customBar.BidAskVolumes = bidAskVolumeList;
+
+            // Deltas
+            customBar.BarDelta = volumes.BarDelta;
+            customBar.MinSeenDelta = volumes.MinSeenDelta;
+            customBar.MaxSeenDelta = volumes.MaxSeenDelta;
+            customBar.DeltaSh = volumes.DeltaSh;
+            customBar.DeltaSl = volumes.DeltaSl;
+            customBar.CumulativeDelta = volumes.CumulativeDelta;
+            customBar.DeltaPercentage = Math.Round(volumes.GetDeltaPercent(), 2);
+            customBar.DeltaChange = volumes.BarDelta - volumetricBar.Volumes[_dataBarDataProvider.CurrentBar - _dataBarDataProvider.BarsAgo - 1].BarDelta;
+
+            return customBar;
         }
 
         private void SetConfigs()

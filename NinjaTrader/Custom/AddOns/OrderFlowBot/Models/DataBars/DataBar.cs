@@ -1,15 +1,13 @@
 ﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.Configs;
-using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBarConfigs;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars.Base;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Utils;
 using System;
-using System.Collections.Generic;
 
 namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars
 {
     public class DataBar
     {
-        public DataBarDataProvider DataBarDataProvider { get; set; }
+        public IDataBarDataProvider DataBarDataProvider { get; set; }
         public BarType BarType { get; set; }
         public int Time { get; set; }
         public int BarNumber { get; set; }
@@ -20,17 +18,17 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars
         public Deltas Deltas { get; set; }
         public Imbalances Imbalances { get; set; }
 
-        public DataBar()
+        public DataBar(IDataBarConfig config)
         {
             DataBarDataProvider = new DataBarDataProvider();
             Prices = new Prices();
             Ratios = new Ratios();
-            Volumes = new Volumes();
+            Volumes = new Volumes(config);
             Deltas = new Deltas();
-            Imbalances = new Imbalances();
+            Imbalances = new Imbalances(config);
         }
 
-        public void SetCurrentDataBar(DataBarDataProvider dataBarDataProvider)
+        public void SetCurrentDataBar(IDataBarDataProvider dataBarDataProvider)
         {
             DataBarDataProvider = dataBarDataProvider;
 
@@ -79,78 +77,27 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars
 
         private void PopulateVolumeAndImbalances()
         {
-            double high = Prices.High;
-            double low = Prices.Low;
-            var volumes = DataBarDataProvider.VolumetricBar.Volumes[DataBarDataProvider.CurrentBar - DataBarDataProvider.BarsAgo];
+            var volumes = DataBarDataProvider.VolumetricBar;
 
             Volumes.Volume = volumes.TotalVolume;
             Volumes.BuyingVolume = volumes.TotalBuyingVolume;
             Volumes.SellingVolume = volumes.TotalSellingVolume;
-            Volumes.ValueAreaHighPrice = volumes.ValueAreaHighPrice;
-            Volumes.ValueAreaLowPrice = volumes.ValueAreaLowPrice;
-
-            double pointOfControl;
-            volumes.GetMaximumVolume(null, out pointOfControl);
-            Volumes.PointOfControl = pointOfControl;
-
-            // Get bid/ask volume for each price in bar
-            List<BidAskVolume> bidAskVolumeList = new List<BidAskVolume>();
-
-            int ticksPerLevel = DataBarConfig.Instance.TicksPerLevel;
-
-            int totalLevels = 0;
-
-            int counter = 0;
-
-            while (high >= low)
-            {
-                if (counter == 0)
-                {
-                    BidAskVolume bidAskVolume = new BidAskVolume
-                    {
-                        Price = high,
-                        BidVolume = volumes.GetBidVolumeForPrice(high),
-                        AskVolume = volumes.GetAskVolumeForPrice(high)
-                    };
-
-                    bidAskVolumeList.Add(bidAskVolume);
-                }
-
-                if (counter == DataBarConfig.Instance.TicksPerLevel - 1)
-                {
-                    counter = 0;
-                }
-                else
-                {
-                    counter++;
-                }
-
-                totalLevels++;
-                high -= DataBarConfig.Instance.TickSize;
-            }
-
-            // Remove the first item if total levels are not divisible by ticksPerLevel and more than 4 levels
-            // Sometimes bidAskVolumeList doesn't correlate visually due to an extra level or lack of a level
-            // This seems to resolve probably many of the realistic scenarios
-            if (totalLevels % ticksPerLevel > 0 && bidAskVolumeList.Count > 4)
-            {
-                bidAskVolumeList.RemoveAt(0);
-            }
-
-            Volumes.BidAskVolumes = bidAskVolumeList;
+            Volumes.PointOfControl = volumes.PointOfControl;
+            Volumes.BidAskVolumes = volumes.BidAskVolumes;
             Volumes.SetBidAskPriceVolumeAndVolumeDelta();
-            Volumes.SetValueArea();
+            // Commented out for now due to bug
+            //Volumes.SetValueArea();
 
-            if (bidAskVolumeList.Count > 2)
+            if (volumes.BidAskVolumes.Count > 2)
             {
-                Imbalances.SetImbalances(bidAskVolumeList);
-                Ratios.SetRatios(bidAskVolumeList);
+                Imbalances.SetImbalances(volumes.BidAskVolumes);
+                Ratios.SetRatios(volumes.BidAskVolumes);
             }
         }
 
         private void PopulateDeltas()
         {
-            var volumes = DataBarDataProvider.VolumetricBar.Volumes[DataBarDataProvider.CurrentBar - DataBarDataProvider.BarsAgo];
+            var volumes = DataBarDataProvider.VolumetricBar;
             long minDelta = volumes.MinSeenDelta;
             long maxDelta = volumes.MaxSeenDelta;
 
@@ -160,11 +107,11 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars
             Deltas.DeltaSh = volumes.DeltaSh;
             Deltas.DeltaSl = volumes.DeltaSl;
             Deltas.CumulativeDelta = volumes.CumulativeDelta;
-            Deltas.DeltaPercentage = Math.Round(volumes.GetDeltaPercent(), 2);
+            Deltas.DeltaPercentage = volumes.DeltaPercentage;
 
             Deltas.MinMaxDeltaRatio = BarUtils.CalculateRatio(Math.Abs(minDelta), Math.Abs(maxDelta));
             Deltas.MaxMinDeltaRatio = BarUtils.CalculateRatio(Math.Abs(maxDelta), Math.Abs(minDelta));
-            Deltas.DeltaChange = volumes.BarDelta - DataBarDataProvider.VolumetricBar.Volumes[DataBarDataProvider.CurrentBar - DataBarDataProvider.BarsAgo - 1].BarDelta;
+            Deltas.DeltaChange = volumes.DeltaChange;
         }
     }
 }

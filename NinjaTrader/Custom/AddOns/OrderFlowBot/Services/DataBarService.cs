@@ -26,10 +26,10 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
             _dataBarEvents.OnPrintDataBar += HandlePrintDataBar;
 
             _dataBars = new List<DataBar>();
-            _currentDataBar = new DataBar();
+            _currentDataBar = new DataBar(DataBarConfig.Instance);
         }
 
-        private void HandleUpdateCurrentDataBar(DataBarDataProvider dataBarDataProvider)
+        private void HandleUpdateCurrentDataBar(IDataBarDataProvider dataBarDataProvider)
         {
             _currentDataBar.SetCurrentDataBar(dataBarDataProvider);
             _dataBarEvents.UpdatedCurrentDataBar(_currentDataBar, _dataBars);
@@ -38,7 +38,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
         private void HandleUpdateCurrentDataBarList()
         {
             _dataBars.Add(_currentDataBar);
-            _currentDataBar = new DataBar();
+            _currentDataBar = new DataBar(DataBarConfig.Instance);
         }
 
         private DataBar HandleGetCurrentDataBar()

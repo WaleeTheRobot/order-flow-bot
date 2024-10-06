@@ -1,4 +1,4 @@
-﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.DataBarConfigs;
+﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.Configs;
 using System;
 using System.Collections.Generic;
 
@@ -23,17 +23,17 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars.Base
         public long ImbalanceMinDelta { get; set; }
         public int StackedImbalance { get; set; }
 
-        public Imbalances()
+        public Imbalances(IDataBarConfig config)
         {
             AskImbalances = new List<ImbalancePrice>();
             BidImbalances = new List<ImbalancePrice>();
             AskStackedImbalances = new List<ImbalancePrice>();
             BidStackedImbalances = new List<ImbalancePrice>();
 
-            TickSize = DataBarConfig.Instance.TickSize * DataBarConfig.Instance.TicksPerLevel;
-            ImbalanceRatio = DataBarConfig.Instance.ImbalanceRatio;
-            ImbalanceMinDelta = DataBarConfig.Instance.ImbalanceMinDelta;
-            StackedImbalance = DataBarConfig.Instance.StackedImbalance;
+            TickSize = config.TickSize * config.TicksPerLevel;
+            ImbalanceRatio = config.ImbalanceRatio;
+            ImbalanceMinDelta = config.ImbalanceMinDelta;
+            StackedImbalance = config.StackedImbalance;
         }
 
         private bool IsValidBidImbalance(List<BidAskVolume> bidAskVolumes, int index)
