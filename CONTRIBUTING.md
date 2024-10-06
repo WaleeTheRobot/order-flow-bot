@@ -6,7 +6,6 @@ Thank you for your interest in contributing to the OrderFlowBot NinjaTrader AddO
 
 - [Setting Up Your Environment](#setting-up-your-environment)
 - [Workflow for Contributing](#workflow-for-contributing)
-- [Code Formatting](#code-formatting)
 - [Tests](#tests)
 - [Submitting Changes](#submitting-changes)
 - [Additional Notes](#additional-notes)
@@ -56,17 +55,12 @@ The project structure is unconventional. The `OrderFlowBot` code resides in the 
    - After formatting, delete the existing OrderFlowBot directory in the AddOns directory for the repository. This will help show the recent changes in the source control.
    - Copy your updated directory to the AddOns directory.
 
-## Code Formatting
-
-- Use Visual Studio's auto-format feature before committing.
-- Ensure there are no errors in the code. NinjaTrader will not compile if there are errors.
-
 ## Tests
 
 - This project uses GitHub Actions for tests.
 - Install Docker Desktop.
 - Install `act` locally to write and run tests. You can do it with Chocolatey on Windows with `choco install act-cli`.
-- Use `act` to build and run the tests. Use `act -j test` to just run the tests.
+- Use `act` to build and run the tests.
 
 ## Submitting Changes
 

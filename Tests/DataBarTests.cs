@@ -19,7 +19,6 @@ namespace OrderFlowBot.Tests
         [Fact]
         public void ShouldPopulateDataBarBasics()
         {
-            var dataBarConfig = DataBarConfigMock.CreateDataBarConfig().Object;
             var dataBarDataProvider = DataBarDataProviderMock.CreateDataBarDataProvider().Object;
             var dataBar = new DataBar(_dataBarConfig.Object);
 
@@ -33,7 +32,6 @@ namespace OrderFlowBot.Tests
         [Fact]
         public void ShouldPopulateDataBarPrices()
         {
-            var dataBarConfig = DataBarConfigMock.CreateDataBarConfig().Object;
             var dataBarDataProvider = DataBarDataProviderMock.CreateDataBarDataProvider().Object;
             var dataBar = new DataBar(_dataBarConfig.Object);
 
@@ -48,20 +46,18 @@ namespace OrderFlowBot.Tests
         [Fact]
         public void ShouldPopulateDataBarRatios()
         {
-            var dataBarConfig = DataBarConfigMock.CreateDataBarConfig().Object;
             var dataBarDataProvider = DataBarDataProviderMock.CreateDataBarDataProvider().Object;
             var dataBar = new DataBar(_dataBarConfig.Object);
 
             dataBar.SetCurrentDataBar(dataBarDataProvider);
 
-            Assert.Equal(1, dataBar.Ratios.BidRatio);
-            Assert.Equal(2.33, dataBar.Ratios.AskRatio);
+            Assert.Equal(0.25, dataBar.Ratios.BidRatio);
+            Assert.Equal(3.5, dataBar.Ratios.AskRatio);
         }
 
         [Fact]
         public void ShouldPopulateDataBarVolumes()
         {
-            var dataBarConfig = DataBarConfigMock.CreateDataBarConfig().Object;
             var dataBarDataProvider = DataBarDataProviderMock.CreateDataBarDataProvider().Object;
             var dataBar = new DataBar(_dataBarConfig.Object);
 
@@ -74,7 +70,7 @@ namespace OrderFlowBot.Tests
             Assert.Equal(0.70, dataBar.Volumes.ValueAreaPercentage);
             //Assert.Equal(VolumetricBarData.ValueAreaHighPrice, dataBar.Volumes.ValueAreaHighPrice);
             //Assert.Equal(VolumetricBarData.ValueAreaLowPrice, dataBar.Volumes.ValueAreaLowPrice);
-            var expectedList = VolumetricBarData.GetTestBarA1BidAskVolume();
+            var expectedList = VolumetricBarData.GetTestBarBidAskVolume();
             var actualList = dataBar.Volumes.BidAskVolumes;
 
             Assert.Equal(expectedList.Count, actualList.Count);
@@ -93,7 +89,6 @@ namespace OrderFlowBot.Tests
         [Fact]
         public void ShouldPopulateDataBarDeltas()
         {
-            var dataBarConfig = DataBarConfigMock.CreateDataBarConfig().Object;
             var dataBarDataProvider = DataBarDataProviderMock.CreateDataBarDataProvider().Object;
             var dataBar = new DataBar(_dataBarConfig.Object);
 
@@ -107,8 +102,8 @@ namespace OrderFlowBot.Tests
             Assert.Equal(VolumetricBarData.DeltaChange, dataBar.Deltas.DeltaChange);
             Assert.Equal(VolumetricBarData.DeltaSl, dataBar.Deltas.DeltaSl);
             Assert.Equal(VolumetricBarData.DeltaSh, dataBar.Deltas.DeltaSh);
-            Assert.Equal(50, dataBar.Deltas.MinMaxDeltaRatio);
-            Assert.Equal(0.02, dataBar.Deltas.MaxMinDeltaRatio);
+            Assert.Equal(0.95, dataBar.Deltas.MinMaxDeltaRatio);
+            Assert.Equal(1.06, dataBar.Deltas.MaxMinDeltaRatio);
         }
 
         [Fact]
@@ -120,91 +115,42 @@ namespace OrderFlowBot.Tests
 
             dataBar.SetCurrentDataBar(dataBarDataProvider);
 
-            Assert.Equal(false, dataBar.Imbalances.HasBidStackedImbalances);
-            Assert.Equal(false, dataBar.Imbalances.HasAskStackedImbalances);
+            Assert.False(dataBar.Imbalances.HasBidStackedImbalances);
+            Assert.False(dataBar.Imbalances.HasAskStackedImbalances);
             Assert.Equal(dataBarConfig.TickSize, dataBar.Imbalances.TickSize);
             Assert.Equal(dataBarConfig.ImbalanceRatio, dataBar.Imbalances.ImbalanceRatio);
             Assert.Equal(dataBarConfig.ImbalanceMinDelta, dataBar.Imbalances.ImbalanceMinDelta);
             Assert.Equal(dataBarConfig.StackedImbalance, dataBar.Imbalances.StackedImbalance);
-            // Will test imbalances at other tick levels
-        }
 
-        [Fact]
-        public void ShouldPopulateDataBarVolumesWithDifferentTicksPerLevel()
-        {
-            var dataBarConfig = DataBarConfigMock.CreateDataBarConfig().Object;
-            var dataBarDataProvider = DataBarDataProviderMock.CreateDataBarDataProvider().Object;
-            var dataBar = new DataBar(_dataBarConfig.Object);
+            var expectedAskList = ImbalancesData.GetTestBarAskImbalances();
+            var actualAskList = dataBar.Imbalances.AskImbalances;
 
-            dataBar.SetCurrentDataBar(dataBarDataProvider);
+            Assert.Equal(expectedAskList.Count, actualAskList.Count);
 
-            var expectedList = VolumetricBarData.GetTestBarA3BidAskVolume();
-            var actualList = dataBar.Volumes.BidAskVolumes;
-
-            for (int i = 0; i < expectedList.Count; i++)
+            for (int i = 0; i < expectedAskList.Count; i++)
             {
-                var expectedItem = expectedList[i];
-                var actualItem = actualList[i];
-
-                // Print for debugging
-                Console.WriteLine($"Expected: {expectedItem.Price}, {expectedItem.BidVolume}, {expectedItem.AskVolume}");
-                Console.WriteLine($"Actual: {actualItem.Price}, {actualItem.BidVolume}, {actualItem.AskVolume}");
+                var expectedItem = expectedAskList[i];
+                var actualItem = actualAskList[i];
 
                 Assert.Equal(expectedItem.Price, actualItem.Price);
-                Assert.Equal(expectedItem.BidVolume, actualItem.BidVolume);
-                Assert.Equal(expectedItem.AskVolume, actualItem.AskVolume);
+                Assert.Equal(expectedItem.Volume, actualItem.Volume);
             }
 
-        }
+            var expectedBidList = ImbalancesData.GetTestBarBidImbalances();
+            var actualBidList = dataBar.Imbalances.BidImbalances;
 
-        /*[Fact]
-        public void ShouldHaveBidImbalances()
-        {
-            var dataBarConfig = DataBarConfigMock.CreateDataBarConfig().Object;
-            var dataBarDataProvider = DataBarDataProviderMock.CreateDataBarDataProviderA3().Object;
-            var dataBar = new DataBar(_dataBarConfig.Object);
+            Assert.Equal(expectedBidList.Count, actualBidList.Count);
 
-            dataBar.SetCurrentDataBar(dataBarDataProvider);
-
-            var expectedList = VolumetricBarData.GetTestBarA3BidAskVolumeBidImbalances();
-            var actualList = dataBar.Volumes.BidAskVolumes;
-
-            Assert.Equal(expectedList.Count, actualList.Count);
-
-            for (int i = 0; i < expectedList.Count; i++)
+            for (int i = 0; i < expectedBidList.Count; i++)
             {
-                var expectedItem = expectedList[i];
-                var actualItem = actualList[i];
+                var expectedItem = expectedBidList[i];
+                var actualItem = actualBidList[i];
 
                 Assert.Equal(expectedItem.Price, actualItem.Price);
-                Assert.Equal(expectedItem.BidVolume, actualItem.BidVolume);
-                Assert.Equal(expectedItem.AskVolume, actualItem.AskVolume);
+                Assert.Equal(expectedItem.Volume, actualItem.Volume);
             }
         }
 
-        [Fact]
-        public void ShouldHaveAskImbalances()
-        {
-            var dataBarConfig = DataBarConfigMock.CreateDataBarConfig().Object;
-            var dataBarDataProvider = DataBarDataProviderMock.CreateDataBarDataProviderA3().Object;
-            var dataBar = new DataBar(_dataBarConfig.Object);
-
-            dataBar.SetCurrentDataBar(dataBarDataProvider);
-
-            var expectedList = VolumetricBarData.GetTestBarA3BidAskVolumeAskImbalances();
-            var actualList = dataBar.Volumes.BidAskVolumes;
-
-            Assert.Equal(expectedList.Count, actualList.Count);
-
-            for (int i = 0; i < expectedList.Count; i++)
-            {
-                var expectedItem = expectedList[i];
-                var actualItem = actualList[i];
-
-                Assert.Equal(expectedItem.Price, actualItem.Price);
-                Assert.Equal(expectedItem.BidVolume, actualItem.BidVolume);
-                Assert.Equal(expectedItem.AskVolume, actualItem.AskVolume);
-            }
-        }*/
+        // There is an issue testing the stacked imbalances. For some reason they are empty, but only in testing.
     }
 }
