@@ -130,7 +130,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 {
                     _eventsContainer.DataBarEvents.UpdateCurrentDataBarList();
 
-
+                    /*
                     _eventsContainer.DataBarEvents.PrintDataBar(new DataBarPrintConfig
                     {
                         BarsAgo = 1,
@@ -142,7 +142,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                         ShowVolumes = true,
                         ShowBidAskVolumePerBar = true,
                     });
-
+                    */
                 }
                 else
                 {
