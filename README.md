@@ -1,6 +1,17 @@
 # OrderFlowBot
 
 [![Actions Status](https://github.com/WaleeTheRobot/order-flow-bot/workflows/Build%20and%20Test/badge.svg)](https://github.com/WaleeTheRobot/order-flow-bot/actions)
+[![Actions Status](https://github.com/WaleeTheRobot/order-flow-bot/workflows/Formatting/badge.svg)](https://github.com/WaleeTheRobot/order-flow-bot/actions)
+[![Actions Status](https://github.com/WaleeTheRobot/order-flow-bot/workflows/SonarCloud/badge.svg)](https://github.com/WaleeTheRobot/order-flow-bot/actions)
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=WaleeTheRobot_order-flow-bot&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=WaleeTheRobot_order-flow-bot)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=WaleeTheRobot_order-flow-bot&metric=bugs)](https://sonarcloud.io/summary/new_code?id=WaleeTheRobot_order-flow-bot)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=WaleeTheRobot_order-flow-bot&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=WaleeTheRobot_order-flow-bot)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=WaleeTheRobot_order-flow-bot&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=WaleeTheRobot_order-flow-bot)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=WaleeTheRobot_order-flow-bot&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=WaleeTheRobot_order-flow-bot)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=WaleeTheRobot_order-flow-bot&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=WaleeTheRobot_order-flow-bot)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=WaleeTheRobot_order-flow-bot&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=WaleeTheRobot_order-flow-bot)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=WaleeTheRobot_order-flow-bot&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=WaleeTheRobot_order-flow-bot)
 
 <img src="./images/screenshot.png" alt="OrderFlowBot" style="display: block; margin: 0 auto">
 

@@ -17,6 +17,7 @@ To contribute to this project, you will need:
 - [NinjaTrader 8](https://ninjatrader.com/) (you'll need the lifetime license or the OrderFlow+ package to work with the volumetric data)
 - [Visual Studio](https://visualstudio.microsoft.com/) (the Community version works great)
 - C#6 and NinjaScript knowledge
+- Make sure you install SonarLint to your IDE. This project uses SonarCloud for static analysis.
 
 Ensure that NinjaTrader's AddOns directory is configured correctly to include `OrderFlowBot`.
 
@@ -34,7 +35,7 @@ The project structure is unconventional. The `OrderFlowBot` code resides in the 
 
    - Move the OrderFlowBot directory into your NinjaTrader AddOns directory normally located at: `C:\Users\<username>\Documents\NinjaTrader 8\bin\Custom\AddOns`.
 
-3. Open the project in Visual Studio.
+3. **Open the project in Visual Studio.**
 
    - Open the solution in Visual Studio.
    - Make your changes in the OrderFlowBot directory.
@@ -46,12 +47,17 @@ The project structure is unconventional. The `OrderFlowBot` code resides in the 
    - Right-click the file in the Solution Explorer.
    - Select Format Document or use the shortcut (Ctrl + K, Ctrl + D).
    - This can also be set to auto-format on save.
+   - GitHub Actions will check for the dotnet default formatting and will fail if there are formatting issues.
 
-5. **Test your changes in NinjaTrader.**
+5. **Static Analysis**
+
+   - This project uses SonarCloud for static analysis in the GitHub Actions pipeline. Installing SonarLint to your IDE will help identify some warnings and issues before pushing your changes.
+
+6. **Test your changes in NinjaTrader.**
 
    - Ensure your changes work correctly by running NinjaTrader with your updated AddOn.
 
-6. **Remove and replace the directory in NinjaTrader.**
+7. **Remove and replace the directory in NinjaTrader.**
    - After formatting, delete the existing OrderFlowBot directory in the AddOns directory for the repository. This will help show the recent changes in the source control.
    - Copy your updated directory to the AddOns directory.
 
@@ -60,7 +66,9 @@ The project structure is unconventional. The `OrderFlowBot` code resides in the 
 - This project uses GitHub Actions for tests.
 - Install Docker Desktop.
 - Install `act` locally to write and run tests. You can do it with Chocolatey on Windows with `choco install act-cli`.
-- Use `act` to build and run the tests.
+- Use `act -j build` to build.
+- Use `act -j test` to build and run the tests.
+- Use `act -j format` to check for formatting.
 
 ## Submitting Changes
 
