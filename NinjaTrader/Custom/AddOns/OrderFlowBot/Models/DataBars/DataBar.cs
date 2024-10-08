@@ -85,8 +85,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars
             Volumes.PointOfControl = volumes.PointOfControl;
             Volumes.BidAskVolumes = volumes.BidAskVolumes;
             Volumes.SetBidAskPriceVolumeAndVolumeDelta();
-            // Commented out for now due to bug
-            //Volumes.SetValueArea();
+            Volumes.SetValueArea();
 
             if (volumes.BidAskVolumes.Count > 2)
             {

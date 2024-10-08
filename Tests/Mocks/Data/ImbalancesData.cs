@@ -10,9 +10,13 @@ namespace OrderFlowBot.Tests.Mocks.Data
         {
             return new List<ImbalancePrice>
             {
-                new ImbalancePrice { Price = 18557.25, Volume = 36 },
-                new ImbalancePrice { Price = 18554.75, Volume = 26 },
-                new ImbalancePrice { Price = 18549.75, Volume = 111 }
+                new ImbalancePrice { Price = 18693.5, Volume = 30 },
+                new ImbalancePrice { Price = 18692.25, Volume = 139 },
+                new ImbalancePrice { Price = 18682.25, Volume = 116 },
+                new ImbalancePrice { Price = 18679.75, Volume = 148 },
+                new ImbalancePrice { Price = 18676, Volume = 35 },
+                new ImbalancePrice { Price = 18672.25, Volume = 95 },
+                new ImbalancePrice { Price = 18669.75, Volume = 90 }
             };
         }
 
@@ -20,10 +24,10 @@ namespace OrderFlowBot.Tests.Mocks.Data
         {
             return new List<ImbalancePrice>
             {
-                new ImbalancePrice { Price = 18561.00, Volume = 16 },
-                new ImbalancePrice { Price = 18559.75, Volume = 20 },
-                new ImbalancePrice { Price = 18557.25, Volume = 76 },
-                new ImbalancePrice { Price = 18552.25, Volume = 59 }
+                new ImbalancePrice { Price = 18689.75, Volume = 206 },
+                new ImbalancePrice { Price = 18679.75, Volume = 87 },
+                new ImbalancePrice { Price = 18669.75, Volume = 90 },
+                new ImbalancePrice { Price = 18668.5, Volume = 30 }
             };
         }
     }

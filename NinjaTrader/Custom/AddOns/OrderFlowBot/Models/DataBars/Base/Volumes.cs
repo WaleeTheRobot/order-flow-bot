@@ -69,23 +69,38 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars.Base
 
             while (currentVolume < valueAreaVolume && (lowerIndex > 0 || upperIndex < sortedVolumes.Count - 1))
             {
-                long lowerVolume = (lowerIndex > 0) ? sortedVolumes[lowerIndex - 1].Volume : 0;
-                long upperVolume = (upperIndex < sortedVolumes.Count - 1) ? sortedVolumes[upperIndex + 1].Volume : 0;
+                // Ensure the lowerIndex and upperIndex are within valid bounds
+                long lowerVolume = (lowerIndex > 0) ? sortedVolumes[lowerIndex - 1].Volume : long.MinValue;
+                long upperVolume = (upperIndex < sortedVolumes.Count - 1) ? sortedVolumes[upperIndex + 1].Volume : long.MinValue;
 
-                if (lowerVolume >= upperVolume)
+                // If both volumes are invalid, break to avoid an infinite loop
+                if (lowerVolume == long.MinValue && upperVolume == long.MinValue)
+                {
+                    break;
+                }
+
+                if (lowerVolume >= upperVolume && lowerIndex > 0)
                 {
                     currentVolume += lowerVolume;
                     lowerIndex--;
                 }
-                else
+                else if (upperIndex < sortedVolumes.Count - 1)
                 {
                     currentVolume += upperVolume;
                     upperIndex++;
                 }
             }
 
-            ValueAreaLowPrice = sortedVolumes[lowerIndex].Price;
-            ValueAreaHighPrice = sortedVolumes[upperIndex].Price;
+            // Ensure the indices are still within bounds before setting prices
+            if (lowerIndex >= 0 && lowerIndex < sortedVolumes.Count)
+            {
+                ValueAreaLowPrice = sortedVolumes[lowerIndex].Price;
+            }
+
+            if (upperIndex >= 0 && upperIndex < sortedVolumes.Count)
+            {
+                ValueAreaHighPrice = sortedVolumes[upperIndex].Price;
+            }
         }
     }
 }

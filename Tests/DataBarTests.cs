@@ -51,8 +51,8 @@ namespace OrderFlowBot.Tests
 
             dataBar.SetCurrentDataBar(dataBarDataProvider);
 
-            Assert.Equal(0.25, dataBar.Ratios.BidRatio);
-            Assert.Equal(3.5, dataBar.Ratios.AskRatio);
+            Assert.Equal(3.36, dataBar.Ratios.BidRatio);
+            Assert.Equal(0.69, dataBar.Ratios.AskRatio);
         }
 
         [Fact]
@@ -68,8 +68,8 @@ namespace OrderFlowBot.Tests
             Assert.Equal(VolumetricBarData.TotalBuyingVolume, dataBar.Volumes.BuyingVolume);
             Assert.Equal(VolumetricBarData.TotalSellingVolume, dataBar.Volumes.SellingVolume);
             Assert.Equal(0.70, dataBar.Volumes.ValueAreaPercentage);
-            //Assert.Equal(VolumetricBarData.ValueAreaHighPrice, dataBar.Volumes.ValueAreaHighPrice);
-            //Assert.Equal(VolumetricBarData.ValueAreaLowPrice, dataBar.Volumes.ValueAreaLowPrice);
+            Assert.Equal(VolumetricBarData.ValueAreaHighPrice, dataBar.Volumes.ValueAreaHighPrice);
+            Assert.Equal(VolumetricBarData.ValueAreaLowPrice, dataBar.Volumes.ValueAreaLowPrice);
             var expectedList = VolumetricBarData.GetTestBarBidAskVolume();
             var actualList = dataBar.Volumes.BidAskVolumes;
 
@@ -102,8 +102,8 @@ namespace OrderFlowBot.Tests
             Assert.Equal(VolumetricBarData.DeltaChange, dataBar.Deltas.DeltaChange);
             Assert.Equal(VolumetricBarData.DeltaSl, dataBar.Deltas.DeltaSl);
             Assert.Equal(VolumetricBarData.DeltaSh, dataBar.Deltas.DeltaSh);
-            Assert.Equal(0.95, dataBar.Deltas.MinMaxDeltaRatio);
-            Assert.Equal(1.06, dataBar.Deltas.MaxMinDeltaRatio);
+            Assert.Equal(1.1, dataBar.Deltas.MinMaxDeltaRatio);
+            Assert.Equal(0.91, dataBar.Deltas.MaxMinDeltaRatio);
         }
 
         [Fact]
