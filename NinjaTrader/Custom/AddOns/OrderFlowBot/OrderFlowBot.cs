@@ -47,7 +47,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         #region Data Bar Properties
 
         [NinjaScriptProperty]
-        [Display(Name = "TicksPerLevel", Description = "Set this to the same ticks per level that is being used.", Order = 0, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
+        [Display(Name = "TicksPerLevel *", Description = "Set this to the same ticks per level that is being used.", Order = 0, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
         public int TicksPerLevel { get; set; }
 
         [NinjaScriptProperty]

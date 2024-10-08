@@ -16,13 +16,13 @@ namespace OrderFlowBot.Tests.Mocks.Data
         static DataBarDataProviderData()
         {
             VolumetricBar = null;
-            Time = 113330;
-            CurrentBar = 48;
+            Time = 102524;
+            CurrentBar = 47;
             BarsAgo = 0;
-            High = 18549.75;
-            Low = 18533;
-            Open = 18549.75;
-            Close = 18546.75;
+            High = 18697.25;
+            Low = 18667.25;
+            Open = 18692.50;
+            Close = 18667.25;
         }
     }
 }
