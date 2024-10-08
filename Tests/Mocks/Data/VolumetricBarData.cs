@@ -22,38 +22,50 @@ namespace OrderFlowBot.Tests.Mocks.Data
 
         static VolumetricBarData()
         {
-            TotalVolume = 1173;
-            TotalBuyingVolume = 587;
-            TotalSellingVolume = 586;
-            //ValueAreaHighPrice = 0;
-            //ValueAreaLowPrice = 0;
-            PointOfControl = 18533.50;
-            BarDelta = 1;
-            MinSeenDelta = -90;
-            MaxSeenDelta = 95;
-            DeltaSh = 3;
-            DeltaSl = 52;
-            CumulativeDelta = -2339;
-            DeltaPercentage = 0.09;
-            DeltaChange = -58;
+            TotalVolume = 4392;
+            TotalBuyingVolume = 2117;
+            TotalSellingVolume = 2275;
+            ValueAreaHighPrice = 18692.25;
+            ValueAreaLowPrice = 18679.75;
+            PointOfControl = 18686;
+            BarDelta = -158;
+            MinSeenDelta = -207;
+            MaxSeenDelta = 189;
+            DeltaSh = -208;
+            DeltaSl = 0;
+            CumulativeDelta = -1106;
+            DeltaPercentage = -3.6;
+            DeltaChange = 209;
         }
 
         public static List<BidAskVolume> GetTestBarBidAskVolume()
         {
             return new List<BidAskVolume>
             {
-                new BidAskVolume { Price = 18563.5, BidVolume = 3, AskVolume = 4 },
-                new BidAskVolume { Price = 18562.25, BidVolume = 3, AskVolume = 14 },
-                new BidAskVolume { Price = 18561, BidVolume = 6, AskVolume = 16 },
-                new BidAskVolume { Price = 18559.75, BidVolume = 3, AskVolume = 20 },
-                new BidAskVolume { Price = 18558.5, BidVolume = 9, AskVolume = 20 },
-                new BidAskVolume { Price = 18557.25, BidVolume = 36, AskVolume = 76 },
-                new BidAskVolume { Price = 18556, BidVolume = 19, AskVolume = 14 },
-                new BidAskVolume { Price = 18554.75, BidVolume = 26, AskVolume = 49 },
-                new BidAskVolume { Price = 18553.5, BidVolume = 72, AskVolume = 104 },
-                new BidAskVolume { Price = 18552.25, BidVolume = 81, AskVolume = 59 },
-                new BidAskVolume { Price = 18551, BidVolume = 28, AskVolume = 19 },
-                new BidAskVolume { Price = 18549.75, BidVolume = 111, AskVolume = 6 }
+                new BidAskVolume { Price = 18696, BidVolume = 12, AskVolume = 26 },
+                new BidAskVolume { Price = 18694.75, BidVolume = 24, AskVolume = 18 },
+                new BidAskVolume { Price = 18693.5, BidVolume = 30, AskVolume = 79 },
+                new BidAskVolume { Price = 18692.25, BidVolume = 139, AskVolume = 163 },
+                new BidAskVolume { Price = 18691, BidVolume = 119, AskVolume = 141 },
+                new BidAskVolume { Price = 18689.75, BidVolume = 157, AskVolume = 206 },
+                new BidAskVolume { Price = 18688.5, BidVolume = 105, AskVolume = 169 },
+                new BidAskVolume { Price = 18687.25, BidVolume = 148, AskVolume = 211 },
+                new BidAskVolume { Price = 18686, BidVolume = 229, AskVolume = 211 },
+                new BidAskVolume { Price = 18684.75, BidVolume = 250, AskVolume = 123 },
+                new BidAskVolume { Price = 18683.5, BidVolume = 139, AskVolume = 61 },
+                new BidAskVolume { Price = 18682.25, BidVolume = 116, AskVolume = 120 },
+                new BidAskVolume { Price = 18681, BidVolume = 145, AskVolume = 78 },
+                new BidAskVolume { Price = 18679.75, BidVolume = 148, AskVolume = 87 },
+                new BidAskVolume { Price = 18678.5, BidVolume = 47, AskVolume = 12 },
+                new BidAskVolume { Price = 18677.25, BidVolume = 17, AskVolume = 8 },
+                new BidAskVolume { Price = 18676, BidVolume = 35, AskVolume = 24 },
+                new BidAskVolume { Price = 18674.75, BidVolume = 33, AskVolume = 52 },
+                new BidAskVolume { Price = 18673.5, BidVolume = 54, AskVolume = 56 },
+                new BidAskVolume { Price = 18672.25, BidVolume = 95, AskVolume = 88 },
+                new BidAskVolume { Price = 18671, BidVolume = 82, AskVolume = 46 },
+                new BidAskVolume { Price = 18669.75, BidVolume = 90, AskVolume = 90 },
+                new BidAskVolume { Price = 18668.5, BidVolume = 47, AskVolume = 30 },
+                new BidAskVolume { Price = 18667.25, BidVolume = 14, AskVolume = 15 }
             };
         }
     }
