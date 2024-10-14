@@ -12,8 +12,8 @@ namespace OrderFlowBot.Tests.Mocks
             mock.SetupGet(x => x.TotalVolume).Returns(VolumetricBarData.TotalVolume);
             mock.SetupGet(x => x.TotalBuyingVolume).Returns(VolumetricBarData.TotalBuyingVolume);
             mock.SetupGet(x => x.TotalSellingVolume).Returns(VolumetricBarData.TotalSellingVolume);
-            //mock.SetupGet(x => x.ValueAreaHighPrice).Returns(0);
-            //mock.SetupGet(x => x.ValueAreaLowPrice).Returns(0);
+            mock.SetupGet(x => x.ValueAreaHighPrice).Returns(0);
+            mock.SetupGet(x => x.ValueAreaLowPrice).Returns(0);
             mock.SetupGet(x => x.PointOfControl).Returns(VolumetricBarData.PointOfControl);
             mock.SetupGet(x => x.BarDelta).Returns(VolumetricBarData.BarDelta);
             mock.SetupGet(x => x.MinSeenDelta).Returns(VolumetricBarData.MinSeenDelta);
