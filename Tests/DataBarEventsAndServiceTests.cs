@@ -21,6 +21,14 @@ namespace OrderFlowBot.Tests
             _dataBarDataProviderMock = new Mock<IDataBarDataProvider>();
             _eventManager = new EventManager();
             _dataBarEvents = new DataBarEvents(_eventManager);
+
+            var eventsContainer = new EventsContainer
+            {
+                EventManager = _eventManager,
+                DataBarEvents = _dataBarEvents
+            };
+
+            new DataBarService(eventsContainer);
         }
 
         [Fact]
