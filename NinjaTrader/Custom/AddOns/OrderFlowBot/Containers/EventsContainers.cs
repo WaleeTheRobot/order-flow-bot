@@ -4,9 +4,9 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Containers
 {
     public class EventsContainer
     {
-        public EventManager EventManager { get; private set; }
-        public DataBarEvents DataBarEvents { get; private set; }
-        public TradingEvents TradingEvents { get; private set; }
+        public EventManager EventManager { get; set; }
+        public DataBarEvents DataBarEvents { get; set; }
+        public TradingEvents TradingEvents { get; set; }
 
         public EventsContainer()
         {

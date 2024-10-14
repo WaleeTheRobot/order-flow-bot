@@ -11,7 +11,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
     {
         private readonly EventManager _eventManager;
         private readonly DataBarEvents _dataBarEvents;
-        private List<DataBar> _dataBars;
+        private readonly List<DataBar> _dataBars;
         private DataBar _currentDataBar;
 
         public DataBarService(EventsContainer eventsContainer)
@@ -51,7 +51,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
             return _dataBars;
         }
 
-        private void HandlePrintDataBar(DataBarPrintConfig dataBarPrintConfig)
+        private void HandlePrintDataBar(IDataBarPrintConfig dataBarPrintConfig)
         {
             DataBar dataBar;
             int barsAgo = dataBarPrintConfig.BarsAgo;

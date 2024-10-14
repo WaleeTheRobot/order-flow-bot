@@ -1,6 +1,6 @@
-﻿namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Configs
+namespace OrderFlowBot.Tests.Mocks.Data
 {
-    public class DataBarPrintConfig : IDataBarPrintConfig
+    public class DataBarPrintConfigData
     {
         public int BarsAgo { get; set; }
         public bool ShowBasic { get; set; }
@@ -11,7 +11,7 @@
         public bool ShowVolumes { get; set; }
         public bool ShowBidAskVolumePerBar { get; set; }
 
-        public DataBarPrintConfig()
+        public DataBarPrintConfigData()
         {
             BarsAgo = 0;
             ShowBasic = true;

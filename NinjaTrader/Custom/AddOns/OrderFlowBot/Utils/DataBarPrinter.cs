@@ -8,7 +8,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Utils
     {
         private static EventManager _eventManager;
 
-        public static void PrintDataBar(EventManager eventManager, DataBar dataBar, DataBarPrintConfig dataBarPrintConfig)
+        public static void PrintDataBar(EventManager eventManager, DataBar dataBar, IDataBarPrintConfig dataBarPrintConfig)
         {
             _eventManager = eventManager;
 
@@ -117,7 +117,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Utils
             Print(string.Format("Ask Ratio: {0}", dataBar.Ratios.AskRatio));
         }
 
-        private static void PrintVolumes(DataBar dataBar, DataBarPrintConfig config)
+        private static void PrintVolumes(DataBar dataBar, IDataBarPrintConfig config)
         {
             Print("**** Volume ****");
             Print(string.Format("Volume: {0}", dataBar.Volumes.Volume));
