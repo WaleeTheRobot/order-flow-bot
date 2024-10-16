@@ -6,7 +6,7 @@ A bot used for trading order flow with a selected ATM strategy. The recommended 
 
 OrderFlowBot uses the selected ATM strategy. Just create your ATM strategies and select the one you want to use for the trade. You can create your own strategies and easily hook it to OrderFlowBot for semi-automated or fully automated trading. Indicators can also be created with data from the OrderFlowBot DataBar for usage when the OrderFlowBot is enabled.
 
-Considering that there are some interest in this project, I would like to refactored this project some time and will probably not continue to contribute to this version.
+Considering that there are some interest in this project, I would like to refactored this project some time and will probably not continue to contribute to this version. The work in progress branch will be in the dev-v3 branch. https://github.com/WaleeTheRobot/order-flow-bot/tree/dev-v3
 
 # Important
 
