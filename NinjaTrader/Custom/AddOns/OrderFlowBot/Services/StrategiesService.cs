@@ -1,6 +1,6 @@
 ﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.Containers;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Events;
-using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,7 +11,6 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
     public class StrategiesService
     {
         private readonly EventManager _eventManager;
-        private readonly DataBarEvents _dataBarEvents;
         private readonly TradingEvents _tradingEvents;
         private readonly List<object> _strategies;
 
@@ -19,8 +18,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
         {
             _eventManager = eventsContainer.EventManager;
 
-            _dataBarEvents = eventsContainer.DataBarEvents;
-            _dataBarEvents.OnUpdatedCurrentDataBar += HandleUpdatedCurrentDataBar;
+            var dataBarEvents = eventsContainer.DataBarEvents;
+            dataBarEvents.OnUpdatedCurrentDataBar += HandleUpdatedCurrentDataBar;
 
             _tradingEvents = eventsContainer.TradingEvents;
 
@@ -71,33 +70,38 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
 
         private object CreateInstance(Type type, EventsContainer eventsContainer)
         {
-            // Try to find a constructor that matches parameters
-            ConstructorInfo ctor = type.GetConstructor(new[] { typeof(EventManager), typeof(DataBarEvents), typeof(TradingEvents) });
+            // Update to reflect any changes in parameters
+            ConstructorInfo ctor = type.GetConstructor(new[] { typeof(EventsContainer) });
 
             if (ctor != null)
             {
-                // Create instance with parameters
                 return ctor.Invoke(new object[] { eventsContainer });
             }
 
-            // If not found, try to find a parameterless constructor
-            ctor = type.GetConstructor(Type.EmptyTypes);
-
-            if (ctor != null)
-            {
-                // If found, create instance with no parameters
-                return ctor.Invoke(null);
-            }
-
-            // Constructors not found
             _eventManager.PrintMessage($"No suitable constructor found for {type.Name}");
-
             return null;
         }
 
-        private void HandleUpdatedCurrentDataBar(DataBar currentDataBar, List<DataBar> dataBars)
+        private void HandleUpdatedCurrentDataBar()
         {
-            // loop through strategies and check
+            // Strategy already triggered
+            if (_tradingEvents.GetTradingState().StrategyTriggered)
+            {
+                return;
+            }
+
+            foreach (StrategyBase strategy in _strategies)
+            {
+                var strategyData = strategy.CheckStrategy();
+
+                if (strategyData.StrategyTriggered)
+                {
+                    _tradingEvents.StrategyTriggered(strategyData);
+
+                    return;
+                }
+            }
         }
+
     }
 }

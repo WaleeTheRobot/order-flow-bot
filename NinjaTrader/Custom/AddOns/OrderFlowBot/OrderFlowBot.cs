@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 #endregion
 
 //This namespace holds Strategies in this folder and is required. Do not change it. 
@@ -26,10 +27,12 @@ namespace NinjaTrader.NinjaScript.Strategies
     public partial class OrderFlowBot : Strategy
     {
         private EventsContainer _eventsContainer;
+        [SuppressMessage("Compiler", "IDE0052", Justification = "Instantiated for event subscription handling")]
+        private ServicesContainer _servicesContainer;
 
         private DataBarDataProvider _dataBarDataProvider;
-        private DataBar _currentDataBar;
-        private TradingState _currentTradingState;
+        private IReadOnlyDataBar _currentDataBar;
+        private IReadOnlyTradingState _currentTradingState;
 
         #region General Properties
 
@@ -39,7 +42,6 @@ namespace NinjaTrader.NinjaScript.Strategies
         public string Version
         {
             get { return "3.0.0"; }
-            set { }
         }
 
         #endregion
@@ -72,7 +74,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             if (State == State.SetDefaults)
             {
-                Description = @"A bot trading order flow";
+                Description = @"An order flow trading bot";
                 Name = "_OrderFlowBot";
                 Calculate = Calculate.OnEachTick;
                 EntriesPerDirection = 1;
@@ -110,13 +112,14 @@ namespace NinjaTrader.NinjaScript.Strategies
                 _currentTradingState = new TradingState();
 
                 _eventsContainer = new EventsContainer();
-                new ServicesContainer(_eventsContainer);
+                _servicesContainer = new ServicesContainer(_eventsContainer);
 
                 _eventsContainer.EventManager.OnPrintMessage += HandlePrintMessage;
                 _eventsContainer.TradingEvents.OnStrategyTriggeredProcessed += HandleStrategyTriggeredProcessed;
             }
         }
 
+        [SuppressMessage("SonarLint", "S125", Justification = "Commented code may be used later")]
         protected override void OnBarUpdate()
         {
             if (CurrentBars[0] < BarsRequiredToTrade)
@@ -184,8 +187,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             customBar.TotalBuyingVolume = volumes.TotalBuyingVolume;
             customBar.TotalSellingVolume = volumes.TotalSellingVolume;
 
-            double pointOfControl;
-            volumes.GetMaximumVolume(null, out pointOfControl);
+            volumes.GetMaximumVolume(null, out double pointOfControl);
             customBar.PointOfControl = pointOfControl;
 
             // Get bid/ask volume for each price in bar
@@ -265,7 +267,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         private void UpdateCurrentDataBarAndTradingState()
         {
             _currentDataBar = _eventsContainer.DataBarEvents.GetCurrentDataBar();
-            _currentTradingState = _currentTradingState = _eventsContainer.TradingEvents.GetTradingState();
+            _currentTradingState = _eventsContainer.TradingEvents.GetTradingState();
         }
 
         private void HandleStrategyTriggeredProcessed()

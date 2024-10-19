@@ -9,62 +9,87 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies
     public abstract class StrategyBase : IStrategy
     {
         protected readonly EventsContainer eventsContainer;
-        protected DataBar currentDataBar;
-        protected List<DataBar> currentDataBars;
-        public abstract string Name { get; set; }
-        public abstract bool StrategyTriggered { get; set; }
+        protected IReadOnlyDataBar currentDataBar;
+        protected List<IReadOnlyDataBar> currentDataBars;
+        public StrategyData StrategyData { get; set; }
 
         protected StrategyBase(EventsContainer eventsContainer)
         {
             this.eventsContainer = eventsContainer;
             currentDataBar = new DataBar(DataBarConfig.Instance);
-            currentDataBars = new List<DataBar>();
-            Name = "";
-            StrategyTriggered = false;
+            currentDataBars = new List<IReadOnlyDataBar>();
+
+            StrategyData = new StrategyData
+            {
+                Name = "",
+                TriggeredDirection = Direction.Flat,
+                StrategyTriggered = false
+            };
+
         }
 
-        public virtual void CheckStrategy()
+        public virtual StrategyData CheckStrategy()
         {
             currentDataBar = GetCurrentDataBar();
             currentDataBars = GetDataBars();
 
-            if (IsValidLongDirection() && !StrategyTriggered)
+            if (IsValidSelectedLongDirection() && CheckLong())
             {
-                CheckLong();
+                StrategyData.UpdateTriggeredDataProvider(
+                    Direction.Long,
+                    true
+                );
+
+                return StrategyData;
             }
 
-            if (IsValidShortDirection() && !StrategyTriggered)
+            if (IsValidSelectedShortDirection() && CheckShort())
             {
-                CheckShort();
+                StrategyData.UpdateTriggeredDataProvider(
+                    Direction.Short,
+                    true
+                );
+
+                return StrategyData;
             }
+
+            return StrategyData;
         }
 
-        protected DataBar GetCurrentDataBar()
+        protected IReadOnlyDataBar GetCurrentDataBar()
         {
             return eventsContainer.DataBarEvents.GetCurrentDataBar();
         }
 
-        protected List<DataBar> GetDataBars()
+        protected List<IReadOnlyDataBar> GetDataBars()
         {
             return eventsContainer.DataBarEvents.GetDataBars();
         }
 
-        protected TradingState GetCurrentTradingState()
+        protected IReadOnlyTradingState GetCurrentTradingState()
         {
             return eventsContainer.TradingEvents.GetTradingState();
         }
 
-        public abstract void CheckLong();
+        public abstract bool CheckLong();
 
-        public abstract void CheckShort();
+        public abstract bool CheckShort();
 
-        protected bool IsValidLongDirection()
+        public virtual void ResetStrategyTriggeredData()
+        {
+            StrategyData.UpdateTriggeredDataProvider(
+                Direction.Flat,
+                false
+            );
+        }
+
+        protected bool IsValidSelectedLongDirection()
         {
             var currentState = GetCurrentTradingState();
             return currentState.SelectedTradeDirection == Direction.Long || currentState.SelectedTradeDirection == Direction.Any;
         }
 
-        protected bool IsValidShortDirection()
+        protected bool IsValidSelectedShortDirection()
         {
             var currentState = GetCurrentTradingState();
             return currentState.SelectedTradeDirection == Direction.Short || currentState.SelectedTradeDirection == Direction.Any;

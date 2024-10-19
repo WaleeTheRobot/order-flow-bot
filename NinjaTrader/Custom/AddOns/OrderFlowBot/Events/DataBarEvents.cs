@@ -11,9 +11,9 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
         public event Action<IDataBarDataProvider> OnUpdateCurrentDataBar;
         public event Action OnUpdateCurrentDataBarList;
         public event Action<IDataBarPrintConfig> OnPrintDataBar;
-        public event Action<DataBar, List<DataBar>> OnUpdatedCurrentDataBar;
-        public event Func<DataBar> OnGetCurrentDataBar;
-        public event Func<List<DataBar>> OnGetDataBars;
+        public event Action OnUpdatedCurrentDataBar;
+        public event Func<IReadOnlyDataBar> OnGetCurrentDataBar;
+        public event Func<List<IReadOnlyDataBar>> OnGetDataBars;
 
         public DataBarEvents(EventManager eventManager)
         {
@@ -42,25 +42,25 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
         /// Event triggered when the current DataBar is updated.
         /// This is used when the current DataBar is updated with new data.
         /// </summary>
-        public void UpdatedCurrentDataBar(DataBar currentDataBar, List<DataBar> dataBars)
+        public void UpdatedCurrentDataBar()
         {
-            _eventManager.InvokeEvent(OnUpdatedCurrentDataBar, currentDataBar, dataBars);
+            _eventManager.InvokeEvent(OnUpdatedCurrentDataBar);
         }
 
         /// <summary>
         /// Event triggered when current DataBar is requested.
-        /// This is used to get the current DataBar.
+        /// This is used to get the current read only DataBar.
         /// </summary>
-        public DataBar GetCurrentDataBar()
+        public IReadOnlyDataBar GetCurrentDataBar()
         {
             return _eventManager.InvokeEvent(() => OnGetCurrentDataBar?.Invoke());
         }
 
         /// <summary>
         /// Event triggered when current DataBar list is requested.
-        /// This is used to get the current DataBar list.
+        /// This is used to get the current read only DataBar list.
         /// </summary>
-        public List<DataBar> GetDataBars()
+        public List<IReadOnlyDataBar> GetDataBars()
         {
             return _eventManager.InvokeEvent(() => OnGetDataBars?.Invoke());
         }

@@ -11,7 +11,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
     {
         private readonly EventManager _eventManager;
         private readonly DataBarEvents _dataBarEvents;
-        private readonly List<DataBar> _dataBars;
+        private readonly List<IReadOnlyDataBar> _dataBars;
         private DataBar _currentDataBar;
 
         public DataBarService(EventsContainer eventsContainer)
@@ -25,14 +25,14 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
             _dataBarEvents.OnGetDataBars += HandleGetDataBars;
             _dataBarEvents.OnPrintDataBar += HandlePrintDataBar;
 
-            _dataBars = new List<DataBar>();
+            _dataBars = new List<IReadOnlyDataBar>();
             _currentDataBar = new DataBar(DataBarConfig.Instance);
         }
 
         private void HandleUpdateCurrentDataBar(IDataBarDataProvider dataBarDataProvider)
         {
             _currentDataBar.SetCurrentDataBar(dataBarDataProvider);
-            _dataBarEvents.UpdatedCurrentDataBar(_currentDataBar, _dataBars);
+            _dataBarEvents.UpdatedCurrentDataBar();
         }
 
         private void HandleUpdateCurrentDataBarList()
@@ -41,19 +41,19 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
             _currentDataBar = new DataBar(DataBarConfig.Instance);
         }
 
-        private DataBar HandleGetCurrentDataBar()
+        private IReadOnlyDataBar HandleGetCurrentDataBar()
         {
             return _currentDataBar;
         }
 
-        private List<DataBar> HandleGetDataBars()
+        private List<IReadOnlyDataBar> HandleGetDataBars()
         {
             return _dataBars;
         }
 
         private void HandlePrintDataBar(IDataBarPrintConfig dataBarPrintConfig)
         {
-            DataBar dataBar;
+            IReadOnlyDataBar dataBar;
             int barsAgo = dataBarPrintConfig.BarsAgo;
 
             if (barsAgo == 0)

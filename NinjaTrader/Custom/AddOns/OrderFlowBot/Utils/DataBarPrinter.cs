@@ -8,7 +8,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Utils
     {
         private static EventManager _eventManager;
 
-        public static void PrintDataBar(EventManager eventManager, DataBar dataBar, IDataBarPrintConfig dataBarPrintConfig)
+        public static void PrintDataBar(EventManager eventManager, IReadOnlyDataBar dataBar, IDataBarPrintConfig dataBarPrintConfig)
         {
             _eventManager = eventManager;
 
@@ -45,7 +45,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Utils
             Print("\n");
         }
 
-        private static void PrintBasic(DataBar dataBar)
+        private static void PrintBasic(IReadOnlyDataBar dataBar)
         {
             Print("**** Basic ****");
             Print(string.Format("Time: {0}", dataBar.Time));
@@ -55,7 +55,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Utils
             Print(string.Format("Volume: {0}", dataBar.Volumes.Volume));
         }
 
-        private static void PrintDelta(DataBar dataBar)
+        private static void PrintDelta(IReadOnlyDataBar dataBar)
         {
             Print("**** Deltas ****");
             Print(string.Format("Delta: {0}", dataBar.Deltas.Delta));
@@ -70,7 +70,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Utils
             Print(string.Format("Delta Sh: {0}", dataBar.Deltas.DeltaSh));
         }
 
-        private static void PrintImbalances(DataBar dataBar)
+        private static void PrintImbalances(IReadOnlyDataBar dataBar)
         {
             Print("**** Imbalances ****");
             Print("Bid Imbalances:");
@@ -101,7 +101,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Utils
             }
         }
 
-        private static void PrintPrices(DataBar dataBar)
+        private static void PrintPrices(IReadOnlyDataBar dataBar)
         {
             Print("**** Prices ****");
             Print(string.Format("High: {0}", dataBar.Prices.High));
@@ -110,14 +110,14 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Utils
             Print(string.Format("Close: {0}", dataBar.Prices.Close));
         }
 
-        private static void PrintRatios(DataBar dataBar)
+        private static void PrintRatios(IReadOnlyDataBar dataBar)
         {
             Print("**** Ratios ****");
             Print(string.Format("Bid Ratio: {0}", dataBar.Ratios.BidRatio));
             Print(string.Format("Ask Ratio: {0}", dataBar.Ratios.AskRatio));
         }
 
-        private static void PrintVolumes(DataBar dataBar, IDataBarPrintConfig config)
+        private static void PrintVolumes(IReadOnlyDataBar dataBar, IDataBarPrintConfig config)
         {
             Print("**** Volume ****");
             Print(string.Format("Volume: {0}", dataBar.Volumes.Volume));

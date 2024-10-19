@@ -2,12 +2,12 @@
 
 namespace NinjaTrader.Custom.AddOns.OrderFlowBot.States
 {
-    public class TradingState
+    public class TradingState : IReadOnlyTradingState
     {
-        public string TriggeredName { get; set; }
-        public bool StrategyTriggered { get; set; }
-        public Direction TriggeredDirection { get; set; }
-        public Direction SelectedTradeDirection { get; set; }
+        public string TriggeredName { get; private set; }
+        public bool StrategyTriggered { get; private set; }
+        public Direction TriggeredDirection { get; private set; }
+        public Direction SelectedTradeDirection { get; private set; }
 
         public TradingState()
         {
@@ -25,6 +25,17 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.States
         private void InitializeManualTradingState()
         {
             SelectedTradeDirection = Direction.Any;
+        }
+
+        public void SetTriggeredTradingState(
+            string name,
+            bool strategyTriggered,
+            Direction triggeredDirection
+        )
+        {
+            TriggeredName = name;
+            StrategyTriggered = strategyTriggered;
+            TriggeredDirection = triggeredDirection;
         }
 
         public void ResetTradingState()

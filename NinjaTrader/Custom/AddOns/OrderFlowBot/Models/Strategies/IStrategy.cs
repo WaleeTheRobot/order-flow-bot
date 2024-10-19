@@ -2,11 +2,9 @@
 {
     public interface IStrategy
     {
-        string Name { get; set; }
-        bool StrategyTriggered { get; set; }
-
-        void CheckStrategy();
-        void CheckLong();
-        void CheckShort();
+        StrategyData StrategyData { get; set; }
+        StrategyData CheckStrategy();
+        bool CheckLong();
+        bool CheckShort();
     }
 }
