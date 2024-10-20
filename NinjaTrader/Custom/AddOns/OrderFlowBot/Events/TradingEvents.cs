@@ -44,6 +44,10 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
             _eventManager.InvokeEvent(OnStrategyTriggeredProcessed);
         }
 
+        /// <summary>
+        /// Event triggered when the order closes.
+        /// This is used to notify consumers that the strategy order closed.
+        /// </summary>
         public void ResetTradingState()
         {
             _eventManager.InvokeEvent(OnResetTradingState);

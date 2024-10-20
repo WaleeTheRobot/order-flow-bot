@@ -8,17 +8,17 @@ namespace OrderFlowBot.Tests.Mocks
     {
         public static Mock<IDataBarPrintConfig> CreateDataBarPrintConfig()
         {
-            var dataBarPrintConfigData = new DataBarPrintConfigData();
+            var configData = new DataBarPrintConfigData();
 
             var mock = new Mock<IDataBarPrintConfig>();
-            mock.SetupProperty(m => m.BarsAgo, dataBarPrintConfigData.BarsAgo);
-            mock.SetupProperty(m => m.ShowBasic, dataBarPrintConfigData.ShowBasic);
-            mock.SetupProperty(m => m.ShowDeltas, dataBarPrintConfigData.ShowDeltas);
-            mock.SetupProperty(m => m.ShowImbalances, dataBarPrintConfigData.ShowImbalances);
-            mock.SetupProperty(m => m.ShowPrices, dataBarPrintConfigData.ShowPrices);
-            mock.SetupProperty(m => m.ShowRatios, dataBarPrintConfigData.ShowRatios);
-            mock.SetupProperty(m => m.ShowVolumes, dataBarPrintConfigData.ShowVolumes);
-            mock.SetupProperty(m => m.ShowBidAskVolumePerBar, dataBarPrintConfigData.ShowBidAskVolumePerBar);
+            mock.SetupProperty(x => x.BarsAgo, configData.BarsAgo);
+            mock.SetupProperty(x => x.ShowBasic, configData.ShowBasic);
+            mock.SetupProperty(x => x.ShowDeltas, configData.ShowDeltas);
+            mock.SetupProperty(x => x.ShowImbalances, configData.ShowImbalances);
+            mock.SetupProperty(x => x.ShowPrices, configData.ShowPrices);
+            mock.SetupProperty(x => x.ShowRatios, configData.ShowRatios);
+            mock.SetupProperty(x => x.ShowVolumes, configData.ShowVolumes);
+            mock.SetupProperty(x => x.ShowBidAskVolumePerBar, configData.ShowBidAskVolumePerBar);
 
             return mock;
         }
