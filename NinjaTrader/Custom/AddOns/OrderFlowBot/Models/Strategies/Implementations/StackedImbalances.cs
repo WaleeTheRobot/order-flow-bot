@@ -5,34 +5,19 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies.Implementatio
 {
     public class StackedImbalances : StrategyBase
     {
-        public override string Name { get; set; }
-        public override bool StrategyTriggered { get; set; }
-
         public StackedImbalances(EventsContainer eventsContainer) : base(eventsContainer)
         {
-            Name = "Stacked Imbalances";
+            StrategyData.Name = "Stacked Imbalances";
         }
 
-        public override void CheckLong()
+        public override bool CheckLong()
         {
-            if (IsBullishBar() && HasValidAskStackedImbalance())
-            {
-                eventsContainer.TradingEvents.StrategyTriggered(new StrategyTriggeredDataProvider(
-                    Name,
-                    Direction.Long
-                ));
-            }
+            return IsBullishBar() && HasValidAskStackedImbalance();
         }
 
-        public override void CheckShort()
+        public override bool CheckShort()
         {
-            if (IsBearishBar() && HasValidBidStackedImbalance())
-            {
-                eventsContainer.TradingEvents.StrategyTriggered(new StrategyTriggeredDataProvider(
-                    Name,
-                    Direction.Short
-                ));
-            }
+            return IsBearishBar() && HasValidBidStackedImbalance();
         }
 
         private bool IsBullishBar()

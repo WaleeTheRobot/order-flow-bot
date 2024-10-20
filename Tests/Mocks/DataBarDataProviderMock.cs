@@ -10,16 +10,16 @@ namespace OrderFlowBot.Tests.Mocks
         {
             var mock = new Mock<IDataBarDataProvider>();
 
-            mock.SetupProperty(dp => dp.Time, DataBarDataProviderData.Time);
-            mock.SetupProperty(dp => dp.CurrentBar, DataBarDataProviderData.CurrentBar);
-            mock.SetupProperty(dp => dp.BarsAgo, DataBarDataProviderData.BarsAgo);
-            mock.SetupProperty(dp => dp.High, DataBarDataProviderData.High);
-            mock.SetupProperty(dp => dp.Low, DataBarDataProviderData.Low);
-            mock.SetupProperty(dp => dp.Open, DataBarDataProviderData.Open);
-            mock.SetupProperty(dp => dp.Close, DataBarDataProviderData.Close);
+            mock.SetupProperty(x => x.Time, DataBarDataProviderData.Time);
+            mock.SetupProperty(x => x.CurrentBar, DataBarDataProviderData.CurrentBar);
+            mock.SetupProperty(x => x.BarsAgo, DataBarDataProviderData.BarsAgo);
+            mock.SetupProperty(x => x.High, DataBarDataProviderData.High);
+            mock.SetupProperty(x => x.Low, DataBarDataProviderData.Low);
+            mock.SetupProperty(x => x.Open, DataBarDataProviderData.Open);
+            mock.SetupProperty(x => x.Close, DataBarDataProviderData.Close);
 
             var mockVolumetricBar = CustomVolumetricBarMock.CreateCustomVolumetricBar().Object;
-            mock.SetupProperty(dp => dp.VolumetricBar, mockVolumetricBar);
+            mock.SetupProperty(x => x.VolumetricBar, mockVolumetricBar);
 
             return mock;
         }

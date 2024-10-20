@@ -5,18 +5,18 @@ using System;
 
 namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars
 {
-    public class DataBar
+    public class DataBar : IReadOnlyDataBar
     {
-        public IDataBarDataProvider DataBarDataProvider { get; set; }
-        public BarType BarType { get; set; }
-        public int Time { get; set; }
-        public int BarNumber { get; set; }
+        public IDataBarDataProvider DataBarDataProvider { get; private set; }
+        public BarType BarType { get; private set; }
+        public int Time { get; private set; }
+        public int BarNumber { get; private set; }
 
-        public Prices Prices { get; set; }
-        public Ratios Ratios { get; set; }
-        public Volumes Volumes { get; set; }
-        public Deltas Deltas { get; set; }
-        public Imbalances Imbalances { get; set; }
+        public Prices Prices { get; private set; }
+        public Ratios Ratios { get; private set; }
+        public Volumes Volumes { get; private set; }
+        public Deltas Deltas { get; private set; }
+        public Imbalances Imbalances { get; private set; }
 
         public DataBar(IDataBarConfig config)
         {
@@ -43,7 +43,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars
             PopulateDeltas();
         }
 
-        public void SetBarType()
+        private void SetBarType()
         {
             if (Prices.Open < Prices.Close)
             {

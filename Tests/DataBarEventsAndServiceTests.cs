@@ -60,8 +60,8 @@ namespace OrderFlowBot.Tests
             dataBarsMock.Add(dataBarMock);
 
             var eventTriggered = false;
-            _dataBarEvents.OnUpdatedCurrentDataBar += (dataBar, dataBars) => eventTriggered = true;
-            _dataBarEvents.UpdatedCurrentDataBar(dataBarMock, dataBarsMock);
+            _dataBarEvents.OnUpdatedCurrentDataBar += () => eventTriggered = true;
+            _dataBarEvents.UpdatedCurrentDataBar();
 
             Assert.True(eventTriggered, "Expected the OnUpdatedCurrentDataBar event to be triggered.");
         }

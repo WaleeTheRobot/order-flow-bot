@@ -2,6 +2,7 @@
 using NinjaTrader.Cbi;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Configs;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Containers;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.Events;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars.Base;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.States;
@@ -10,6 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
+
 #endregion
 
 //This namespace holds Strategies in this folder and is required. Do not change it. 
@@ -19,17 +22,25 @@ namespace NinjaTrader.NinjaScript.Strategies
     {
         public const string GROUP_NAME_GENERAL = "General";
         public const string GROUP_NAME_DATA_BAR = "Data Bar";
+        public const string GROUP_NAME_TESTING = "Testing";
     }
 
     [Gui.CategoryOrder(GroupConstants.GROUP_NAME_GENERAL, 0)]
     [Gui.CategoryOrder(GroupConstants.GROUP_NAME_DATA_BAR, 1)]
+    [Gui.CategoryOrder(GroupConstants.GROUP_NAME_TESTING, 2)]
     public partial class OrderFlowBot : Strategy
     {
         private EventsContainer _eventsContainer;
+        [SuppressMessage("SonarLint", "S4487", Justification = "Instantiated for event handling")]
+        private ServicesContainer _servicesContainer;
+        private EventManager _eventManager;
+        private TradingEvents _tradingEvents;
+        private DataBarEvents _dataBarEvents;
+
+        private IReadOnlyDataBar _currentDataBar;
+        private IReadOnlyTradingState _currentTradingState;
 
         private DataBarDataProvider _dataBarDataProvider;
-        private DataBar _currentDataBar;
-        private TradingState _currentTradingState;
 
         #region General Properties
 
@@ -68,11 +79,35 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         #endregion
 
+        #region Back Test Properties
+
+        [NinjaScriptProperty]
+        [Display(Name = "Back Testing Enabled", Description = "Enable this to back test all strategies and directions.", Order = 0, GroupName = GroupConstants.GROUP_NAME_TESTING)]
+        public bool BackTestingEnabled { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Back Testing Strategy Name", Description = "The strategy name to back test. This should be the same as the file name.", Order = 1, GroupName = GroupConstants.GROUP_NAME_TESTING)]
+        public string BackTestingStrategyName { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Quantity", Description = "The name order quantity.", Order = 2, GroupName = GroupConstants.GROUP_NAME_TESTING)]
+        public int Quantity { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Target", Description = "The target in ticks.", Order = 3, GroupName = GroupConstants.GROUP_NAME_TESTING)]
+        public int Target { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Stop", Description = "The stop in ticks.", Order = 4, GroupName = GroupConstants.GROUP_NAME_TESTING)]
+        public int Stop { get; set; }
+
+        #endregion
+
         protected override void OnStateChange()
         {
             if (State == State.SetDefaults)
             {
-                Description = @"A bot trading order flow";
+                Description = @"An order flow trading bot";
                 Name = "_OrderFlowBot";
                 Calculate = Calculate.OnEachTick;
                 EntriesPerDirection = 1;
@@ -93,6 +128,12 @@ namespace NinjaTrader.NinjaScript.Strategies
                 // See the Help Guide for additional information
                 IsInstantiatedOnEachOptimizationIteration = true;
 
+                BackTestingEnabled = false;
+                BackTestingStrategyName = "Stacked Imbalances";
+                Target = 40;
+                Stop = 40;
+                Quantity = 1;
+
                 TicksPerLevel = 1;
                 ImbalanceRatio = 1.5;
                 StackedImbalance = 3;
@@ -106,17 +147,21 @@ namespace NinjaTrader.NinjaScript.Strategies
             else if (State == State.DataLoaded)
             {
                 _dataBarDataProvider = new DataBarDataProvider();
-                _currentDataBar = new DataBar(DataBarConfig.Instance);
-                _currentTradingState = new TradingState();
 
                 _eventsContainer = new EventsContainer();
-                new ServicesContainer(_eventsContainer);
+                _servicesContainer = new ServicesContainer(_eventsContainer);
+
+                _eventManager = _eventsContainer.EventManager;
+                _tradingEvents = _eventsContainer.TradingEvents;
+                _dataBarEvents = _eventsContainer.DataBarEvents;
 
                 _eventsContainer.EventManager.OnPrintMessage += HandlePrintMessage;
-                _eventsContainer.TradingEvents.OnStrategyTriggeredProcessed += HandleStrategyTriggeredProcessed;
+
+                InitializeStrategyManager();
             }
         }
 
+        [SuppressMessage("SonarLint", "S125", Justification = "Commented code may be used later")]
         protected override void OnBarUpdate()
         {
             if (CurrentBars[0] < BarsRequiredToTrade)
@@ -124,30 +169,23 @@ namespace NinjaTrader.NinjaScript.Strategies
                 return;
             }
 
-            if (BarsInProgress == 0)
+            if (BarsInProgress == 0 && IsFirstTickOfBar)
             {
-                if (IsFirstTickOfBar)
-                {
-                    _eventsContainer.DataBarEvents.UpdateCurrentDataBarList();
+                _eventsContainer.DataBarEvents.UpdateCurrentDataBarList();
 
-                    /*
-                    _eventsContainer.DataBarEvents.PrintDataBar(new DataBarPrintConfig
-                    {
-                        BarsAgo = 1,
-                        ShowBasic = true,
-                        ShowDeltas = true,
-                        ShowImbalances = true,
-                        ShowPrices = true,
-                        ShowRatios = true,
-                        ShowVolumes = true,
-                        ShowBidAskVolumePerBar = true,
-                    });
-                    */
-                }
-                else
+                /*
+                _eventsContainer.DataBarEvents.PrintDataBar(new DataBarPrintConfig
                 {
-                    CheckStrategies();
-                }
+                    BarsAgo = 1,
+                    ShowBasic = true,
+                    ShowDeltas = false,
+                    ShowImbalances = false,
+                    ShowPrices = false,
+                    ShowRatios = false,
+                    ShowVolumes = false,
+                    ShowBidAskVolumePerBar = false,
+                });
+                */
             }
 
             _eventsContainer.DataBarEvents.UpdateCurrentDataBar(GetDataBarDataProvider(DataBarConfig.Instance));
@@ -184,8 +222,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             customBar.TotalBuyingVolume = volumes.TotalBuyingVolume;
             customBar.TotalSellingVolume = volumes.TotalSellingVolume;
 
-            double pointOfControl;
-            volumes.GetMaximumVolume(null, out pointOfControl);
+            volumes.GetMaximumVolume(null, out double pointOfControl);
             customBar.PointOfControl = pointOfControl;
 
             // Get bid/ask volume for each price in bar
@@ -255,22 +292,16 @@ namespace NinjaTrader.NinjaScript.Strategies
         }
 
         // Used for debugging event messages
-        private void HandlePrintMessage(string eventMessage)
+        private void HandlePrintMessage(string eventMessage, bool addNewLine)
         {
             Print(eventMessage);
+
+            if (addNewLine)
+            {
+                Print("");
+            }
         }
 
         #endregion
-
-        private void UpdateCurrentDataBarAndTradingState()
-        {
-            _currentDataBar = _eventsContainer.DataBarEvents.GetCurrentDataBar();
-            _currentTradingState = _currentTradingState = _eventsContainer.TradingEvents.GetTradingState();
-        }
-
-        private void HandleStrategyTriggeredProcessed()
-        {
-            UpdateCurrentDataBarAndTradingState();
-        }
     }
 }
