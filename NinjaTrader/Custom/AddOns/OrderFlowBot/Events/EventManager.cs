@@ -4,7 +4,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
 {
     public class EventManager
     {
-        public event Action<string> OnPrintMessage;
+        public event Action<string, bool> OnPrintMessage;
 
         public void InvokeEvent(Action eventHandler)
         {
@@ -63,9 +63,9 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
             }
         }
 
-        public void PrintMessage(string eventMessage)
+        public void PrintMessage(string eventMessage, bool addNewLine = false)
         {
-            InvokeEvent(OnPrintMessage, eventMessage);
+            InvokeEvent(OnPrintMessage, eventMessage, addNewLine);
         }
     }
 }

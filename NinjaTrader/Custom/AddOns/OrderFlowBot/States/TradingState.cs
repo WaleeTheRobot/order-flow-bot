@@ -12,7 +12,6 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.States
         public TradingState()
         {
             InitializeTradingState();
-            InitializeManualTradingState();
         }
 
         private void InitializeTradingState()
@@ -20,10 +19,6 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.States
             TriggeredName = "None";
             StrategyTriggered = false;
             TriggeredDirection = Direction.Flat;
-        }
-
-        private void InitializeManualTradingState()
-        {
             SelectedTradeDirection = Direction.Any;
         }
 

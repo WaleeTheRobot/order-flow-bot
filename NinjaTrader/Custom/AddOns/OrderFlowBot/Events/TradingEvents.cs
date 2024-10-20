@@ -19,7 +19,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
 
         /// <summary>
         /// Event triggered when the trading state is requested.
-        /// This is used get the read only trading state.
+        /// This is used to get the read only trading state.
         /// </summary>
         public IReadOnlyTradingState GetTradingState()
         {
@@ -27,14 +27,18 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
         }
 
         /// <summary>
-        /// Event triggered when a strategy entry is found.
-        /// This is used set the strategy triggered state.
+        /// Event triggered when the strategy entry is found.
+        /// This is used to set the strategy triggered state.
         /// </summary>
         public void StrategyTriggered(StrategyData strategyTriggeredData)
         {
             _eventManager.InvokeEvent(OnStrategyTriggered, strategyTriggeredData);
         }
 
+        /// <summary>
+        /// Event triggered when the found strategy entry completed updating the trading state.
+        /// This is used to notify consumers that the found strategy entry has been set in the trading state.
+        /// </summary>
         public void StrategyTriggeredProcessed()
         {
             _eventManager.InvokeEvent(OnStrategyTriggeredProcessed);

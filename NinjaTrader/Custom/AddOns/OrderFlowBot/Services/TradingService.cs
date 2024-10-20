@@ -35,6 +35,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
                 strategyTriggeredData.StrategyTriggered,
                 strategyTriggeredData.TriggeredDirection
             );
+
+            _tradingEvents.StrategyTriggeredProcessed();
         }
 
         private void HandleResetTradingState()

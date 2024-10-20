@@ -84,7 +84,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
 
         private void HandleUpdatedCurrentDataBar()
         {
-            // Strategy already triggered
+            // Strategy already triggered. No further checks needed.
             if (_tradingEvents.GetTradingState().StrategyTriggered)
             {
                 return;
@@ -102,6 +102,5 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
                 }
             }
         }
-
     }
 }

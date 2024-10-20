@@ -25,7 +25,6 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies
                 TriggeredDirection = Direction.Flat,
                 StrategyTriggered = false
             };
-
         }
 
         public virtual StrategyData CheckStrategy()

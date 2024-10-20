@@ -22,7 +22,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
 
         /// <summary>
         /// Event triggered when the current DataBar needs to be updated.
-        /// This is used update the current DataBar.
+        /// This is used to update the current DataBar.
         /// </summary>
         public void UpdateCurrentDataBar(IDataBarDataProvider dataBarDataProvider)
         {
@@ -31,7 +31,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
 
         /// <summary>
         /// Event triggered when the current DataBar needs to be added to the list.
-        /// This is used update the DataBar list with the current DataBar.
+        /// This is used to update the DataBar list with the current DataBar.
         /// </summary>
         public void UpdateCurrentDataBarList()
         {
