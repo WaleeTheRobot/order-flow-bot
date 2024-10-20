@@ -158,6 +158,11 @@ namespace NinjaTrader.NinjaScript.Strategies
                 _eventsContainer.EventManager.OnPrintMessage += HandlePrintMessage;
 
                 InitializeStrategyManager();
+                InitializeUIManager();
+            }
+            else if (State == State.Terminated)
+            {
+                ControlPanelSetStateTerminated();
             }
         }
 
