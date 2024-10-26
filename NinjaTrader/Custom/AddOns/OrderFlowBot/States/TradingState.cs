@@ -8,10 +8,15 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.States
         public bool StrategyTriggered { get; private set; }
         public Direction TriggeredDirection { get; private set; }
         public Direction SelectedTradeDirection { get; private set; }
+        public bool IsAutoTradeEnabled { get; private set; }
+        public bool IsAlertEnabled { get; private set; }
 
         public TradingState()
         {
             InitializeTradingState();
+
+            IsAutoTradeEnabled = false;
+            IsAlertEnabled = false;
         }
 
         private void InitializeTradingState()
@@ -36,6 +41,16 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.States
         public void ResetTradingState()
         {
             InitializeTradingState();
+        }
+
+        public void SetAutoTrade(bool isEnabled)
+        {
+            IsAutoTradeEnabled = isEnabled;
+        }
+
+        public void SetAlert(bool isEnabled)
+        {
+            IsAlertEnabled = isEnabled;
         }
     }
 }

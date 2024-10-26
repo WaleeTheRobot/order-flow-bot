@@ -7,7 +7,6 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
 {
     public class TradingService
     {
-        private readonly EventManager _eventManager;
         private readonly TradingEvents _tradingEvents;
         private readonly TradingState _tradingState;
 
@@ -15,12 +14,12 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
         {
             _tradingState = new TradingState();
 
-            _eventManager = eventsContainer.EventManager;
-
             _tradingEvents = eventsContainer.TradingEvents;
             _tradingEvents.OnGetTradingState += HandleGetTradingState;
             _tradingEvents.OnStrategyTriggered += HandleStrategyTriggered;
             _tradingEvents.OnResetTradingState += HandleResetTradingState;
+            _tradingEvents.OnTradeManagementSetAutoTradeTriggered += HandleTradeManagementSetAutoTradeTriggered;
+            _tradingEvents.OnTradeManagementSetAlertTriggered += HandleTradeManagementSetAlertTriggered;
         }
 
         private IReadOnlyTradingState HandleGetTradingState()
@@ -42,6 +41,16 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
         private void HandleResetTradingState()
         {
             _tradingState.ResetTradingState();
+        }
+
+        private void HandleTradeManagementSetAutoTradeTriggered(bool isEnabled)
+        {
+            _tradingState.SetAutoTrade(isEnabled);
+        }
+
+        private void HandleTradeManagementSetAlertTriggered(bool isEnabled)
+        {
+            _tradingState.SetAlert(isEnabled);
         }
     }
 }

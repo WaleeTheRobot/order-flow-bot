@@ -3,5 +3,7 @@
     public interface IComponentSetup
     {
         void InitializeComponent();
+        void Ready();
+        void HandleEnabledDisabledTriggered(bool isEnabled);
     }
 }

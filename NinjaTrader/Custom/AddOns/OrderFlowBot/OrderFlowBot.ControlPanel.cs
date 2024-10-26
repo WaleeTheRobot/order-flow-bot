@@ -1,4 +1,8 @@
-﻿using NinjaTrader.Gui.Chart;
+﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Configs;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Events;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Utils;
+using NinjaTrader.Gui.Chart;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -8,35 +12,41 @@ namespace NinjaTrader.NinjaScript.Strategies
     {
         private ChartTab _chartTab;
         private Chart _chartWindow;
-        private Grid _chartTraderGrid, _tradeManagementGrid, _tradeDirectionGrid, _strategiesGrid;
+        private Grid _chartTraderGrid, _mainGrid, _tradeDirectionGrid, _strategiesGrid;
+        private TradeManagementGrid _tradeManagementGrid;
         private bool _panelActive;
         private TabItem _tabItem;
 
+        private UserInterfaceEvents _userInterfaceEvents;
+
         public void InitializeUIManager()
         {
-            ControlPanelSetStateDataLoaded();
+            LoadControlPanel();
+            _userInterfaceEvents = new UserInterfaceEvents(_eventManager);
         }
 
-        private void ControlPanelSetStateDataLoaded()
+        private void LoadControlPanel()
         {
-            if (ChartControl != null)
+            ChartControl?.Dispatcher.InvokeAsync(() =>
             {
-                ChartControl.Dispatcher.InvokeAsync(() =>
-                {
-                    CreateWPFControls();
-                });
-            }
+                CreateWPFControls();
+            });
         }
 
-        private void ControlPanelSetStateTerminated()
+        private void UnloadControlPanel()
         {
-            if (ChartControl != null)
+            ChartControl?.Dispatcher.InvokeAsync(() =>
             {
-                ChartControl.Dispatcher.InvokeAsync(() =>
-                {
-                    DisposeWPFControls();
-                });
-            }
+                DisposeWPFControls();
+            });
+        }
+
+        private void ReadyControlPanel()
+        {
+            ChartControl?.Dispatcher.InvokeAsync(() =>
+            {
+                _tradeManagementGrid.Ready();
+            });
         }
 
         private void CreateWPFControls()
@@ -48,18 +58,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                 return;
             }
 
-            // Chart Trader area grid
             _chartTraderGrid = (_chartWindow.FindFirst("ChartWindowChartTraderControl") as ChartTrader).Content as Grid;
 
             if (_chartTraderGrid == null)
-            {
-                return;
-            }
-
-            /*// Existing Chart Trader buttons
-            _chartTraderButtonsGrid = _chartTraderGrid.Children[0] as Grid;
-
-            if (_chartTraderButtonsGrid == null)
             {
                 return;
             }
@@ -68,7 +69,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             _mainGrid = new Grid
             {
                 Margin = new Thickness(0, 50, 0, 0),
-                Background = GetSolidColorBrushFromHex("#32373b")
+                Background = UserInterfaceUtils.GetSolidColorBrushFromHex(CustomColors.MAIN_GRID_BG_COLOR)
             };
 
             _mainGrid.RowDefinitions.Add(new RowDefinition());
@@ -76,26 +77,15 @@ namespace NinjaTrader.NinjaScript.Strategies
             _mainGrid.RowDefinitions.Add(new RowDefinition());
             _mainGrid.RowDefinitions.Add(new RowDefinition());
 
-            TopGrid();
-            Grid.SetRow(_topGrid, 0);
-            _mainGrid.Children.Add(_topGrid);
+            _tradeManagementGrid = new TradeManagementGrid(_eventsContainer, _userInterfaceEvents);
 
-            if (!BackTestingEnabled)
+            Grid.SetRow(_tradeManagementGrid, 0);
+            _mainGrid.Children.Add(_tradeManagementGrid);
+
+            if (TabSelected())
             {
-                TradeManagementGrid();
-                DirectionGrid();
-                StrategiesGrid();
-
-                Grid.SetRow(_tradeManagementPanel, 1);
-                Grid.SetRow(_directionPanel, 2);
-                Grid.SetRow(_strategiesPanel, 3);
-
-                _mainGrid.Children.Add(_tradeManagementPanel);
-                _mainGrid.Children.Add(_directionPanel);
-                _mainGrid.Children.Add(_strategiesPanel);
+                InsertWPFControls();
             }
-
-            if (TabSelected()) InsertWPFControls();*/
 
             _chartWindow.MainTabControl.SelectionChanged += TabChangedHandler;
         }
@@ -103,11 +93,9 @@ namespace NinjaTrader.NinjaScript.Strategies
         private void DisposeWPFControls()
         {
             if (_chartWindow != null)
+            {
                 _chartWindow.MainTabControl.SelectionChanged -= TabChangedHandler;
-
-            //DisposeStrategyButtons();
-            // DisposeDirectionButtons();
-            //  DisposeManagementButtons();
+            }
 
             RemoveWPFControls();
         }
@@ -115,10 +103,12 @@ namespace NinjaTrader.NinjaScript.Strategies
         private void InsertWPFControls()
         {
             if (_panelActive)
+            {
                 return;
+            }
 
-            // Grid.SetRow(_mainGrid, (_chartTraderGrid.RowDefinitions.Count - 1));
-            // _chartTraderGrid.Children.Add(_mainGrid);
+            Grid.SetRow(_mainGrid, (_chartTraderGrid.RowDefinitions.Count - 1));
+            _chartTraderGrid.Children.Add(_mainGrid);
 
             _panelActive = true;
         }
@@ -126,12 +116,14 @@ namespace NinjaTrader.NinjaScript.Strategies
         private void RemoveWPFControls()
         {
             if (!_panelActive)
+            {
                 return;
+            }
 
-            /* if (_chartTraderButtonsGrid != null || _mainGrid != null)
-             {
-                 _chartTraderGrid.Children.Remove(_mainGrid);
-             }*/
+            if (_tradeManagementGrid != null || _mainGrid != null)
+            {
+                _chartTraderGrid.Children.Remove(_mainGrid);
+            }
 
             _panelActive = false;
         }
@@ -141,8 +133,12 @@ namespace NinjaTrader.NinjaScript.Strategies
             bool tabSelected = false;
 
             foreach (TabItem tab in _chartWindow.MainTabControl.Items)
+            {
                 if ((tab.Content as ChartTab).ChartControl == ChartControl && tab == _chartWindow.MainTabControl.SelectedItem)
+                {
                     tabSelected = true;
+                }
+            }
 
             return tabSelected;
         }
@@ -150,20 +146,30 @@ namespace NinjaTrader.NinjaScript.Strategies
         private void TabChangedHandler(object sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count <= 0)
+            {
                 return;
+            }
 
             _tabItem = e.AddedItems[0] as TabItem;
             if (_tabItem == null)
+            {
                 return;
+            }
 
             _chartTab = _tabItem.Content as ChartTab;
             if (_chartTab == null)
+            {
                 return;
+            }
 
             if (TabSelected())
+            {
                 InsertWPFControls();
+            }
             else
+            {
                 RemoveWPFControls();
+            }
         }
     }
 }

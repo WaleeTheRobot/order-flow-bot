@@ -160,9 +160,13 @@ namespace NinjaTrader.NinjaScript.Strategies
                 InitializeStrategyManager();
                 InitializeUIManager();
             }
+            else if (State == State.Realtime)
+            {
+                ReadyControlPanel();
+            }
             else if (State == State.Terminated)
             {
-                ControlPanelSetStateTerminated();
+                UnloadControlPanel();
             }
         }
 

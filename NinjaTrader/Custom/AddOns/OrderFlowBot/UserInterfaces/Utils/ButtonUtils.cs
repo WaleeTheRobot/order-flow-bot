@@ -22,7 +22,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Utils
             Button button = new Button
             {
                 Content = config.IsToggleable && config.InitialToggleState ? config.ToggledContent : config.Content,
-                FontSize = 16,
+                FontSize = 12,
                 Visibility = Visibility.Visible,
                 Foreground = UserInterfaceUtils.GetSolidColorBrushFromHex(config.TextColor),
                 HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -31,7 +31,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Utils
                 Background = UserInterfaceUtils.GetSolidColorBrushFromHex(config.BackgroundColor),
                 BorderBrush = Brushes.Transparent,
                 BorderThickness = new Thickness(0),
-                Padding = new Thickness(3),
+                Padding = new Thickness(8),
                 Margin = new Thickness(3)
             };
 

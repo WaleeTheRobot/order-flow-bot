@@ -11,6 +11,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
         public event Action<StrategyData> OnStrategyTriggered;
         public event Action OnStrategyTriggeredProcessed;
         public event Action OnResetTradingState;
+        public event Action<bool> OnTradeManagementSetAutoTradeTriggered;
+        public event Action<bool> OnTradeManagementSetAlertTriggered;
 
         public TradingEvents(EventManager eventManager)
         {
@@ -51,6 +53,24 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
         public void ResetTradingState()
         {
             _eventManager.InvokeEvent(OnResetTradingState);
+        }
+
+        /// <summary>
+        /// Event triggered when the Auto Enabled/Disabled button is clicked.
+        /// This is used to enable or disable the auto trading.
+        /// </summary>
+        public void TradeManagementSetAutoTradeTriggered(bool isEnabled)
+        {
+            _eventManager.InvokeEvent(OnTradeManagementSetAutoTradeTriggered, isEnabled);
+        }
+
+        /// <summary>
+        /// Event triggered when the Alert Enabled/Disabled button is clicked.
+        /// This is used to enable or disable the alert.
+        /// </summary>
+        public void TradeManagementSetAlertTriggered(bool isEnabled)
+        {
+            _eventManager.InvokeEvent(OnTradeManagementSetAlertTriggered, isEnabled);
         }
     }
 }
