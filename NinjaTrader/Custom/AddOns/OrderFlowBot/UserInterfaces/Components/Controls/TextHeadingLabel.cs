@@ -1,21 +1,25 @@
 ﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Configs;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Utils;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Utils
+namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components.Controls
 {
-    public static class TextHeadingLabelUtils
+    public class TextHeadingLabel
     {
-        public static TextBlock GetHeadingLabel(string text)
+        public TextBlock Label { get; private set; }
+
+        public TextHeadingLabel(string text)
         {
-            return new TextBlock
+            Label = new TextBlock
             {
                 Text = text,
                 FontSize = 14,
                 Foreground = UserInterfaceUtils.GetSolidColorBrushFromHex(CustomColors.TEXT_COLOR),
                 FontWeight = FontWeights.Bold,
                 VerticalAlignment = VerticalAlignment.Center,
-                Margin = new Thickness(0, 10, 0, 0)
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Margin = new Thickness(0, 10, 0, 5)
             };
         }
     }

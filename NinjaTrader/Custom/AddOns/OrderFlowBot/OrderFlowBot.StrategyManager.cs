@@ -13,6 +13,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         public void InitializeStrategyManager()
         {
             _tradingEvents.OnStrategyTriggeredProcessed += HandleStrategyTriggeredProcessed;
+            _tradingEvents.OnCloseTriggered += HandleCloseTriggered;
 
             _triggeredName = "";
             _lastTradeBarNumber = 0;
@@ -40,6 +41,12 @@ namespace NinjaTrader.NinjaScript.Strategies
             _triggeredName = _currentTradingState.TriggeredName;
 
             ProcessTriggeredStrategy();
+        }
+
+        private void HandleCloseTriggered()
+        {
+            // TODO: Close position
+            Print("Position Closed");
         }
 
         private void ProcessTriggeredStrategy()

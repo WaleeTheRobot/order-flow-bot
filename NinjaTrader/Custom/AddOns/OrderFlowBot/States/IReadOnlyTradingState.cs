@@ -8,6 +8,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.States
         bool StrategyTriggered { get; }
         Direction TriggeredDirection { get; }
         Direction SelectedTradeDirection { get; }
+        bool IsTradingEnabled { get; }
         bool IsAutoTradeEnabled { get; }
         bool IsAlertEnabled { get; }
     }

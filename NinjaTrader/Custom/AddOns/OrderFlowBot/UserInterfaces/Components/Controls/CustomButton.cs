@@ -1,5 +1,6 @@
 ﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Configs;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Models;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Utils;
 using System;
 using System.Threading.Tasks;
 using System.Windows;
@@ -7,7 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Utils
+namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components.Controls
 {
     public class ButtonState
     {
@@ -15,12 +16,20 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Utils
         public ButtonModel Config { get; set; }
     }
 
-    public static class ButtonUtils
+    public class CustomButton
     {
-        public static Button GetButton(ButtonModel config)
+        public Button Button { get; private set; }
+
+        public CustomButton(ButtonModel config)
+        {
+            Button = CreateButton(config);
+        }
+
+        private Button CreateButton(ButtonModel config)
         {
             Button button = new Button
             {
+                Name = config.Name,
                 Content = config.IsToggleable && config.InitialToggleState ? config.ToggledContent : config.Content,
                 FontSize = 12,
                 Visibility = Visibility.Visible,
@@ -66,7 +75,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Utils
             return button;
         }
 
-        private static Style CreateCustomButtonStyle(Button button)
+        private Style CreateCustomButtonStyle(Button button)
         {
             Style style = new Style(typeof(Button));
 
@@ -102,7 +111,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Utils
             return style;
         }
 
-        private static ControlTemplate CreateButtonTemplate()
+        private ControlTemplate CreateButtonTemplate()
         {
             ControlTemplate template = new ControlTemplate(typeof(Button));
 
@@ -122,7 +131,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Utils
             return template;
         }
 
-        public static void UpdateButtonState(Button button, bool isEnabled)
+        private static void UpdateButtonState(Button button, bool isEnabled)
         {
             var state = (ButtonState)button.Tag;
             var config = state.Config;

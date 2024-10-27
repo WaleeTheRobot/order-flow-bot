@@ -1,6 +1,7 @@
 ﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Configs;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Events;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Services;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Utils;
 using NinjaTrader.Gui.Chart;
 using System.Windows;
@@ -12,24 +13,35 @@ namespace NinjaTrader.NinjaScript.Strategies
     {
         private ChartTab _chartTab;
         private Chart _chartWindow;
-        private Grid _chartTraderGrid, _mainGrid, _tradeDirectionGrid, _strategiesGrid;
+        private Grid _chartTraderGrid, _mainGrid;
         private TradeManagementGrid _tradeManagementGrid;
+        private TradeDirectionGrid _tradeDirectionGrid;
         private bool _panelActive;
         private TabItem _tabItem;
 
         private UserInterfaceEvents _userInterfaceEvents;
+        private UserInterfaceService _userInterfaceService;
 
         public void InitializeUIManager()
         {
             LoadControlPanel();
-            _userInterfaceEvents = new UserInterfaceEvents(_eventManager);
         }
 
         private void LoadControlPanel()
         {
             ChartControl?.Dispatcher.InvokeAsync(() =>
             {
+                _userInterfaceEvents = new UserInterfaceEvents(_eventManager);
+
                 CreateWPFControls();
+
+                _userInterfaceService =
+                    new UserInterfaceService(
+                        _servicesContainer,
+                        _userInterfaceEvents,
+                        _tradeManagementGrid,
+                        _tradeDirectionGrid
+                    );
             });
         }
 
@@ -46,6 +58,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             ChartControl?.Dispatcher.InvokeAsync(() =>
             {
                 _tradeManagementGrid.Ready();
+                _tradeDirectionGrid.Ready();
             });
         }
 
@@ -77,10 +90,26 @@ namespace NinjaTrader.NinjaScript.Strategies
             _mainGrid.RowDefinitions.Add(new RowDefinition());
             _mainGrid.RowDefinitions.Add(new RowDefinition());
 
-            _tradeManagementGrid = new TradeManagementGrid(_eventsContainer, _userInterfaceEvents);
+            TextBlock orderFlowLabel = new TextBlock()
+            {
+                FontFamily = ChartControl.Properties.LabelFont.Family,
+                FontSize = 16,
+                FontWeight = FontWeights.Bold,
+                Foreground = ChartControl.Properties.ChartText,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Margin = new Thickness(3, 3, 3, 3),
+                Text = BackTestingEnabled ? "Back Testing" : "OrderFlowBot"
+            };
 
-            Grid.SetRow(_tradeManagementGrid, 0);
+            _tradeManagementGrid = new TradeManagementGrid(_servicesContainer, _userInterfaceEvents);
+            _tradeDirectionGrid = new TradeDirectionGrid(_servicesContainer, _userInterfaceEvents);
+
+            Grid.SetRow(orderFlowLabel, 0);
+            Grid.SetRow(_tradeManagementGrid, 1);
+            Grid.SetRow(_tradeDirectionGrid, 2);
+            _mainGrid.Children.Add(orderFlowLabel);
             _mainGrid.Children.Add(_tradeManagementGrid);
+            _mainGrid.Children.Add(_tradeDirectionGrid);
 
             if (TabSelected())
             {
@@ -120,7 +149,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                 return;
             }
 
-            if (_tradeManagementGrid != null || _mainGrid != null)
+            if (_tradeManagementGrid != null ||
+                _tradeDirectionGrid != null ||
+                _mainGrid != null)
             {
                 _chartTraderGrid.Children.Remove(_mainGrid);
             }

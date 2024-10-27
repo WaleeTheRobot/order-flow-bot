@@ -5,6 +5,8 @@
         Any,
         Flat,
         Long,
-        Short
+        Short,
+        Standard,
+        Inverse
     }
 }

@@ -1,33 +1,88 @@
-﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.Events;
+﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.Containers;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.Services;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Events;
+using System.Collections.Generic;
+using Direction = NinjaTrader.Custom.AddOns.OrderFlowBot.Configs.Direction;
 
 namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Services
 {
     public class UserInterfaceService
     {
-        private readonly EventManager _eventManager;
+        private readonly TradingService _tradingService;
+
         private readonly UserInterfaceEvents _userInterfaceEvents;
 
-        private readonly TradeManagementGrid _tradeManagementGrid;
+        private readonly List<GridBase> grids;
 
         public UserInterfaceService(
-            EventManager eventManager,
+            ServicesContainer servicesContainer,
             UserInterfaceEvents userInterfaceEvents,
-            TradeManagementGrid tradeManagementGrid
+            TradeManagementGrid tradeManagementGrid,
+            TradeDirectionGrid tradeDirectionGrid
         )
         {
-            _eventManager = eventManager;
+            _tradingService = servicesContainer.TradingService;
 
             _userInterfaceEvents = userInterfaceEvents;
             _userInterfaceEvents.OnEnabledDisabledTriggered += HandleEnabledDisabledTriggered;
+            _userInterfaceEvents.OnAutoTradeTriggered += HandleAutoTradeTriggered;
+            _userInterfaceEvents.OnAlertTriggered += HandleAlertTriggered;
+            _userInterfaceEvents.OnDirectionTriggered += HandleDirectionTriggered;
+            _userInterfaceEvents.OnStandardTriggered += HandleStandardTriggered;
+            _userInterfaceEvents.OnCloseTriggered += HandleCloseTriggered;
+            _userInterfaceEvents.OnTriggerStrikePriceTriggered += HandleTriggerStrikePriceTriggered;
 
-            _tradeManagementGrid = tradeManagementGrid;
+            grids = new List<GridBase>
+            {
+                tradeManagementGrid,
+                tradeDirectionGrid
+            };
         }
 
         private void HandleEnabledDisabledTriggered(bool isEnabled)
         {
-            _tradeManagementGrid.HandleEnabledDisabledTriggered(isEnabled);
+            foreach (var grid in grids)
+            {
+                grid.HandleEnabledDisabledTriggered(isEnabled);
+            }
+
+            _tradingService.UpdateIsTradingEnabled(isEnabled);
+        }
+
+        private void HandleAutoTradeTriggered(bool isEnabled)
+        {
+            foreach (var grid in grids)
+            {
+                grid.HandleAutoTradeTriggered(isEnabled);
+            }
+
+            _tradingService.UpdateIsAutoTradeEnabled(isEnabled);
+        }
+
+        private void HandleAlertTriggered(bool isEnabled)
+        {
+            _tradingService.UpdateIsAlertEnabled(isEnabled);
+        }
+
+        private void HandleDirectionTriggered(Direction direction)
+        {
+            _tradingService.UpdateSelectedTradeDirection(direction);
+        }
+
+        private void HandleStandardTriggered(Direction direction)
+        {
+            _tradingService.UpdateStandardInverse(direction);
+        }
+
+        private void HandleCloseTriggered()
+        {
+            _tradingService.HandleCloseTriggered();
+        }
+
+        private void HandleTriggerStrikePriceTriggered(double price)
+        {
+            _tradingService.HandleTriggerStrikePriceTriggered(price);
         }
     }
 }

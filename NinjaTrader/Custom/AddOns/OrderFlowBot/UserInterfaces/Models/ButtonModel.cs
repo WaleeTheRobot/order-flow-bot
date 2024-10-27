@@ -4,6 +4,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Models
 {
     public class ButtonModel
     {
+        public string Name { get; set; }
         public string Content { get; set; }
         public string ToggledContent { get; set; }
         public string BackgroundColor { get; set; }

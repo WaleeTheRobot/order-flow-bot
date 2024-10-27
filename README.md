@@ -45,17 +45,40 @@ Sometimes NinjaTrader will complain about an import failed. You can just open th
 
 <img src="./images/controlpanel.png" alt="OrderFlowBot Control Panel" style="display: block; margin: 0 auto">
 
+TODO
+
 ## Trade Management
 
-This section has options to manage OrderFlowBot, quickly clear other sections and close trades.
+This section has options to manage OrderFlowBot, quickly clear other sections and close a trade that was triggered from a strategy.
 
 #### Enabled/Disabled
 
-Resets all sections and disables or enable the sections. No strategies will be checked when disabled is selected. This can only be activated when there aren't any positions opened.
+The Enabled/Disabled button is used for enabling and disabling trading. An ideal scenario to use this is during economic releases. You can click to disable so the bot doesn't check for entries.
+
+- Enable/Disable trading
+- Closes position entered from a strategy
 
 #### Auto
 
-Automatically trades the selected strategies for both long and short. Disables the Trade Direction. This is **NOT** recommended, but is an option. Only custom created advanced strategies should be considered if this option is used. None of the default strategies available for OrderFlowBot are designed for fully automated trading.
+Automatically trades the selected strategies for both long and short. This is **NOT** recommended, but is an option. Only custom created advanced strategies should be considered if this option is used. None of the default strategies available for OrderFlowBot are designed for fully automated trading.
+
+- Disables Reset Direction
+- Disables Trigger Strike Price, Long and Short
+- Resets Trigger Strike Price, Long and Short
+
+#### Alert
+
+This is useful if you want to see your strategy entries, but want to further analyze for an actual entry. You can manually place the trade when it satisfies your requirements. Note that the close in the Trade Management section will not close manual entries.
+
+- Does not submit an order
+- Draws a triangle and plays sound based on triggered strategy
+
+#### Close
+
+Use this to close an ATM position triggered by a strategy.
+
+- Closes ATM position triggered by a strategy
+- Resets the Trigger Strike Price
 
 #### Reset Direction
 
@@ -65,21 +88,17 @@ Resets the Trade Direction section.
 
 Resets the Strategies section.
 
-#### Close
-
-Closes any ATM positions created by OrderFlowBot and resets the Trade Direction section.
-
-#### Alert
-
-This alerts you of the trade by playing a sound and painting triangles instead of executing the trade. Using this will alert you to further analyze the valid trade entry from your strategy and manually enter.
-
 ## Trade Direction
 
-This section contains the inputs for triggering a trade direction.
+This section contains the options for triggering a trade direction. No entries will be considered if Long or Short options are not selected. Selecting both Long and Short options will enable the bot to look for both long and short entries.
 
 #### Trigger Strike Price
 
 The strike price to trigger the strategy to start looking for an entry. A threshold in the strategies properties section is set to allow for a buffer for triggering. The trigger strike price will only be considered if there is a value set in the input.
+
+#### Standard/Inverse
+
+This will enter with the default standard order or inverse. For example, if a strategy triggered long then a standard order will long the position. If inverse is selected then the strategy triggered long will short instead of long the position. This may be useful in range where the strategy is triggering but the market rejects and continues to the opposite direction.
 
 #### Long
 
@@ -88,14 +107,6 @@ Select this to look for long trades.
 #### Short
 
 Select this to look for short trades.
-
-## Indicators
-
-#### Ratios
-
- <img src="./images/ratios.png" alt="OrderFlowBot Ratios" style="display: block; margin: 0 auto">
-
-This indicator shows the bottom divided bid ratios or top divided ask ratios. The ratios will be displayed in color, bold and larger font if it meets the threshold in `ValidExhaustionRatio` or `ValidAbsorptionRatio` properies.
 
 ## Strategies
 
