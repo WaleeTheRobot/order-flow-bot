@@ -2,6 +2,7 @@
 using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components.Controls;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Configs;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Events;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -73,7 +74,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
 
         public abstract void HandleAutoTradeTriggered(bool isEnabled);
 
-        public abstract void HandleButtonClick(object sender, RoutedEventArgs e);
+        public abstract void HandleButtonClick(object sender, EventArgs e);
 
         public virtual void HandleEnabledDisabledTriggered(bool isEnabled)
         {

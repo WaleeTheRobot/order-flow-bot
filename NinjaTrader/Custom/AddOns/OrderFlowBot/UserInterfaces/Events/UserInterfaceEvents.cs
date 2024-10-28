@@ -49,8 +49,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Events
         }
 
         /// <summary>
-        /// Event triggered when the Standard/Reverse button is clicked.
-        /// This is used to enable trades for standard or reverse.
+        /// Event triggered when the Standard/Inverse button is clicked.
+        /// This is used to enable trades for standard or inverse.
         /// </summary>
         public void StandardTriggered(Direction direction)
         {

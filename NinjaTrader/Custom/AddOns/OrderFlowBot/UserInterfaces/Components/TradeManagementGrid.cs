@@ -5,7 +5,6 @@ using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Events;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Models;
 using System;
 using System.Collections.Generic;
-using System.Windows;
 using System.Windows.Controls;
 
 namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
@@ -45,7 +44,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
                     HoverBackgroundColor = CustomColors.BUTTON_YELLOW_COLOR,
                     ToggledBackgroundColor = CustomColors.BUTTON_RED_COLOR,
                     TextColor = CustomColors.TEXT_COLOR,
-                    ClickHandler = (Action<object, RoutedEventArgs>)HandleButtonClick,
+                    ClickHandler = (Action<object, EventArgs>)HandleButtonClick,
                     IsToggleable = true,
                     InitialToggleState = initialToggleState[ButtonName.ENABLED]
                 },
@@ -58,7 +57,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
                     HoverBackgroundColor = CustomColors.BUTTON_HOVER_BG_COLOR,
                     ToggledBackgroundColor = CustomColors.BUTTON_BG_COLOR,
                     TextColor = CustomColors.TEXT_COLOR,
-                    ClickHandler = (Action<object, RoutedEventArgs>)HandleButtonClick,
+                    ClickHandler = (Action<object, EventArgs>)HandleButtonClick,
                     IsToggleable = true,
                     InitialToggleState = initialToggleState[ButtonName.AUTO]
                 },
@@ -71,7 +70,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
                     HoverBackgroundColor = CustomColors.BUTTON_HOVER_BG_COLOR,
                     ToggledBackgroundColor = CustomColors.BUTTON_BG_COLOR,
                     TextColor = CustomColors.TEXT_COLOR,
-                    ClickHandler = (Action<object, RoutedEventArgs>)HandleButtonClick,
+                    ClickHandler = (Action<object, EventArgs>)HandleButtonClick,
                     IsToggleable = true,
                     InitialToggleState = initialToggleState[ButtonName.ALERT]
                 },
@@ -82,7 +81,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
                     BackgroundColor = CustomColors.BUTTON_BG_COLOR,
                     HoverBackgroundColor = CustomColors.BUTTON_HOVER_BG_COLOR,
                     TextColor = CustomColors.TEXT_COLOR,
-                    ClickHandler = (Action<object, RoutedEventArgs>)HandleButtonClick,
+                    ClickHandler = (Action<object, EventArgs>)HandleButtonClick,
                     IsToggleable = initialToggleState[ButtonName.CLOSE]
                 },
                 new ButtonModel
@@ -92,7 +91,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
                     BackgroundColor = CustomColors.BUTTON_BG_COLOR,
                     HoverBackgroundColor = CustomColors.BUTTON_HOVER_BG_COLOR,
                     TextColor = CustomColors.TEXT_COLOR,
-                    ClickHandler = (Action<object, RoutedEventArgs>)HandleButtonClick,
+                    ClickHandler = (Action<object, EventArgs>)HandleButtonClick,
                     IsToggleable = initialToggleState[ButtonName.RESET_DIRECTION]
                 },
                 new ButtonModel
@@ -102,7 +101,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
                     BackgroundColor = CustomColors.BUTTON_BG_COLOR,
                     HoverBackgroundColor = CustomColors.BUTTON_HOVER_BG_COLOR,
                     TextColor = CustomColors.TEXT_COLOR,
-                    ClickHandler = (Action<object, RoutedEventArgs>)HandleButtonClick,
+                    ClickHandler = (Action<object, EventArgs>)HandleButtonClick,
                     IsToggleable = initialToggleState[ButtonName.RESET_STRATEGIES]
                 }
             };
@@ -121,7 +120,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
             }
         }
 
-        public override void HandleButtonClick(object sender, RoutedEventArgs e)
+        public override void HandleButtonClick(object sender, EventArgs e)
         {
             Button button = (Button)sender;
             ButtonState state = (ButtonState)button.Tag;

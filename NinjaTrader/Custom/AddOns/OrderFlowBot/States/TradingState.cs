@@ -18,6 +18,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.States
         {
             InitializeTradingState();
 
+            StandardInverse = Direction.Standard;
             IsTradingEnabled = true;
             IsAutoTradeEnabled = false;
             IsAlertEnabled = false;
@@ -28,7 +29,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.States
             TriggeredName = "None";
             StrategyTriggered = false;
             TriggeredDirection = Direction.Flat;
-            SelectedTradeDirection = Direction.Any;
+            SelectedTradeDirection = Direction.Flat;
         }
 
         public void SetTriggeredTradingState(

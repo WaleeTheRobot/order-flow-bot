@@ -125,7 +125,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
                     HoverBackgroundColor = CustomColors.BUTTON_HOVER_BG_COLOR,
                     ToggledBackgroundColor = CustomColors.BUTTON_BG_COLOR,
                     TextColor = CustomColors.TEXT_COLOR,
-                    ClickHandler = (Action<object, RoutedEventArgs>)HandleButtonClick,
+                    ClickHandler = (Action<object, EventArgs>)HandleButtonClick,
                     IsToggleable = true,
                     InitialToggleState = initialToggleState[ButtonName.STANDARD]
                 },
@@ -138,7 +138,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
                     HoverBackgroundColor = CustomColors.BUTTON_HOVER_BG_COLOR,
                     ToggledBackgroundColor = CustomColors.BUTTON_BG_COLOR,
                     TextColor = CustomColors.TEXT_COLOR,
-                    ClickHandler = (Action<object, RoutedEventArgs>)HandleButtonClick,
+                    ClickHandler = (Action<object, EventArgs>)HandleButtonClick,
                     IsToggleable = true,
                     InitialToggleState = initialToggleState[ButtonName.LONG]
                 },
@@ -151,7 +151,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
                     HoverBackgroundColor = CustomColors.BUTTON_HOVER_BG_COLOR,
                     ToggledBackgroundColor = CustomColors.BUTTON_BG_COLOR,
                     TextColor = CustomColors.TEXT_COLOR,
-                    ClickHandler = (Action<object, RoutedEventArgs>)HandleButtonClick,
+                    ClickHandler = (Action<object, EventArgs>)HandleButtonClick,
                     IsToggleable = true,
                     InitialToggleState = initialToggleState[ButtonName.SHORT]
                 }
@@ -195,7 +195,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
             }
         }
 
-        public override void HandleButtonClick(object sender, RoutedEventArgs e)
+        public override void HandleButtonClick(object sender, EventArgs e)
         {
             Button button = (Button)sender;
             ButtonState state = (ButtonState)button.Tag;

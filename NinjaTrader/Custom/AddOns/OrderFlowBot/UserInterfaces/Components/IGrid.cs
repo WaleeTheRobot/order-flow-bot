@@ -1,4 +1,4 @@
-﻿using System.Windows;
+﻿using System;
 
 namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
 {
@@ -9,6 +9,6 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
         void Ready();
         void HandleEnabledDisabledTriggered(bool isEnabled);
         void HandleAutoTradeTriggered(bool isEnabled);
-        void HandleButtonClick(object sender, RoutedEventArgs e);
+        void HandleButtonClick(object sender, EventArgs e);
     }
 }

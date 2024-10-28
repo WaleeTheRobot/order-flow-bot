@@ -13,13 +13,13 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Services
 
         private readonly UserInterfaceEvents _userInterfaceEvents;
 
-        private readonly List<GridBase> grids;
+        private readonly List<IGrid> grids;
 
         public UserInterfaceService(
             ServicesContainer servicesContainer,
             UserInterfaceEvents userInterfaceEvents,
-            TradeManagementGrid tradeManagementGrid,
-            TradeDirectionGrid tradeDirectionGrid
+            IGrid tradeManagementGrid,
+            IGrid tradeDirectionGrid
         )
         {
             _tradingService = servicesContainer.TradingService;
@@ -33,7 +33,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Services
             _userInterfaceEvents.OnCloseTriggered += HandleCloseTriggered;
             _userInterfaceEvents.OnTriggerStrikePriceTriggered += HandleTriggerStrikePriceTriggered;
 
-            grids = new List<GridBase>
+            grids = new List<IGrid>
             {
                 tradeManagementGrid,
                 tradeDirectionGrid
@@ -44,7 +44,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Services
         {
             foreach (var grid in grids)
             {
-                grid.HandleEnabledDisabledTriggered(isEnabled);
+                grid?.HandleEnabledDisabledTriggered(isEnabled);
             }
 
             _tradingService.UpdateIsTradingEnabled(isEnabled);
@@ -54,10 +54,16 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Services
         {
             foreach (var grid in grids)
             {
-                grid.HandleAutoTradeTriggered(isEnabled);
+                grid?.HandleAutoTradeTriggered(isEnabled);
             }
 
             _tradingService.UpdateIsAutoTradeEnabled(isEnabled);
+            _tradingService.UpdateSelectedTradeDirection(isEnabled ? Direction.Any : Direction.Flat);
+
+            if (isEnabled)
+            {
+                _tradingService.HandleTriggerStrikePriceTriggered(0);
+            }
         }
 
         private void HandleAlertTriggered(bool isEnabled)
