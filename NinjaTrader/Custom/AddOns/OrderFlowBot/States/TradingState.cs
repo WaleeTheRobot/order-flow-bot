@@ -4,6 +4,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.States
 {
     public class TradingState : IReadOnlyTradingState
     {
+        private readonly dynamic _initialTriggeredState;
+        private readonly dynamic _initialTradeDirectionState;
         public string TriggeredName { get; private set; }
         public bool StrategyTriggered { get; private set; }
         public Direction TriggeredDirection { get; private set; }
@@ -16,20 +18,26 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.States
 
         public TradingState()
         {
-            InitializeTradingState();
+            _initialTriggeredState = new
+            {
+                TriggeredName = "None",
+                StrategyTriggered = false,
+                TriggeredDirection = Direction.Flat,
+            };
 
-            StandardInverse = Direction.Standard;
+            _initialTradeDirectionState = new
+            {
+                TriggerStrikePrice = 0,
+                StandardInverse = Direction.Standard,
+                SelectedTradeDirection = Direction.Flat
+            };
+
             IsTradingEnabled = true;
             IsAutoTradeEnabled = false;
             IsAlertEnabled = false;
-        }
 
-        private void InitializeTradingState()
-        {
-            TriggeredName = "None";
-            StrategyTriggered = false;
-            TriggeredDirection = Direction.Flat;
-            SelectedTradeDirection = Direction.Flat;
+            SetInitialTriggeredState();
+            SetInitialTradeDirection();
         }
 
         public void SetTriggeredTradingState(
@@ -43,14 +51,18 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.States
             TriggeredDirection = triggeredDirection;
         }
 
-        public void ResetTradingState()
+        public void SetInitialTriggeredState()
         {
-            InitializeTradingState();
+            TriggeredName = _initialTriggeredState.TriggeredName;
+            StrategyTriggered = _initialTriggeredState.StrategyTriggered;
+            TriggeredDirection = _initialTriggeredState.TriggeredDirection;
         }
 
-        public void SetSelectedDirection(Direction direction)
+        public void SetInitialTradeDirection()
         {
-            SelectedTradeDirection = direction;
+            TriggerStrikePrice = _initialTradeDirectionState.TriggerStrikePrice;
+            StandardInverse = _initialTradeDirectionState.StandardInverse;
+            SelectedTradeDirection = _initialTradeDirectionState.SelectedTradeDirection;
         }
     }
 }

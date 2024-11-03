@@ -41,7 +41,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
 
         private void HandleResetTradingState()
         {
-            _tradingState.ResetTradingState();
+            _tradingState.SetInitialTriggeredState();
         }
 
         #region User Interface
@@ -65,6 +65,14 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
             _tradingState.IsAlertEnabled = isEnabled;
 
             _eventManager.PrintMessage($"IsAlertEnabled: {_tradingState.IsAlertEnabled}");
+        }
+
+        public void HandleResetDirectionTriggered()
+        {
+            _tradingState.SetInitialTradeDirection();
+            _eventManager.PrintMessage($"ResetDirectionTriggered: {_tradingState.TriggerStrikePrice}");
+            _eventManager.PrintMessage($"ResetDirectionTriggered: {_tradingState.StandardInverse}");
+            _eventManager.PrintMessage($"ResetDirectionTriggered: {_tradingState.SelectedTradeDirection}");
         }
 
         public void UpdateSelectedTradeDirection(Direction direction)

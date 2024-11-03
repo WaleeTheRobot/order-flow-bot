@@ -31,6 +31,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Services
             _userInterfaceEvents.OnDirectionTriggered += HandleDirectionTriggered;
             _userInterfaceEvents.OnStandardTriggered += HandleStandardTriggered;
             _userInterfaceEvents.OnCloseTriggered += HandleCloseTriggered;
+            _userInterfaceEvents.OnResetDirectionTriggered += HandleResetDirectionTriggered;
             _userInterfaceEvents.OnTriggerStrikePriceTriggered += HandleTriggerStrikePriceTriggered;
 
             grids = new List<IGrid>
@@ -84,6 +85,11 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Services
         private void HandleCloseTriggered()
         {
             _tradingService.HandleCloseTriggered();
+        }
+
+        private void HandleResetDirectionTriggered()
+        {
+            _tradingService.HandleResetDirectionTriggered();
         }
 
         private void HandleTriggerStrikePriceTriggered(double price)

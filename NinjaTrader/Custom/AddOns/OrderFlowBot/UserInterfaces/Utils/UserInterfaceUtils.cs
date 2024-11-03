@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Utils
@@ -30,6 +31,14 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Utils
             {
                 throw new Exception($"Error creating SolidColorBrush from hex color: {hexColor}", ex);
             }
+        }
+
+        public static void ForceRefreshButton(Button button)
+        {
+            // Button redraw workaround
+            // Quickly disables and enables button to force the button state to visually update
+            button.IsEnabled = false;
+            button.IsEnabled = true;
         }
     }
 }

@@ -146,7 +146,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
                     break;
 
                 case ButtonName.RESET_DIRECTION:
-                    // Implement reset direction functionality
+                    userInterfaceEvents.ResetDirectionTriggered();
                     break;
 
                 case ButtonName.RESET_STRATEGIES:

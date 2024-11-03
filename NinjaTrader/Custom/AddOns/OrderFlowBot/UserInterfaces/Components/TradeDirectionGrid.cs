@@ -22,6 +22,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
         ) : base("Trade Direction", servicesContainer, userInterfaceEvents)
         {
             userInterfaceEvents.OnResetTriggerStrikePrice += HandleResetTriggerStrikePrice;
+            userInterfaceEvents.OnResetDirectionTriggered += HandleResetDirectionTriggered;
         }
 
         public override void Ready()
@@ -81,7 +82,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
                     return;
                 }
 
-                // Allow input input after starting with decimal
+                // Allow input after starting with decimal
                 if (input == ".")
                 {
                     // Don't set strike price to 0 yet, let the user continue typing
@@ -274,6 +275,23 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
         private void HandleResetTriggerStrikePrice()
         {
             _triggerStrikeTextBox.Text = "";
+        }
+
+        private void HandleResetDirectionTriggered()
+        {
+            _triggerStrikeTextBox.Text = "";
+
+            foreach (var buttonName in buttons.Keys)
+            {
+                ButtonState buttonState = (ButtonState)buttons[buttonName].Tag;
+
+                if (initialToggleState.ContainsKey(buttonName))
+                {
+                    buttonState.IsToggled = initialToggleState[buttonName];
+
+                    UserInterfaceUtils.ForceRefreshButton(buttons[buttonName]);
+                }
+            }
         }
     }
 }

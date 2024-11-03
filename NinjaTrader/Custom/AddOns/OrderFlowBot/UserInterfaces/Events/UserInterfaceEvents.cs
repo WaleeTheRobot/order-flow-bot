@@ -13,6 +13,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Events
         public event Action<Direction> OnDirectionTriggered;
         public event Action<Direction> OnStandardTriggered;
         public event Action OnCloseTriggered;
+        public event Action OnResetDirectionTriggered;
         public event Action<double> OnTriggerStrikePriceTriggered;
         public event Action OnResetTriggerStrikePrice;
 
@@ -73,6 +74,15 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Events
         public void CloseTriggered()
         {
             _eventManager.InvokeEvent(OnCloseTriggered);
+        }
+
+        /// <summary>
+        /// Event triggered for resetting Trade Direction section.
+        /// This is used to reset the Trade Direction section.
+        /// </summary>
+        public void ResetDirectionTriggered()
+        {
+            _eventManager.InvokeEvent(OnResetDirectionTriggered);
         }
 
         /// <summary>
