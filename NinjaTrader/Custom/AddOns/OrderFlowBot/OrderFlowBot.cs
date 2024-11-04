@@ -6,12 +6,14 @@ using NinjaTrader.Custom.AddOns.OrderFlowBot.Events;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars.Base;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.States;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Configs;
 using NinjaTrader.NinjaScript.BarsTypes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 
 #endregion
 
@@ -298,6 +300,9 @@ namespace NinjaTrader.NinjaScript.Strategies
             DataBarConfig.Instance.ImbalanceRatio = ImbalanceRatio;
             DataBarConfig.Instance.ImbalanceMinDelta = ImbalanceMinDelta;
             DataBarConfig.Instance.ValueAreaPercentage = ValueAreaPercentage;
+
+            UserInterfaceConfig.Instance.AssetsPath =
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "NinjaTrader 8", "bin", "Custom", "AddOns", "OrderFlowBot", "Assets");
         }
 
         // Used for debugging event messages

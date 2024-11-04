@@ -1,4 +1,5 @@
 ﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.Configs;
+using System.Collections.Generic;
 
 namespace NinjaTrader.Custom.AddOns.OrderFlowBot.States
 {
@@ -13,5 +14,6 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.States
         bool IsAutoTradeEnabled { get; }
         bool IsAlertEnabled { get; }
         double TriggerStrikePrice { get; }
+        public List<string> SelectedStrategies { get; }
     }
 }

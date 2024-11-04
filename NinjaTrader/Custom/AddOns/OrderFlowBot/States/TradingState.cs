@@ -1,4 +1,5 @@
 ﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.Configs;
+using System.Collections.Generic;
 
 namespace NinjaTrader.Custom.AddOns.OrderFlowBot.States
 {
@@ -15,6 +16,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.States
         public bool IsAutoTradeEnabled { get; set; }
         public bool IsAlertEnabled { get; set; }
         public double TriggerStrikePrice { get; set; }
+        public List<string> SelectedStrategies { get; set; }
 
         public TradingState()
         {
@@ -35,6 +37,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.States
             IsTradingEnabled = true;
             IsAutoTradeEnabled = false;
             IsAlertEnabled = false;
+            SelectedStrategies = new List<string>();
 
             SetInitialTriggeredState();
             SetInitialTradeDirection();
@@ -63,6 +66,19 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.States
             TriggerStrikePrice = _initialTradeDirectionState.TriggerStrikePrice;
             StandardInverse = _initialTradeDirectionState.StandardInverse;
             SelectedTradeDirection = _initialTradeDirectionState.SelectedTradeDirection;
+        }
+
+        public void AddStrategyByName(string name)
+        {
+            if (!SelectedStrategies.Contains(name))
+            {
+                SelectedStrategies.Add(name);
+            }
+        }
+
+        public void RemoveStrategyByName(string name)
+        {
+            SelectedStrategies.RemoveAll(s => s == name);
         }
     }
 }

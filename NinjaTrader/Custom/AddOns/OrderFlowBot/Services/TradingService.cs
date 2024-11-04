@@ -108,6 +108,20 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
             _eventManager.PrintMessage($"TriggerStrikePrice: {_tradingState.TriggerStrikePrice}");
         }
 
+        public void HandleAddSelectedStrategyTriggered(string name)
+        {
+            _tradingState.AddStrategyByName(name);
+            _eventManager.PrintMessage($"Added: {name}");
+            _eventManager.PrintMessage($"Count: {_tradingState.SelectedStrategies.Count}");
+        }
+
+        public void HandleRemoveSelectedStrategyTriggered(string name)
+        {
+            _tradingState.RemoveStrategyByName(name);
+            _eventManager.PrintMessage($"Removed: {name}");
+            _eventManager.PrintMessage($"Count: {_tradingState.SelectedStrategies.Count}");
+        }
+
         #endregion
     }
 }

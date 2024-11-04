@@ -4,6 +4,7 @@ using System;
 
 namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Events
 {
+    // Events triggered by UI interaction
     public class UserInterfaceEvents
     {
         private readonly EventManager _eventManager;
@@ -16,6 +17,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Events
         public event Action OnResetDirectionTriggered;
         public event Action<double> OnTriggerStrikePriceTriggered;
         public event Action OnResetTriggerStrikePrice;
+        public event Action<string> OnAddSelectedStrategyTriggered;
+        public event Action<string> OnRemoveSelectedStrategyTriggered;
 
         public UserInterfaceEvents(EventManager eventManager)
         {
@@ -101,6 +104,24 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Events
         public void ResetTriggerStrikePrice()
         {
             _eventManager.InvokeEvent(OnResetTriggerStrikePrice);
+        }
+
+        /// <summary>
+        /// Event triggered for adding a selected strategy.
+        /// This is used add a selected strategy.
+        /// </summary>
+        public void AddSelectedStrategyTriggered(string name)
+        {
+            _eventManager.InvokeEvent(OnAddSelectedStrategyTriggered, name);
+        }
+
+        /// <summary>
+        /// Event triggered for removing a selected strategy.
+        /// This is used remove a selected strategy.
+        /// </summary>
+        public void RemoveSelectedStrategyTriggered(string name)
+        {
+            _eventManager.InvokeEvent(OnRemoveSelectedStrategyTriggered, name);
         }
     }
 }

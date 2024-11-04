@@ -1,6 +1,11 @@
-﻿using System;
+﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Configs;
+using System;
+using System.IO;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Utils
 {
@@ -39,6 +44,24 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Utils
             // Quickly disables and enables button to force the button state to visually update
             button.IsEnabled = false;
             button.IsEnabled = true;
+        }
+
+        public static Image CreateCogIcon(Action onClickAction)
+        {
+            Image cogIcon = new Image
+            {
+                Source = new BitmapImage(new Uri(Path.Combine(UserInterfaceConfig.Instance.AssetsPath, "cog.png"))),
+                Width = 13,
+                Height = 13,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(5, 4, 0, 0),
+                Cursor = Cursors.Hand
+            };
+
+            cogIcon.MouseLeftButtonUp += (s, e) => onClickAction?.Invoke();
+
+            return cogIcon;
         }
     }
 }

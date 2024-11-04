@@ -19,7 +19,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Services
             ServicesContainer servicesContainer,
             UserInterfaceEvents userInterfaceEvents,
             IGrid tradeManagementGrid,
-            IGrid tradeDirectionGrid
+            IGrid tradeDirectionGrid,
+            IGrid strategiesGrid
         )
         {
             _tradingService = servicesContainer.TradingService;
@@ -33,11 +34,14 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Services
             _userInterfaceEvents.OnCloseTriggered += HandleCloseTriggered;
             _userInterfaceEvents.OnResetDirectionTriggered += HandleResetDirectionTriggered;
             _userInterfaceEvents.OnTriggerStrikePriceTriggered += HandleTriggerStrikePriceTriggered;
+            _userInterfaceEvents.OnAddSelectedStrategyTriggered += HandleAddSelectedStrategyTriggered;
+            _userInterfaceEvents.OnRemoveSelectedStrategyTriggered += HandleRemoveSelectedStrategyTriggered;
 
             grids = new List<IGrid>
             {
                 tradeManagementGrid,
-                tradeDirectionGrid
+                tradeDirectionGrid,
+                strategiesGrid
             };
         }
 
@@ -95,6 +99,16 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Services
         private void HandleTriggerStrikePriceTriggered(double price)
         {
             _tradingService.HandleTriggerStrikePriceTriggered(price);
+        }
+
+        private void HandleAddSelectedStrategyTriggered(string name)
+        {
+            _tradingService.HandleAddSelectedStrategyTriggered(name);
+        }
+
+        private void HandleRemoveSelectedStrategyTriggered(string name)
+        {
+            _tradingService.HandleRemoveSelectedStrategyTriggered(name);
         }
     }
 }

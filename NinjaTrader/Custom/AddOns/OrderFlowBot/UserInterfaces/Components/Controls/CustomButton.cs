@@ -31,7 +31,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components.Contr
             {
                 Name = config.Name,
                 Content = config.IsToggleable && config.InitialToggleState ? config.ToggledContent : config.Content,
-                FontSize = 12,
+                FontSize = 14,
                 Visibility = Visibility.Visible,
                 Foreground = UserInterfaceUtils.GetSolidColorBrushFromHex(config.TextColor),
                 HorizontalAlignment = HorizontalAlignment.Stretch,

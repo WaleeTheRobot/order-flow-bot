@@ -18,10 +18,14 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
         {
             _eventManager = eventsContainer.EventManager;
 
+            var strategiesEvents = eventsContainer.StrategiesEvents;
+            strategiesEvents.OnGetStrategies += HandleGetStrategies;
+
             var dataBarEvents = eventsContainer.DataBarEvents;
             dataBarEvents.OnUpdatedCurrentDataBar += HandleUpdatedCurrentDataBar;
 
             _tradingEvents = eventsContainer.TradingEvents;
+
 
             _strategies = new List<object>();
 
@@ -101,6 +105,11 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
                     return;
                 }
             }
+        }
+
+        private List<object> HandleGetStrategies()
+        {
+            return _strategies;
         }
     }
 }

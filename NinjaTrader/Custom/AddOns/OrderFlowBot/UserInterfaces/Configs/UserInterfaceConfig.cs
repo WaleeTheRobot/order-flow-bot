@@ -1,8 +1,28 @@
 ﻿namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Configs
 {
+    public class UserInterfaceConfig
+    {
+        private static readonly UserInterfaceConfig _instance = new UserInterfaceConfig();
+
+        private UserInterfaceConfig()
+        {
+        }
+
+        public static UserInterfaceConfig Instance
+        {
+            get
+            {
+                return _instance;
+            }
+        }
+
+        public string AssetsPath { get; set; }
+    }
+
     public static class CustomColors
     {
         public const string MAIN_GRID_BG_COLOR = "#2C2C34";
+        public const string MAIN_HEADING_BG_COLOR = "#005A9C";
         public const string BUTTON_BG_COLOR = "#6082B6";
         public const string BUTTON_HOVER_BG_COLOR = "#6F8FAF";
         public const string BUTTON_DISABLED_BG_COLOR = "#808080";
