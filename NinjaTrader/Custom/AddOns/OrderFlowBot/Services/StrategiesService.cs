@@ -1,6 +1,7 @@
 ﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.Containers;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Events;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.States;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,7 +13,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
     {
         private readonly EventManager _eventManager;
         private readonly TradingEvents _tradingEvents;
-        private readonly List<object> _strategies;
+        private readonly IReadOnlyTradingState _tradingState;
+        private readonly List<StrategyBase> _strategies;
 
         public StrategiesService(EventsContainer eventsContainer)
         {
@@ -25,9 +27,9 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
             dataBarEvents.OnUpdatedCurrentDataBar += HandleUpdatedCurrentDataBar;
 
             _tradingEvents = eventsContainer.TradingEvents;
+            _tradingState = _tradingEvents.GetTradingState();
 
-
-            _strategies = new List<object>();
+            _strategies = new List<StrategyBase>();
 
             InitializeStrategies(eventsContainer);
         }
@@ -57,7 +59,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
                         object instance = CreateInstance(type, eventsContainer);
                         if (instance != null)
                         {
-                            _strategies.Add(instance);
+                            _strategies.Add((StrategyBase)instance);
                         }
                     }
                     catch (Exception ex)
@@ -88,14 +90,25 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
 
         private void HandleUpdatedCurrentDataBar()
         {
-            // Strategy already triggered. No further checks needed.
-            if (_tradingEvents.GetTradingState().StrategyTriggered)
+            // No further checks needed
+            // Trading is disabled
+            // Strategy triggered
+            // Failed last traded bar number requirement
+            if (
+                !_tradingState.IsTradingEnabled ||
+                _tradingState.StrategyTriggered ||
+                _tradingState.CurrentBarNumber <= _tradingState.LastTradedBarNumber)
             {
                 return;
             }
 
             foreach (StrategyBase strategy in _strategies)
             {
+                if (_tradingState.IsBackTestEnabled && _tradingState.BackTestStrategyName != strategy.StrategyData.Name)
+                {
+                    continue;
+                }
+
                 var strategyData = strategy.CheckStrategy();
 
                 if (strategyData.StrategyTriggered)
@@ -107,7 +120,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
             }
         }
 
-        private List<object> HandleGetStrategies()
+        private List<StrategyBase> HandleGetStrategies()
         {
             return _strategies;
         }

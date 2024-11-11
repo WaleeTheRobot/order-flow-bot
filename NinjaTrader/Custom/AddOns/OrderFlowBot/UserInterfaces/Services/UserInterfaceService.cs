@@ -1,9 +1,9 @@
-﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.Containers;
+﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.Configs;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.Containers;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Services;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Events;
 using System.Collections.Generic;
-using Direction = NinjaTrader.Custom.AddOns.OrderFlowBot.Configs.Direction;
 
 namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Services
 {

@@ -5,6 +5,7 @@ using NinjaTrader.Custom.AddOns.OrderFlowBot.Containers;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Events;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars.Base;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.States;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Configs;
 using NinjaTrader.NinjaScript.BarsTypes;
@@ -24,12 +25,12 @@ namespace NinjaTrader.NinjaScript.Strategies
     {
         public const string GROUP_NAME_GENERAL = "General";
         public const string GROUP_NAME_DATA_BAR = "Data Bar";
-        public const string GROUP_NAME_TESTING = "Testing";
+        public const string GROUP_NAME_TEST = "Back Test";
     }
 
     [Gui.CategoryOrder(GroupConstants.GROUP_NAME_GENERAL, 0)]
     [Gui.CategoryOrder(GroupConstants.GROUP_NAME_DATA_BAR, 1)]
-    [Gui.CategoryOrder(GroupConstants.GROUP_NAME_TESTING, 2)]
+    [Gui.CategoryOrder(GroupConstants.GROUP_NAME_TEST, 2)]
     public partial class OrderFlowBot : Strategy
     {
         private EventsContainer _eventsContainer;
@@ -60,7 +61,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         #region Data Bar Properties
 
         [NinjaScriptProperty]
-        [Display(Name = "TicksPerLevel *", Description = "Set this to the same ticks per level that is being used.", Order = 0, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
+        [Display(Name = "Ticks Per Level *", Description = "Set this to the same ticks per level that is being used.", Order = 0, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
         public int TicksPerLevel { get; set; }
 
         [NinjaScriptProperty]
@@ -84,23 +85,23 @@ namespace NinjaTrader.NinjaScript.Strategies
         #region Back Test Properties
 
         [NinjaScriptProperty]
-        [Display(Name = "Back Testing Enabled", Description = "Enable this to back test all strategies and directions.", Order = 0, GroupName = GroupConstants.GROUP_NAME_TESTING)]
-        public bool BackTestingEnabled { get; set; }
+        [Display(Name = "Back Test Enabled", Description = "Enable this to back test all strategies and directions.", Order = 0, GroupName = GroupConstants.GROUP_NAME_TEST)]
+        public bool BackTestEnabled { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Back Testing Strategy Name", Description = "The strategy name to back test. This should be the same as the file name.", Order = 1, GroupName = GroupConstants.GROUP_NAME_TESTING)]
-        public string BackTestingStrategyName { get; set; }
+        [Display(Name = "Back Test Strategy Name", Description = "The strategy name to back test. This should be the same as the file name.", Order = 1, GroupName = GroupConstants.GROUP_NAME_TEST)]
+        public string BackTestStrategyName { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Quantity", Description = "The name order quantity.", Order = 2, GroupName = GroupConstants.GROUP_NAME_TESTING)]
+        [Display(Name = "Quantity", Description = "The name order quantity.", Order = 2, GroupName = GroupConstants.GROUP_NAME_TEST)]
         public int Quantity { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Target", Description = "The target in ticks.", Order = 3, GroupName = GroupConstants.GROUP_NAME_TESTING)]
+        [Display(Name = "Target", Description = "The target in ticks.", Order = 3, GroupName = GroupConstants.GROUP_NAME_TEST)]
         public int Target { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Stop", Description = "The stop in ticks.", Order = 4, GroupName = GroupConstants.GROUP_NAME_TESTING)]
+        [Display(Name = "Stop", Description = "The stop in ticks.", Order = 4, GroupName = GroupConstants.GROUP_NAME_TEST)]
         public int Stop { get; set; }
 
         #endregion
@@ -130,8 +131,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 // See the Help Guide for additional information
                 IsInstantiatedOnEachOptimizationIteration = true;
 
-                BackTestingEnabled = false;
-                BackTestingStrategyName = "Stacked Imbalances";
+                BackTestEnabled = false;
+                BackTestStrategyName = "";
                 Target = 40;
                 Stop = 40;
                 Quantity = 1;
@@ -151,7 +152,11 @@ namespace NinjaTrader.NinjaScript.Strategies
                 _dataBarDataProvider = new DataBarDataProvider();
 
                 _eventsContainer = new EventsContainer();
-                _servicesContainer = new ServicesContainer(_eventsContainer);
+                _servicesContainer = new ServicesContainer(_eventsContainer, new BackTestData
+                {
+                    Name = BackTestStrategyName,
+                    IsBackTestEnabled = BackTestEnabled
+                });
 
                 _eventManager = _eventsContainer.EventManager;
                 _tradingEvents = _eventsContainer.TradingEvents;
@@ -199,6 +204,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 */
             }
 
+            _eventsContainer.TradingEvents.CurrentBarNumberTriggered(CurrentBars[0]);
             _eventsContainer.DataBarEvents.UpdateCurrentDataBar(GetDataBarDataProvider(DataBarConfig.Instance));
         }
 

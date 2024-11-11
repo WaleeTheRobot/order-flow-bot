@@ -1,4 +1,5 @@
 ﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.Configs;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies;
 using System.Collections.Generic;
 
 namespace NinjaTrader.Custom.AddOns.OrderFlowBot.States
@@ -12,14 +13,21 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.States
         public Direction TriggeredDirection { get; private set; }
         public Direction SelectedTradeDirection { get; set; }
         public Direction StandardInverse { get; set; }
+        public bool IsBackTestEnabled { get; set; }
+        public string BackTestStrategyName { get; set; }
         public bool IsTradingEnabled { get; set; }
         public bool IsAutoTradeEnabled { get; set; }
         public bool IsAlertEnabled { get; set; }
         public double TriggerStrikePrice { get; set; }
         public List<string> SelectedStrategies { get; set; }
+        public int LastTradedBarNumber { get; set; }
+        public int CurrentBarNumber { get; set; }
 
-        public TradingState()
+        public TradingState(BackTestData backTestData)
         {
+            IsBackTestEnabled = backTestData.IsBackTestEnabled;
+            BackTestStrategyName = backTestData.Name;
+
             _initialTriggeredState = new
             {
                 TriggeredName = "None",
@@ -31,13 +39,15 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.States
             {
                 TriggerStrikePrice = 0,
                 StandardInverse = Direction.Standard,
-                SelectedTradeDirection = Direction.Flat
+                SelectedTradeDirection = IsBackTestEnabled ? Direction.Any : Direction.Flat
             };
 
             IsTradingEnabled = true;
             IsAutoTradeEnabled = false;
             IsAlertEnabled = false;
             SelectedStrategies = new List<string>();
+            LastTradedBarNumber = 0;
+            CurrentBarNumber = 0;
 
             SetInitialTriggeredState();
             SetInitialTradeDirection();

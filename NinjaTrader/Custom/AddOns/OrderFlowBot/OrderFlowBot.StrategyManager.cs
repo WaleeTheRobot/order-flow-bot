@@ -4,11 +4,10 @@ using System;
 
 namespace NinjaTrader.NinjaScript.Strategies
 {
+    // Manages strategies that requires NinjaScript namespace
     public partial class OrderFlowBot : Strategy
     {
-
         private string _triggeredName;
-        private int _lastTradeBarNumber;
 
         public void InitializeStrategyManager()
         {
@@ -16,7 +15,6 @@ namespace NinjaTrader.NinjaScript.Strategies
             _tradingEvents.OnCloseTriggered += HandleCloseTriggered;
 
             _triggeredName = "";
-            _lastTradeBarNumber = 0;
         }
 
         protected override void OnExecutionUpdate(
@@ -30,7 +28,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             if (Position.MarketPosition == MarketPosition.Flat)
             {
-                ResetStrategy();
+                ResetBackTestStrategy();
+                _eventsContainer.StrategiesEvents.ResetStrategyData();
             }
         }
 
@@ -51,7 +50,27 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         private void ProcessTriggeredStrategy()
         {
-            if (AllowStrategyEntry())
+            if (BackTestEnabled)
+            {
+                ProcessBackTestTriggeredStrategy();
+            }
+            // else use atm
+        }
+
+        private void ResetBackTestStrategy()
+        {
+            _eventManager.PrintMessage($"Exit | {_currentDataBar.Time} {_triggeredName}", true);
+
+            // Prevent re-entry on exit bar
+            _tradingEvents.LastTradedBarNumberTriggered(_dataBarEvents.GetCurrentDataBar().BarNumber);
+            _tradingEvents.ResetTradingState();
+        }
+
+        #region BackTest
+
+        private void ProcessBackTestTriggeredStrategy()
+        {
+            if (Position.MarketPosition == MarketPosition.Flat)
             {
                 if (_currentTradingState.TriggeredDirection == Direction.Long)
                 {
@@ -59,8 +78,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                     SetStopLoss(_triggeredName, CalculationMode.Ticks, Stop, false);
                     EnterLong(Quantity, _triggeredName);
 
-                    _lastTradeBarNumber = _currentDataBar.BarNumber;
-                    _eventManager.PrintMessage($"Enter Long | {_triggeredName}");
+                    _tradingEvents.LastTradedBarNumberTriggered(_currentDataBar.BarNumber);
+                    _eventManager.PrintMessage($"Enter Long | {_currentDataBar.Time} {_triggeredName}");
 
                     return;
                 }
@@ -71,35 +90,12 @@ namespace NinjaTrader.NinjaScript.Strategies
                     SetStopLoss(_triggeredName, CalculationMode.Ticks, Stop, false);
                     EnterShort(Quantity, _triggeredName);
 
-                    _lastTradeBarNumber = _currentDataBar.BarNumber;
-                    _eventManager.PrintMessage($"Enter Short | {_triggeredName}");
+                    _tradingEvents.LastTradedBarNumberTriggered(_currentDataBar.BarNumber);
+                    _eventManager.PrintMessage($"Enter Short | {_currentDataBar.Time} {_triggeredName}");
                 }
             }
         }
 
-        private bool AllowStrategyEntry()
-        {
-            if (
-                Position.MarketPosition == MarketPosition.Flat &&
-                _currentDataBar.BarNumber <= _lastTradeBarNumber
-            )
-            {
-                // Reset in case strategy was triggered within same _lastTradeBarNumber
-                _tradingEvents.ResetTradingState();
-
-                return false;
-            }
-
-            return true;
-        }
-
-        private void ResetStrategy()
-        {
-            _eventManager.PrintMessage($"Exit | {_triggeredName}", true);
-
-            // Prevent re-entry on exit bar
-            _lastTradeBarNumber = _dataBarEvents.GetCurrentDataBar().BarNumber;
-            _tradingEvents.ResetTradingState();
-        }
+        #endregion
     }
 }

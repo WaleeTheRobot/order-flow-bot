@@ -32,9 +32,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
         {
             initialToggleState = new Dictionary<string, bool>();
 
-            _strategies = strategiesEvents.GetStrategies()
-                .OfType<StrategyBase>()
-                .ToList();
+            _strategies = strategiesEvents.GetStrategies();
 
             foreach (StrategyBase strategy in _strategies)
             {

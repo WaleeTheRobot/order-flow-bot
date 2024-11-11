@@ -105,7 +105,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 TextAlignment = TextAlignment.Center,
                 Margin = new Thickness(0),
                 Padding = new Thickness(4),
-                Text = BackTestingEnabled ? "Back Testing" : "OrderFlowBot"
+                Text = BackTestEnabled ? "Back Testing" : "OrderFlowBot"
             };
 
             _tradeManagementGrid = new TradeManagementGrid(_servicesContainer, _userInterfaceEvents);

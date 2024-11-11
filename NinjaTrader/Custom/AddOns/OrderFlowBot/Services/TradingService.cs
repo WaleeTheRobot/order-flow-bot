@@ -1,4 +1,5 @@
-﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.Containers;
+﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.Configs;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.Containers;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Events;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.States;
@@ -12,15 +13,17 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
         private readonly TradingEvents _tradingEvents;
         private readonly TradingState _tradingState;
 
-        public TradingService(EventsContainer eventsContainer)
+        public TradingService(EventsContainer eventsContainer, BackTestData backTestData)
         {
             _eventManager = eventsContainer.EventManager;
-            _tradingState = new TradingState();
+            _tradingState = new TradingState(backTestData);
 
             _tradingEvents = eventsContainer.TradingEvents;
             _tradingEvents.OnGetTradingState += HandleGetTradingState;
             _tradingEvents.OnStrategyTriggered += HandleStrategyTriggered;
             _tradingEvents.OnResetTradingState += HandleResetTradingState;
+            _tradingEvents.OnLastTradedBarNumberTriggered += HandleLastTradedBarNumberTriggered;
+            _tradingEvents.OnCurrentBarNumberTriggered += HandleCurrentBarNumberTriggered;
         }
 
         private IReadOnlyTradingState HandleGetTradingState()
@@ -42,6 +45,16 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
         private void HandleResetTradingState()
         {
             _tradingState.SetInitialTriggeredState();
+        }
+
+        private void HandleLastTradedBarNumberTriggered(int barNumber)
+        {
+            _tradingState.LastTradedBarNumber = barNumber;
+        }
+
+        private void HandleCurrentBarNumberTriggered(int barNumber)
+        {
+            _tradingState.CurrentBarNumber = barNumber;
         }
 
         #region User Interface

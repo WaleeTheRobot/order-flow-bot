@@ -12,6 +12,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
         public event Action OnStrategyTriggeredProcessed;
         public event Action OnResetTradingState;
         public event Action OnCloseTriggered;
+        public event Action<int> OnLastTradedBarNumberTriggered;
+        public event Action<int> OnCurrentBarNumberTriggered;
 
         public TradingEvents(EventManager eventManager)
         {
@@ -61,6 +63,24 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
         public void CloseTriggered()
         {
             _eventManager.InvokeEvent(OnCloseTriggered);
+        }
+
+        /// <summary>
+        /// Event triggered when the last traded bar number is triggered.
+        /// This is used to notify consumers with the last traded bar number.
+        /// </summary>
+        public void LastTradedBarNumberTriggered(int barNumber)
+        {
+            _eventManager.InvokeEvent(OnLastTradedBarNumberTriggered, barNumber);
+        }
+
+        /// <summary>
+        /// Event triggered when the current bar number is triggered.
+        /// This is used to notify consumers with the current bar number.
+        /// </summary>
+        public void CurrentBarNumberTriggered(int barNumber)
+        {
+            _eventManager.InvokeEvent(OnCurrentBarNumberTriggered, barNumber);
         }
     }
 }
