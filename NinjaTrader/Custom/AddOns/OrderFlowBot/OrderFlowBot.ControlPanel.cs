@@ -19,6 +19,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         private StrategiesGrid _strategiesGrid;
         private bool _panelActive;
         private TabItem _tabItem;
+        private TextBlock _orderFlowLabel;
 
         private UserInterfaceEvents _userInterfaceEvents;
         private UserInterfaceService _userInterfaceService;
@@ -59,10 +60,23 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             ChartControl?.Dispatcher.InvokeAsync(() =>
             {
-                _tradeManagementGrid.Ready();
-                _tradeDirectionGrid.Ready();
-                _strategiesGrid.Ready();
+                if (!BackTestEnabled)
+                {
+                    UpdateControlPanelLabel("OrderFlowBot");
+                    _tradeManagementGrid.Ready();
+                    _tradeDirectionGrid.Ready();
+                    _strategiesGrid.Ready();
+                }
+                else
+                {
+                    UpdateControlPanelLabel("Back Testing");
+                }
             });
+        }
+
+        private void UpdateControlPanelLabel(string text)
+        {
+            _orderFlowLabel.Text = text;
         }
 
         private void CreateWPFControls()
@@ -93,7 +107,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             _mainGrid.RowDefinitions.Add(new RowDefinition());
             _mainGrid.RowDefinitions.Add(new RowDefinition());
 
-            TextBlock orderFlowLabel = new TextBlock()
+            _orderFlowLabel = new TextBlock()
             {
                 FontFamily = ChartControl.Properties.LabelFont.Family,
                 FontSize = 16,
@@ -105,19 +119,19 @@ namespace NinjaTrader.NinjaScript.Strategies
                 TextAlignment = TextAlignment.Center,
                 Margin = new Thickness(0),
                 Padding = new Thickness(4),
-                Text = BackTestEnabled ? "Back Testing" : "OrderFlowBot"
+                Text = "Loading..."
             };
 
             _tradeManagementGrid = new TradeManagementGrid(_servicesContainer, _userInterfaceEvents);
             _tradeDirectionGrid = new TradeDirectionGrid(_servicesContainer, _userInterfaceEvents);
             _strategiesGrid = new StrategiesGrid(_servicesContainer, _userInterfaceEvents, _eventsContainer.StrategiesEvents);
 
-            Grid.SetRow(orderFlowLabel, 0);
+            Grid.SetRow(_orderFlowLabel, 0);
             Grid.SetRow(_tradeManagementGrid, 1);
             Grid.SetRow(_tradeDirectionGrid, 2);
             Grid.SetRow(_strategiesGrid, 3);
 
-            _mainGrid.Children.Add(orderFlowLabel);
+            _mainGrid.Children.Add(_orderFlowLabel);
             _mainGrid.Children.Add(_tradeManagementGrid);
             _mainGrid.Children.Add(_tradeDirectionGrid);
             _mainGrid.Children.Add(_strategiesGrid);

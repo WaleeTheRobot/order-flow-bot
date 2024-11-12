@@ -76,7 +76,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 {
                     SetProfitTarget(_triggeredName, CalculationMode.Ticks, Target);
                     SetStopLoss(_triggeredName, CalculationMode.Ticks, Stop, false);
-                    EnterLong(Quantity, _triggeredName);
+                    // Enter using tick series
+                    EnterLong(1, Quantity, _triggeredName);
 
                     _tradingEvents.LastTradedBarNumberTriggered(_currentDataBar.BarNumber);
                     _eventManager.PrintMessage($"Enter Long | {_currentDataBar.Time} {_triggeredName}");
@@ -88,7 +89,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 {
                     SetProfitTarget(_triggeredName, CalculationMode.Ticks, Target);
                     SetStopLoss(_triggeredName, CalculationMode.Ticks, Stop, false);
-                    EnterShort(Quantity, _triggeredName);
+                    // Enter using tick series
+                    EnterShort(1, Quantity, _triggeredName);
 
                     _tradingEvents.LastTradedBarNumberTriggered(_currentDataBar.BarNumber);
                     _eventManager.PrintMessage($"Enter Short | {_currentDataBar.Time} {_triggeredName}");

@@ -133,8 +133,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 
                 BackTestEnabled = false;
                 BackTestStrategyName = "";
-                Target = 40;
-                Stop = 40;
+                Target = 60;
+                Stop = 60;
                 Quantity = 1;
 
                 TicksPerLevel = 1;
@@ -146,6 +146,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             else if (State == State.Configure)
             {
                 SetConfigs();
+                AddDataSeries(Data.BarsPeriodType.Tick, 1);
             }
             else if (State == State.DataLoaded)
             {
@@ -204,8 +205,11 @@ namespace NinjaTrader.NinjaScript.Strategies
                 */
             }
 
-            _eventsContainer.TradingEvents.CurrentBarNumberTriggered(CurrentBars[0]);
-            _eventsContainer.DataBarEvents.UpdateCurrentDataBar(GetDataBarDataProvider(DataBarConfig.Instance));
+            if (BarsInProgress == 0)
+            {
+                _eventsContainer.TradingEvents.CurrentBarNumberTriggered(CurrentBars[0]);
+                _eventsContainer.DataBarEvents.UpdateCurrentDataBar(GetDataBarDataProvider(DataBarConfig.Instance));
+            }
         }
 
         #region DataBar Setup and Debugging

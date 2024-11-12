@@ -27,7 +27,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Events
 
         /// <summary>
         /// Event triggered when the Enabled/Disabled button is clicked.
-        /// This is used to enable or disable the control panel.
+        /// This is used to enable or disable the control panel except the Enabled/Disabled button.
         /// </summary>
         public void EnabledDisabledTriggered(bool isEnabled)
         {

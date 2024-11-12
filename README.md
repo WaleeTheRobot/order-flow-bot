@@ -164,9 +164,13 @@ This strategy is triggered based on the sequential increasing volume starting fr
 - Open below trigger strike price if trigger strike price is used
 - Has sequential increasing volume on bid starting from the top of bar
 
-## Backtesting
+## Entries
 
-You can backtest your strategies by enabling the backtesting. This will use the backtest file name, target and stop where you enabled the backtesting. This will disable the control panel.
+This does not allow multiple entries on the same bar. However, multiple entries may appear on the same bar when back testing even though it should be the next bar.
+
+## Back Testing
+
+You can backtest your strategies by enabling the backtesting. Entries uses the 1 tick data series for better granularity. You won't be able to use high resolution option.
 
 ## Adding Strategies and Indicators
 
