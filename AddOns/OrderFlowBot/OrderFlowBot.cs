@@ -265,7 +265,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 _technicalLevels = new List<TechnicalLevels>
                 {
                     new TechnicalLevels(CurrentBars[0], RequiredTicksForBroken * TickSize)
-                    //new TechnicalLevels(CurrentBars[1], RequiredTicksForBroken * TickSize)
+                    //new TechnicalLevels(CurrentBars[2], RequiredTicksForBroken * TickSize)
                 };
 
                 _strategiesConfig = new StrategiesConfig();
@@ -292,7 +292,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 // Required for the cumulative delta bar
                 AddDataSeries(Data.BarsPeriodType.Tick, 1);
 
-                // Make sure to add the BarsInProgress for the additional data series
+                // Make sure to add the BarsInProgress for the additional data series. e.g. BarsInProgress = 2
                 // Make sure to add second TechnicalLevels instance for the list
                 //AddDataSeries(BarsPeriodType.Minute, 5);
             }
