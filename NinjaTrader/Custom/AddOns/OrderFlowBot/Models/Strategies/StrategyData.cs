@@ -2,7 +2,7 @@
 
 namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies
 {
-    public class StrategyData
+    public class StrategyData : IStrategyData
     {
         public string Name { get; set; }
         public Direction TriggeredDirection { get; set; }

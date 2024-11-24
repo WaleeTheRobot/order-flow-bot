@@ -13,7 +13,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
         private readonly TradingEvents _tradingEvents;
         private readonly TradingState _tradingState;
 
-        public TradingService(EventsContainer eventsContainer, BacktestData backtestData)
+        public TradingService(EventsContainer eventsContainer, IBacktestData backtestData)
         {
             _eventManager = eventsContainer.EventManager;
             _tradingState = new TradingState(backtestData);
@@ -31,7 +31,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
             return _tradingState;
         }
 
-        private void HandleStrategyTriggered(StrategyData strategyTriggeredData)
+        private void HandleStrategyTriggered(IStrategyData strategyTriggeredData)
         {
             _tradingState.SetTriggeredTradingState(
                 strategyTriggeredData.Name,

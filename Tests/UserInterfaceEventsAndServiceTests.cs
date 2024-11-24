@@ -8,6 +8,7 @@ using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Services;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Services;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Events;
 using System.Diagnostics.CodeAnalysis;
+using OrderFlowBot.Tests.Mocks.Data;
 
 namespace OrderFlowBot.Tests
 {
@@ -24,7 +25,8 @@ namespace OrderFlowBot.Tests
         public UserInterfaceEventsAndServiceTests()
         {
             EventsContainer eventsContainer = new EventsContainer();
-            _servicesContainer = new ServicesContainer(eventsContainer);
+            var backtestData = new BacktestConfigData();
+            _servicesContainer = new ServicesContainer(eventsContainer, backtestData);
             _tradingService = _servicesContainer.TradingService;
             _tradingEvents = eventsContainer.TradingEvents;
 
@@ -33,6 +35,7 @@ namespace OrderFlowBot.Tests
                 new UserInterfaceService(
                     _servicesContainer,
                     _userInterfaceEvents,
+                    null,
                     null,
                     null
                 );

@@ -11,7 +11,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies
         protected readonly EventsContainer eventsContainer;
         protected IReadOnlyDataBar currentDataBar;
         protected List<IReadOnlyDataBar> dataBars;
-        public StrategyData StrategyData { get; set; }
+        public IStrategyData StrategyData { get; set; }
 
         protected StrategyBase(EventsContainer eventsContainer)
         {
@@ -29,7 +29,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies
             };
         }
 
-        public virtual StrategyData CheckStrategy()
+        public virtual IStrategyData CheckStrategy()
         {
             currentDataBar = GetCurrentDataBar();
             dataBars = GetDataBars();

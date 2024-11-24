@@ -8,7 +8,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
     {
         private readonly EventManager _eventManager;
         public event Func<IReadOnlyTradingState> OnGetTradingState;
-        public event Action<StrategyData> OnStrategyTriggered;
+        public event Action<IStrategyData> OnStrategyTriggered;
         public event Action OnStrategyTriggeredProcessed;
         public event Action OnResetTriggeredTradingState;
         public event Action OnCloseTriggered;
@@ -33,7 +33,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
         /// Event triggered when the strategy entry is found.
         /// This is used to set the strategy triggered state.
         /// </summary>
-        public void StrategyTriggered(StrategyData strategyTriggeredData)
+        public void StrategyTriggered(IStrategyData strategyTriggeredData)
         {
             _eventManager.InvokeEvent(OnStrategyTriggered, strategyTriggeredData);
         }

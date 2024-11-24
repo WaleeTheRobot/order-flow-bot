@@ -23,7 +23,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.States
         public int LastTradedBarNumber { get; set; }
         public int CurrentBarNumber { get; set; }
 
-        public TradingState(BacktestData backtestData)
+        public TradingState(IBacktestData backtestData)
         {
             IsBacktestEnabled = backtestData.IsBacktestEnabled;
             BacktestStrategyName = backtestData.Name;

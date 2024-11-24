@@ -5,11 +5,11 @@ namespace OrderFlowBot.Tests.Mocks
 {
     public static class StrategyDataMock
     {
-        public static Mock<StrategyData> CreateDataBarConfig()
+        public static Mock<StrategyConfigData> CreateDataBarConfig()
         {
-            var config = new StrategyData();
+            var config = new StrategyConfigData();
 
-            var mock = new Mock<StrategyData>();
+            var mock = new Mock<StrategyConfigData>();
             mock.SetupGet(x => x.Name).Returns(config.Name);
             mock.SetupGet(x => x.StrategyTriggered).Returns(config.StrategyTriggered);
             mock.SetupGet(x => x.TriggeredDirection).Returns(config.TriggeredDirection);

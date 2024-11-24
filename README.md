@@ -23,11 +23,9 @@ Make sure you have ATM strategies.
 
 OrderFlowBot may not work if using a version of NinjaTrader below 8.1.2.1. This is the minimum version supporting features up to C# 8. The below are information about OrderFlowBot usage.
 
-Consider increasing the ticks per level in the data series for less liquid assets.
+Consider increasing the ticks per level in the data series for less liquid assets and update it to be the same in the OrderFlowBot properties.
 
-For developing, you can copy the OrderFlowBot folder into your local NinjaTrader AddOns folder.
-
-For usage, you can download the zip containing the word import in the release page. You can import this zip file similar to importing a normal NinjaTrader Add-On. https://github.com/WaleeTheRobot/order-flow-bot/releases
+For usage, you can download the zip containing the word release in the release page. You can import this zip file similar to importing a normal NinjaTrader Add-On. https://github.com/WaleeTheRobot/order-flow-bot/releases
 
 # Issues
 
@@ -41,10 +39,13 @@ This section has options to manage OrderFlowBot, quickly clear other sections an
 
 #### Enabled/Disabled
 
-The Enabled/Disabled button is used for enabling and disabling trading. An ideal scenario to use this is during economic releases. You can click to disable so the bot doesn't check for entries.
+The Enabled/Disabled button is used for enabling and disabling trading. An ideal scenario is to use this is during economic releases. You can click to disable so the bot doesn't check for entries. You can then enable it again afterwards.
 
-- Enable/Disable trading
-- Closes position entered from a strategy
+- Enables or disables the bot from looking for strategies
+- Enables or disables all other buttons
+- Closes ATM positions
+
+--- TODO ---
 
 #### Auto
 
@@ -123,21 +124,3 @@ This does not allow multiple entries on the same bar. However, multiple entries 
 ## Backtesting
 
 You can backtest your strategies by enabling the backtesting. Entries uses the 1 tick data series for better granularity. You won't be able to use high resolution option.
-
-## Adding Strategies and Indicators
-
-The custom DataBar should be used if you are considering adding strategies and indicators. It takes some of the data from the volumetric bars and creates custom bars that you can also add any additional information to. The default strategies and indicators can be used as a reference.
-
-## Advance
-
-#### OrderFlowBotDataBar
-
-This contains the information from the volumetric data and additional information such as checks for stacked imbalances, ratios, etc. You can use this to access the data to develop your own strategy.
-
-#### Technical Levels
-
-There is a class called TechnicalLevels that you can pass to your custom strategy for further analysis. There is an example in the strategy implementations folder called `PivotFader` that you can look at for example usage. It's not enabled and only exists for the example of using the technical levels. It includes a commmented out second data series (5 min). This has to be hard coded and not depdendent on run-time variables per NinjaTrader.
-
-#### Pivots (Support/Resistance)
-
-This is integrated from https://github.com/WaleeTheRobot/open-auto-trend-support-resistance. Add that as an indicator if you want to visually see the pivots. The last item in the list is the current developing pivot point. The second to the last is the last high or low pivot point.
