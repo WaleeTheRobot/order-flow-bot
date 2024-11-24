@@ -2,12 +2,15 @@ using Moq;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Configs;
 using OrderFlowBot.Tests.Mocks;
 
-public class DataBarConfigFixture
+namespace OrderFlowBot.Tests
 {
-    public Mock<IDataBarConfig> DataBarConfig { get; private set; }
-
-    public DataBarConfigFixture()
+    public class DataBarConfigFixture
     {
-        DataBarConfig = DataBarConfigMock.CreateDataBarConfig();
+        public Mock<IDataBarConfig> DataBarConfig { get; private set; }
+
+        public DataBarConfigFixture()
+        {
+            DataBarConfig = DataBarConfigMock.CreateDataBarConfig();
+        }
     }
 }

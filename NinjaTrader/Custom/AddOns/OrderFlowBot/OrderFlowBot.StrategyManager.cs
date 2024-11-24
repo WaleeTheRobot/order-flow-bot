@@ -29,7 +29,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             _blockingAtmIsFlat = true;
 
             // Sound
-            string baseDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "NinjaTrader 8", "bin", "Custom", "AddOns", "OrderFlowBot", "Media");
+            string baseDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "NinjaTrader 8", "bin", "Custom", "AddOns", "OrderFlowBot", "Assets");
             string alertSoundFilePath = Path.Combine(baseDirectory, "alert.wav");
 
             if (File.Exists(alertSoundFilePath))
@@ -249,7 +249,6 @@ namespace NinjaTrader.NinjaScript.Strategies
             {
                 AtmStrategyClose(_atmStrategyId);
                 ResetAtm();
-                _eventManager.PrintMessage($"ATM Position Closed", true);
             }
         }
 

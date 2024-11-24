@@ -16,6 +16,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Events
         public event Action<Direction> OnStandardTriggered;
         public event Action OnCloseTriggered;
         public event Action OnResetDirectionTriggered;
+        public event Action OnResetStrategiesTriggered;
         public event Action<double> OnTriggerStrikePriceTriggered;
         public event Action OnResetTriggerStrikePrice;
         public event Action<string> OnAddSelectedStrategyTriggered;
@@ -32,10 +33,10 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Events
         /// <remarks>
         /// This method performs the following actions:
         /// <list type="bullet">
-        /// <item><description>Toggles the trading state by updating <see cref="TradingState.IsTradingEnabled"/>.</description></item>
+        /// <item><description>Toggles if trading is enabled or disabled by updating <see cref="TradingState.IsTradingEnabled"/>.</description></item>
         /// <item><description>Resets the <see cref="TradingState.SetInitialTriggeredState"/> to its default configuration.</description></item>
         /// <item><description>Disables all other control panel buttons except for the "Enable/Disable" button.</description></item>
-        /// <item><description>Closes all open positions.</description></item>
+        /// <item><description>Closes all triggered ATM open positions.</description></item>
         /// </list>
         /// </remarks>
         public void EnabledDisabledTriggered(bool isEnabled)
@@ -53,9 +54,16 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Events
         }
 
         /// <summary>
-        /// Event triggered when the Alert Enabled/Disabled button is clicked.
-        /// This is used to enable or disable the alert.
+        /// Triggered when the Alert button is clicked.
         /// </summary>
+        /// /// <remarks>
+        /// This method performs the following actions:
+        /// <list type="bullet">
+        /// <item><description>Toggles if alert is enabled or disabled by updating <see cref="TradingState.IsAlertEnabled"/>.</description></item>
+        /// <item><description>Draws a triangle and plays a sound instead of entering a position.</description></item>
+        /// <item><description>Resets the <see cref="TradingState.SetInitialTriggeredState"/> to its default configuration.</description></item>
+        /// </list>
+        /// </remarks>
         public void AlertTriggered(bool isEnabled)
         {
             _eventManager.InvokeEvent(OnAlertTriggered, isEnabled);
@@ -80,21 +88,48 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Events
         }
 
         /// <summary>
-        /// Event triggered when the Close button is clicked.
-        /// This is used to close positions.
+        /// Triggered when the Close button is clicked.
         /// </summary>
+        /// <remarks>
+        /// This method performs the following actions:
+        /// <list type="bullet">
+        /// <item><description>Closes the triggered ATM positions.</description></item>
+        /// <item><description>Resets the <see cref="TradingState.SetInitialTriggeredState"/> to its default configuration.</description></item>
+        /// </list>
+        /// </remarks>
         public void CloseTriggered()
         {
             _eventManager.InvokeEvent(OnCloseTriggered);
         }
 
         /// <summary>
-        /// Event triggered for resetting Trade Direction section.
-        /// This is used to reset the Trade Direction section.
+        /// Triggered when the Reset Direction button is clicked.
         /// </summary>
+        /// <remarks>
+        /// This method performs the following actions:
+        /// <list type="bullet">
+        /// <item><description>Resets Trigger Strike Price, Standard/Inverse, Long and Short field/buttons.</description></item>
+        /// <item><description>Resets the <see cref="TradingState.SetInitialTradeDirection"/> to its default configuration.</description></item>
+        /// </list>
+        /// </remarks>
         public void ResetDirectionTriggered()
         {
             _eventManager.InvokeEvent(OnResetDirectionTriggered);
+        }
+
+        /// <summary>
+        /// Triggered when the Reset Strategies button is clicked.
+        /// </summary>
+        /// <remarks>
+        /// This method performs the following actions:
+        /// <list type="bullet">
+        /// <item><description>Resets buttons for the strategies.</description></item>
+        /// <item><description>Calls <see cref="TradingState.RemoveAllSelectedStrategies"/>.</description></item>
+        /// </list>
+        /// </remarks>
+        public void ResetStrategiesTriggered()
+        {
+            _eventManager.InvokeEvent(OnResetStrategiesTriggered);
         }
 
         /// <summary>

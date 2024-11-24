@@ -12,5 +12,11 @@ namespace OrderFlowBot.Tests.Mocks.Data
             Name = "Test";
             IsBacktestEnabled = true;
         }
+
+        public void SetNoBacktest()
+        {
+            Name = "";
+            IsBacktestEnabled = false;
+        }
     }
 }

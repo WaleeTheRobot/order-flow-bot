@@ -6,7 +6,7 @@ namespace OrderFlowBot.Tests.Mocks
 {
     public static class TradingStateMock
     {
-        public static Mock<TradingState> CreateDataBarConfig()
+        public static Mock<TradingState> CreateTradingState()
         {
             var config = new TradingStateData();
 

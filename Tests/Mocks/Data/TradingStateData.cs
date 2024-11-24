@@ -19,7 +19,7 @@ namespace OrderFlowBot.Tests.Mocks.Data
             TriggeredName = "Stacked Imbalances";
             StrategyTriggered = true;
             TriggeredDirection = Direction.Long;
-            SelectedTradeDirection = Direction.Any;
+            SelectedTradeDirection = Direction.Flat;
             StandardInverse = Direction.Standard;
             IsTradingEnabled = false;
             IsAutoTradeEnabled = false;

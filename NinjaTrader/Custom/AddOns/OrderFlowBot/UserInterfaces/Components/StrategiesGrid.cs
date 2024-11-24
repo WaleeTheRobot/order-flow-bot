@@ -5,6 +5,7 @@ using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components.Controls;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Configs;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Events;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Models;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
             StrategiesEvents strategiesEvents
         ) : base("Strategies", servicesContainer, userInterfaceEvents, strategiesEvents)
         {
+            userInterfaceEvents.OnResetStrategiesTriggered += HandleResetStrategiesTriggered;
         }
         //) : base("Strategies", servicesContainer, userInterfaceEvents, strategiesEvents, UserInterfaceUtils.CreateCogIcon(() =>
         //{
@@ -38,7 +40,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
 
             foreach (StrategyBase strategy in _strategies)
             {
-                initialToggleState[strategy.StrategyData.Name] = false;
+                initialToggleState[strategy.StrategyData.Name.Replace(" ", "")] = false;
             }
         }
 
@@ -85,6 +87,16 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
             else
             {
                 userInterfaceEvents.RemoveSelectedStrategyTriggered(buttonName);
+            }
+        }
+
+        private void HandleResetStrategiesTriggered()
+        {
+            foreach (var buttonName in buttons.Keys)
+            {
+                ButtonState buttonState = (ButtonState)buttons[buttonName].Tag;
+                buttonState.IsToggled = initialToggleState[buttonName];
+                UserInterfaceUtils.ForceRefreshButton(buttons[buttonName]);
             }
         }
 

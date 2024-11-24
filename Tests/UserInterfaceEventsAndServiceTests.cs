@@ -26,6 +26,7 @@ namespace OrderFlowBot.Tests
         {
             EventsContainer eventsContainer = new EventsContainer();
             var backtestData = new BacktestConfigData();
+            backtestData.SetNoBacktest();
             _servicesContainer = new ServicesContainer(eventsContainer, backtestData);
             _tradingService = _servicesContainer.TradingService;
             _tradingEvents = eventsContainer.TradingEvents;
@@ -41,39 +42,26 @@ namespace OrderFlowBot.Tests
                 );
         }
 
-        #region Trade Management
-        [Fact]
-        public void ShouldTriggerEnabledDisabledTriggered()
+        private void SimulateStrategyTriggered()
         {
-            var eventTriggered = false;
-            _userInterfaceEvents.OnEnabledDisabledTriggered += (isEnabled) => eventTriggered = true;
-
-            _userInterfaceEvents.EnabledDisabledTriggered(true);
-            Assert.True(
-                eventTriggered,
-                "Trading enabled. Expected EnabledDisabledTriggered event to be triggered."
-            );
-            Assert.True(
-                _tradingEvents.GetTradingState().IsTradingEnabled,
-                "Expected IsTradingEnabled event to be enabled."
-            );
-
-            // Trigger strategy true to mock a strategy triggering for testing disabling
             _tradingEvents.StrategyTriggered(new StrategyConfigData());
             Assert.True(
                 _tradingEvents.GetTradingState().StrategyTriggered,
                 "Expected StrategyTriggered to be true after triggering."
             );
+        }
 
-            _userInterfaceEvents.EnabledDisabledTriggered(false);
-            Assert.True(
-                eventTriggered,
-                "Trading disabled. Expected EnabledDisabledTriggered event to be triggered."
-            );
+        private void SimulateStrategyTriggeredReset()
+        {
+            _tradingEvents.ResetTriggeredTradingState();
             Assert.False(
-                _tradingEvents.GetTradingState().IsTradingEnabled,
-                "Expected IsTradingEnabled event to be disabled."
+                _tradingEvents.GetTradingState().StrategyTriggered,
+                "Expected StrategyTriggered to be false after reset."
             );
+        }
+
+        private void VerifyStrategyTriggeredReset()
+        {
             Assert.True(
                 _tradingEvents.GetTradingState().TriggeredName == "None",
                 "Expected initial triggered state Name to be None."
@@ -88,8 +76,58 @@ namespace OrderFlowBot.Tests
             );
         }
 
+        private void VerifyTradeDirectionTriggeredReset()
+        {
+            Assert.True(
+                _tradingEvents.GetTradingState().SelectedTradeDirection == Direction.Flat,
+                "Expected SelectedTradeDirection to be flat."
+            );
+            Assert.True(
+                _tradingEvents.GetTradingState().StandardInverse == Direction.Standard,
+                "Expected StandardInverse to be standard."
+            );
+            Assert.True(
+                _tradingEvents.GetTradingState().TriggerStrikePrice == 0,
+                "Expected TriggerStrikePrice to be zero."
+            );
+        }
+
+        #region Trade Management
         [Fact]
-        public void ShouldTriggerAutoTradeTriggered()
+        public void EnabledDisabledTriggered()
+        {
+            var eventTriggered = false;
+            _userInterfaceEvents.OnEnabledDisabledTriggered += (isEnabled) => eventTriggered = true;
+
+            _userInterfaceEvents.EnabledDisabledTriggered(true);
+            Assert.True(
+                eventTriggered,
+                "Trading enabled. Expected EnabledDisabledTriggered event to be triggered."
+            );
+            Assert.True(
+                _tradingEvents.GetTradingState().IsTradingEnabled,
+                "Expected IsTradingEnabled event to be enabled."
+            );
+
+            // Strategy triggered while enabled
+            SimulateStrategyTriggered();
+
+            _userInterfaceEvents.EnabledDisabledTriggered(false);
+            Assert.True(
+                eventTriggered,
+                "Trading disabled. Expected EnabledDisabledTriggered event to be triggered."
+            );
+            Assert.False(
+                _tradingEvents.GetTradingState().IsTradingEnabled,
+                "Expected IsTradingEnabled event to be disabled."
+            );
+
+            // Strategy triggered closed from disabling
+            VerifyStrategyTriggeredReset();
+        }
+
+        [Fact]
+        public void AutoTradeTriggered()
         {
             var eventTriggered = false;
             _userInterfaceEvents.OnAutoTradeTriggered += (isEnabled) => eventTriggered = true;
@@ -148,7 +186,7 @@ namespace OrderFlowBot.Tests
         }
 
         [Fact]
-        public void ShouldTriggerAlertTriggered()
+        public void AlertTriggered()
         {
             var eventTriggered = false;
             _userInterfaceEvents.OnAlertTriggered += (isEnabled) => eventTriggered = true;
@@ -163,6 +201,11 @@ namespace OrderFlowBot.Tests
                 "Alert enabled. Expected IsAlertEnabled to be enabled"
             );
 
+            SimulateStrategyTriggered();
+            // OrderFlowBot.StrategyManager.TradeAlert triangle painted
+            // OrderFlowBot.StrategyManager.ResetAtm
+            SimulateStrategyTriggeredReset();
+
             _userInterfaceEvents.AlertTriggered(false);
             Assert.True(
                 eventTriggered,
@@ -172,18 +215,100 @@ namespace OrderFlowBot.Tests
                 _tradingEvents.GetTradingState().IsAlertEnabled,
                 "Alert disabled. Expected IsAlertEnabled to be disabled"
             );
+
+            VerifyStrategyTriggeredReset();
         }
 
         [Fact]
-        public void ShouldTriggerCloseTriggered()
+        public void CloseTriggered()
         {
+            // Strategy triggered before closing
+            SimulateStrategyTriggered();
+
             var eventTriggered = false;
             _userInterfaceEvents.OnCloseTriggered += () => eventTriggered = true;
 
             _userInterfaceEvents.CloseTriggered();
             Assert.True(
                 eventTriggered,
-                "Expected AlertTriggered event to be triggered."
+                "Expected CloseTriggered event to be triggered."
+            );
+
+            // OrderFlowBot.StrategyManager.HandleCloseAtmPosition
+            SimulateStrategyTriggeredReset();
+            // Strategy triggered closed from disabling
+            VerifyStrategyTriggeredReset();
+        }
+
+        [Fact]
+        public void ResetDirectionTriggered()
+        {
+            VerifyTradeDirectionTriggeredReset();
+
+            // User actions
+            _userInterfaceEvents.TriggerStrikePriceTriggered(1000);
+            _userInterfaceEvents.DirectionTriggered(Direction.Any);
+            _userInterfaceEvents.StandardTriggered(Direction.Inverse);
+
+            Assert.True(
+                _tradingEvents.GetTradingState().SelectedTradeDirection == Direction.Any,
+                "Expected SelectedTradeDirection to be any."
+            );
+            Assert.True(
+                _tradingEvents.GetTradingState().StandardInverse == Direction.Inverse,
+                "Expected StandardInverse to be inverse."
+            );
+            Assert.True(
+                _tradingEvents.GetTradingState().TriggerStrikePrice != 0,
+                "Expected TriggerStrikePrice to not be zero."
+            );
+
+            var eventTriggered = false;
+            _userInterfaceEvents.OnResetDirectionTriggered += () => eventTriggered = true;
+            _userInterfaceEvents.ResetDirectionTriggered();
+
+            Assert.True(
+                eventTriggered,
+                "Expected ResetDirectionTriggered event to be triggered."
+            );
+
+            VerifyTradeDirectionTriggeredReset();
+        }
+
+        [Fact]
+        public void ResetStrategiesTriggered()
+        {
+            var strategy1 = "Stacked Imbalances";
+            var strategy2 = "Test";
+
+            // User actions
+            _userInterfaceEvents.AddSelectedStrategyTriggered(strategy1);
+            _userInterfaceEvents.AddSelectedStrategyTriggered(strategy2);
+
+            Assert.True(
+                _tradingEvents.GetTradingState().SelectedStrategies.Count == 2,
+                "Expected SelectedStrategies to be 2."
+            );
+            Assert.True(
+                _tradingEvents.GetTradingState().SelectedStrategies.Contains(strategy1),
+                $"Expected SelectedStrategies to have {strategy1}."
+            );
+            Assert.True(
+                _tradingEvents.GetTradingState().SelectedStrategies.Contains(strategy2),
+                $"Expected SelectedStrategies to have {strategy2}."
+            );
+
+            var eventTriggered = false;
+            _userInterfaceEvents.OnResetStrategiesTriggered += () => eventTriggered = true;
+            _userInterfaceEvents.ResetStrategiesTriggered();
+
+            Assert.True(
+                eventTriggered,
+                "Expected ResetDirectionTriggered event to be triggered."
+            );
+            Assert.True(
+                _tradingEvents.GetTradingState().SelectedStrategies.Count == 0,
+                "Expected SelectedStrategies to be zero."
             );
         }
 

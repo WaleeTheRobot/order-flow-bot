@@ -150,7 +150,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
                     break;
 
                 case ButtonName.RESET_STRATEGIES:
-                    // Implement reset strategies functionality
+                    userInterfaceEvents.ResetStrategiesTriggered();
                     break;
 
                 default:

@@ -90,5 +90,10 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.States
         {
             SelectedStrategies.RemoveAll(s => s == name);
         }
+
+        public void RemoveAllSelectedStrategies()
+        {
+            SelectedStrategies.Clear();
+        }
     }
 }

@@ -64,8 +64,6 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
             _tradingState.IsTradingEnabled = isEnabled;
             _tradingState.SetInitialTriggeredState();
             HandleCloseTriggered();
-
-            _eventManager.PrintMessage($"IsTradingEnabled: {_tradingState.IsTradingEnabled}");
         }
 
         public void UpdateIsAutoTradeEnabled(bool isEnabled)
@@ -78,16 +76,16 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
         public void UpdateIsAlertEnabled(bool isEnabled)
         {
             _tradingState.IsAlertEnabled = isEnabled;
-
-            _eventManager.PrintMessage($"IsAlertEnabled: {_tradingState.IsAlertEnabled}");
         }
 
         public void HandleResetDirectionTriggered()
         {
             _tradingState.SetInitialTradeDirection();
-            _eventManager.PrintMessage($"ResetDirectionTriggered: {_tradingState.TriggerStrikePrice}");
-            _eventManager.PrintMessage($"ResetDirectionTriggered: {_tradingState.StandardInverse}");
-            _eventManager.PrintMessage($"ResetDirectionTriggered: {_tradingState.SelectedTradeDirection}");
+        }
+
+        public void HandleResetStrategiesTriggered()
+        {
+            _tradingState.RemoveAllSelectedStrategies();
         }
 
         public void UpdateSelectedTradeDirection(Direction direction)

@@ -5,7 +5,7 @@ namespace OrderFlowBot.Tests.Mocks
 {
     public static class StrategyDataMock
     {
-        public static Mock<StrategyConfigData> CreateDataBarConfig()
+        public static Mock<StrategyConfigData> CreateStrategyConfig()
         {
             var config = new StrategyConfigData();
 
