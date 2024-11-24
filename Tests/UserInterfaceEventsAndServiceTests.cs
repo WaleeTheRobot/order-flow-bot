@@ -58,6 +58,13 @@ namespace OrderFlowBot.Tests
                 "Expected IsTradingEnabled event to be enabled."
             );
 
+            // Trigger strategy true to mock a strategy triggering for testing disabling
+            _tradingEvents.StrategyTriggered(new StrategyConfigData());
+            Assert.True(
+                _tradingEvents.GetTradingState().StrategyTriggered,
+                "Expected StrategyTriggered to be true after triggering."
+            );
+
             _userInterfaceEvents.EnabledDisabledTriggered(false);
             Assert.True(
                 eventTriggered,
@@ -66,6 +73,18 @@ namespace OrderFlowBot.Tests
             Assert.False(
                 _tradingEvents.GetTradingState().IsTradingEnabled,
                 "Expected IsTradingEnabled event to be disabled."
+            );
+            Assert.True(
+                _tradingEvents.GetTradingState().TriggeredName == "None",
+                "Expected initial triggered state Name to be None."
+            );
+            Assert.False(
+                _tradingEvents.GetTradingState().StrategyTriggered,
+                "Expected initial triggered state StrategyTriggered to be false."
+            );
+            Assert.True(
+                _tradingEvents.GetTradingState().TriggeredDirection == Direction.Flat,
+                "Expected initial triggered state TriggeredDirection to be Flat."
             );
         }
 
