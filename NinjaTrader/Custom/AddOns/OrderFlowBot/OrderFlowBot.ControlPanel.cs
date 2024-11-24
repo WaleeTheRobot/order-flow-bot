@@ -60,7 +60,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             ChartControl?.Dispatcher.InvokeAsync(() =>
             {
-                if (!BackTestEnabled)
+                if (!BacktestEnabled)
                 {
                     UpdateControlPanelLabel("OrderFlowBot");
                     _tradeManagementGrid.Ready();

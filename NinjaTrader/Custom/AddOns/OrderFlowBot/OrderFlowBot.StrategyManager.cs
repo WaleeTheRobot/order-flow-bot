@@ -19,8 +19,9 @@ namespace NinjaTrader.NinjaScript.Strategies
         public void InitializeStrategyManager()
         {
             _tradingEvents.OnStrategyTriggeredProcessed += HandleStrategyTriggeredProcessed;
-            _tradingEvents.OnCloseTriggered += HandleCloseTriggered;
+            _tradingEvents.OnCloseTriggered += HandleCloseAtmPosition;
 
+            _currentTradingState = _tradingEvents.GetTradingState();
             _triggeredName = "";
             _alertSoundFilePath = "";
             _atmStrategyId = "";
@@ -53,31 +54,31 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             if (Position.MarketPosition == MarketPosition.Flat)
             {
-                ResetBackTestStrategy();
+                ResetBacktestStrategy();
                 _eventsContainer.StrategiesEvents.ResetStrategyData();
             }
+        }
+
+        private void HandleEnabledDisabledTriggered(bool isEnabled)
+        {
+            Print(isEnabled);
+            Print("SM: Handling Trading enabled " + _currentTradingState.IsTradingEnabled);
+
         }
 
         private void HandleStrategyTriggeredProcessed()
         {
             _currentDataBar = _dataBarEvents.GetCurrentDataBar();
-            _currentTradingState = _tradingEvents.GetTradingState();
             _triggeredName = _currentTradingState.TriggeredName;
 
             ProcessTriggeredStrategy();
         }
 
-        private void HandleCloseTriggered()
-        {
-            // TODO: Close position
-            Print("Position Closed");
-        }
-
         private void ProcessTriggeredStrategy()
         {
-            if (BackTestEnabled)
+            if (BacktestEnabled)
             {
-                ProcessBackTestTriggeredStrategy();
+                ProcessBacktestTriggeredStrategy();
             }
             else
             {
@@ -87,7 +88,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         #region Back Test
 
-        private void ProcessBackTestTriggeredStrategy()
+        private void ProcessBacktestTriggeredStrategy()
         {
             if (Position.MarketPosition == MarketPosition.Flat)
             {
@@ -117,13 +118,13 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
         }
 
-        private void ResetBackTestStrategy()
+        private void ResetBacktestStrategy()
         {
             _eventManager.PrintMessage($"Exit | {_currentDataBar.Time} {_triggeredName}", true);
 
             // Prevent re-entry on exit bar
             _tradingEvents.LastTradedBarNumberTriggered(_dataBarEvents.GetCurrentDataBar().BarNumber);
-            _tradingEvents.ResetTradingState();
+            _tradingEvents.ResetTriggeredTradingState();
         }
 
         #endregion
@@ -221,8 +222,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         private void ResetAtm()
         {
-            _eventManager.PrintMessage($"Exit | {_currentDataBar.Time} {_triggeredName}", true);
-
             _atmStrategyId = null;
             _isAtmStrategyCreated = false;
             _blockingAtmIsFlat = true;
@@ -231,7 +230,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
             // Prevent re-entry on exit bar
             _tradingEvents.LastTradedBarNumberTriggered(_dataBarEvents.GetCurrentDataBar().BarNumber);
-            _tradingEvents.ResetTradingState();
+            _tradingEvents.ResetTriggeredTradingState();
         }
 
         private bool AtmIsFlat()
@@ -244,7 +243,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             return GetAtmStrategyMarketPosition(_atmStrategyId) == MarketPosition.Flat;
         }
 
-        private void CloseAtmPosition()
+        private void HandleCloseAtmPosition()
         {
             if (_atmStrategyId != null)
             {

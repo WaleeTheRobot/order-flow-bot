@@ -1,21 +1,21 @@
 ﻿namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies
 {
-    public class BackTestData
+    public class BacktestData
     {
         public string Name { get; set; }
-        public bool IsBackTestEnabled { get; set; }
+        public bool IsBacktestEnabled { get; set; }
 
-        public BackTestData()
+        public BacktestData()
         {
         }
 
-        public BackTestData(
+        public BacktestData(
             string name,
-            bool isBackTestEnabled
+            bool isBacktestEnabled
         )
         {
             Name = name;
-            IsBackTestEnabled = isBackTestEnabled;
+            IsBacktestEnabled = isBacktestEnabled;
         }
     }
 }

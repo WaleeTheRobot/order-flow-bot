@@ -5,7 +5,6 @@ using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components.Controls;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Configs;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Events;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Models;
-using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,12 +20,15 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
             ServicesContainer servicesContainer,
             UserInterfaceEvents userInterfaceEvents,
             StrategiesEvents strategiesEvents
-        ) : base("Strategies", servicesContainer, userInterfaceEvents, strategiesEvents, UserInterfaceUtils.CreateCogIcon(() =>
-        {
-            // TODO: Handle button
-        }))
+        ) : base("Strategies", servicesContainer, userInterfaceEvents, strategiesEvents)
         {
         }
+        //) : base("Strategies", servicesContainer, userInterfaceEvents, strategiesEvents, UserInterfaceUtils.CreateCogIcon(() =>
+        //{
+        //    // Handle button
+        //}))
+        //{
+        //}
 
         public override void InitializeInitialToggleState()
         {
@@ -74,7 +76,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
         {
             Button button = (Button)sender;
             ButtonState state = (ButtonState)button.Tag;
-            string buttonName = state.Config.Name;
+            string buttonName = state.Config.Content;
 
             if (state.IsToggled)
             {

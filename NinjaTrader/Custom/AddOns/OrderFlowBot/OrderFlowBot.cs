@@ -8,6 +8,7 @@ using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars.Base;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.States;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Configs;
+using NinjaTrader.Data;
 using NinjaTrader.NinjaScript.BarsTypes;
 using System;
 using System.Collections.Generic;
@@ -25,7 +26,7 @@ namespace NinjaTrader.NinjaScript.Strategies
     {
         public const string GROUP_NAME_GENERAL = "General";
         public const string GROUP_NAME_DATA_BAR = "Data Bar";
-        public const string GROUP_NAME_TEST = "Back Test";
+        public const string GROUP_NAME_TEST = "Backtest";
     }
 
     [Gui.CategoryOrder(GroupConstants.GROUP_NAME_GENERAL, 0)]
@@ -36,7 +37,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         private EventsContainer _eventsContainer;
         [SuppressMessage("SonarLint", "S4487", Justification = "Instantiated for event handling")]
         private ServicesContainer _servicesContainer;
-        private EventManager _eventManager;
+        private Custom.AddOns.OrderFlowBot.Events.EventManager _eventManager;
         private TradingEvents _tradingEvents;
         private DataBarEvents _dataBarEvents;
 
@@ -82,15 +83,15 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         #endregion
 
-        #region Back Test Properties
+        #region Backtest Properties
 
         [NinjaScriptProperty]
-        [Display(Name = "Back Test Enabled", Description = "Enable this to back test all strategies and directions.", Order = 0, GroupName = GroupConstants.GROUP_NAME_TEST)]
-        public bool BackTestEnabled { get; set; }
+        [Display(Name = "Backtest Enabled", Description = "Enable this to backtest all strategies and directions.", Order = 0, GroupName = GroupConstants.GROUP_NAME_TEST)]
+        public bool BacktestEnabled { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Back Test Strategy Name", Description = "The strategy name to back test. This should be the same as the file name.", Order = 1, GroupName = GroupConstants.GROUP_NAME_TEST)]
-        public string BackTestStrategyName { get; set; }
+        [Display(Name = "Backtest Strategy Name", Description = "The strategy name to backtest. This should be the same as the file name.", Order = 1, GroupName = GroupConstants.GROUP_NAME_TEST)]
+        public string BacktestStrategyName { get; set; }
 
         [NinjaScriptProperty]
         [Display(Name = "Quantity", Description = "The name order quantity.", Order = 2, GroupName = GroupConstants.GROUP_NAME_TEST)]
@@ -131,13 +132,13 @@ namespace NinjaTrader.NinjaScript.Strategies
                 // See the Help Guide for additional information
                 IsInstantiatedOnEachOptimizationIteration = true;
 
-                BackTestEnabled = false;
-                BackTestStrategyName = "";
+                BacktestEnabled = false;
+                BacktestStrategyName = "Test";
                 Target = 60;
                 Stop = 60;
                 Quantity = 1;
 
-                TicksPerLevel = 1;
+                TicksPerLevel = 5;
                 ImbalanceRatio = 1.5;
                 StackedImbalance = 3;
                 ImbalanceMinDelta = 10;
@@ -146,17 +147,17 @@ namespace NinjaTrader.NinjaScript.Strategies
             else if (State == State.Configure)
             {
                 SetConfigs();
-                AddDataSeries(Data.BarsPeriodType.Tick, 1);
+                AddDataSeries(BarsPeriodType.Tick, 1);
             }
             else if (State == State.DataLoaded)
             {
                 _dataBarDataProvider = new DataBarDataProvider();
 
                 _eventsContainer = new EventsContainer();
-                _servicesContainer = new ServicesContainer(_eventsContainer, new BackTestData
+                _servicesContainer = new ServicesContainer(_eventsContainer, new BacktestData
                 {
-                    Name = BackTestStrategyName,
-                    IsBackTestEnabled = BackTestEnabled
+                    Name = BacktestStrategyName,
+                    IsBacktestEnabled = BacktestEnabled
                 });
 
                 _eventManager = _eventsContainer.EventManager;
@@ -181,6 +182,13 @@ namespace NinjaTrader.NinjaScript.Strategies
         [SuppressMessage("SonarLint", "S125", Justification = "Commented code may be used later")]
         protected override void OnBarUpdate()
         {
+            // Ensure we have defaults at the start of the session across multiple sessions
+            if (IsFirstTickOfBar)
+            {
+                _tradingEvents.ResetTriggeredTradingState();
+                _eventsContainer.StrategiesEvents.ResetStrategyData();
+            }
+
             if (CurrentBars[0] < BarsRequiredToTrade)
             {
                 return;
@@ -326,6 +334,6 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
         }
 
-        #endregion
+        #endregion       
     }
 }

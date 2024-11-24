@@ -13,14 +13,6 @@
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=WaleeTheRobot_order-flow-bot&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=WaleeTheRobot_order-flow-bot)
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=WaleeTheRobot_order-flow-bot&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=WaleeTheRobot_order-flow-bot)
 
-<img src="./images/screenshot.png" alt="OrderFlowBot" style="display: block; margin: 0 auto">
-
-A bot used for trading order flow with a selected ATM strategy. The recommended way to use OrderFlowBot is semi-automated trading to **ASSIST** with entries, but fully automated is an option.
-
-OrderFlowBot uses the selected ATM strategy. Just create your ATM strategies and select the one you want to use for the trade. You can create your own strategies and easily hook it to OrderFlowBot for semi-automated or fully automated trading. Indicators can also be created with data from the OrderFlowBot DataBar for usage when the OrderFlowBot is enabled.
-
-Considering that there are some interest in this project, I would like to refactored this project some time and will probably not continue to contribute to this version. The work in progress branch will be in the dev-v3 branch. https://github.com/WaleeTheRobot/order-flow-bot/tree/dev-v3
-
 # Important
 
 Requires the lifetime NinjaTrader license for the volumetric data or the Order Flow + subscription.
@@ -42,10 +34,6 @@ For usage, you can download the zip containing the word import in the release pa
 Sometimes NinjaTrader will complain about an import failed. You can just open the zip file from the release and copy the OrderFlowBot folder into the Add On folder on your computer after removing the previous OrderFlowBot folder. It's normally located at: `C:\Users\<username>\Documents\NinjaTrader 8\bin\Custom\AddOns`. Afterwards, open NinjaTrader and click `New` > `NinjaScript Editor`. Click the NinjaScript Editor and press `F5`. It'll take a few seconds and you'll hear a sound. The icon at the bottom left corner of it will disappear when it's done compiling. Close the NinjaScript Editor and you should be good to go.
 
 # Control Panel
-
-<img src="./images/controlpanel.png" alt="OrderFlowBot Control Panel" style="display: block; margin: 0 auto">
-
-TODO
 
 ## Trade Management
 
@@ -112,25 +100,7 @@ Select this to look for short trades.
 
 This section contains the custom created strategies and are dynamically created from the `StrategiesConfig`. The strategies available are intended to be semi-automated, meaning you select the strategy you want OrderFlowBot to start looking at based on your analysis and OrderFlowBot will assist with finding entries based on the strategy. The default strategies here can be used as examples to create your own custom strategy. More strategies will be considered in the future. Note that a strategy will trigger when the requirements are met, but the requirement may become invalid before the bar completes.
 
-#### Delta Chaser
-
-<img src="./images/deltachaser.png" alt="OrderFlowBot Delta Chaser" style="display: block; margin: 0 auto">
-
-This strategy is designed to enter a position based on the delta. Trade the structure with appropriate targets.
-
-#### Long
-
-- Bullish bar
-- Delta > `DeltaChaserDelta`
-
-#### Short
-
-- Bearish bar
-- Delta < -`DeltaChaserDelta`
-
 #### Stacked Imbalances
-
-<img src="./images/stackedimbalances.png" alt="OrderFlowBot Stacked Imbalances" style="display: block; margin: 0 auto">
 
 This strategy is the common stacked imbalances strategy.
 
@@ -146,29 +116,11 @@ This strategy is the common stacked imbalances strategy.
 - Open below trigger strike price if trigger strike price is used
 - Has valid bid stacked imbalances
 
-#### Volume Sequencing
-
-<img src="./images/volumesequencing.png" alt="OrderFlowBot Volume Sequencing" style="display: block; margin: 0 auto">
-
-This strategy is triggered based on the sequential increasing volume starting from the top or bottom.
-
-#### Long
-
-- Bullish bar
-- Open above trigger strike price if trigger strike price is used
-- Has sequential increasing volume on ask starting from the bottom of bar
-
-#### Short
-
-- Bearish bar
-- Open below trigger strike price if trigger strike price is used
-- Has sequential increasing volume on bid starting from the top of bar
-
 ## Entries
 
-This does not allow multiple entries on the same bar. However, multiple entries may appear on the same bar when back testing even though it should be the next bar.
+This does not allow multiple entries on the same bar. However, multiple entries may appear on the same bar when backtesting even though it should be the next bar.
 
-## Back Testing
+## Backtesting
 
 You can backtest your strategies by enabling the backtesting. Entries uses the 1 tick data series for better granularity. You won't be able to use high resolution option.
 

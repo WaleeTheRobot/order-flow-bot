@@ -10,8 +10,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.States
         Direction TriggeredDirection { get; }
         Direction SelectedTradeDirection { get; }
         Direction StandardInverse { get; }
-        bool IsBackTestEnabled { get; set; }
-        string BackTestStrategyName { get; set; }
+        bool IsBacktestEnabled { get; set; }
+        string BacktestStrategyName { get; set; }
         bool IsTradingEnabled { get; }
         bool IsAutoTradeEnabled { get; }
         bool IsAlertEnabled { get; }

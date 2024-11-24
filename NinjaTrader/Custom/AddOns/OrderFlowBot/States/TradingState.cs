@@ -13,8 +13,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.States
         public Direction TriggeredDirection { get; private set; }
         public Direction SelectedTradeDirection { get; set; }
         public Direction StandardInverse { get; set; }
-        public bool IsBackTestEnabled { get; set; }
-        public string BackTestStrategyName { get; set; }
+        public bool IsBacktestEnabled { get; set; }
+        public string BacktestStrategyName { get; set; }
         public bool IsTradingEnabled { get; set; }
         public bool IsAutoTradeEnabled { get; set; }
         public bool IsAlertEnabled { get; set; }
@@ -23,10 +23,10 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.States
         public int LastTradedBarNumber { get; set; }
         public int CurrentBarNumber { get; set; }
 
-        public TradingState(BackTestData backTestData)
+        public TradingState(BacktestData backtestData)
         {
-            IsBackTestEnabled = backTestData.IsBackTestEnabled;
-            BackTestStrategyName = backTestData.Name;
+            IsBacktestEnabled = backtestData.IsBacktestEnabled;
+            BacktestStrategyName = backtestData.Name;
 
             _initialTriggeredState = new
             {
@@ -39,7 +39,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.States
             {
                 TriggerStrikePrice = 0,
                 StandardInverse = Direction.Standard,
-                SelectedTradeDirection = IsBackTestEnabled ? Direction.Any : Direction.Flat
+                SelectedTradeDirection = IsBacktestEnabled ? Direction.Any : Direction.Flat
             };
 
             IsTradingEnabled = true;

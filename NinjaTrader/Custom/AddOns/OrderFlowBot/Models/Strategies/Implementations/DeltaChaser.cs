@@ -34,10 +34,10 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies.Implementatio
         {
             if (longCheck)
             {
-                return currentDataBar.Deltas.Delta > 100;
+                return currentDataBar.Deltas.Delta > 500;
             }
 
-            return currentDataBar.Deltas.Delta < -100;
+            return currentDataBar.Deltas.Delta < -500;
         }
     }
 }

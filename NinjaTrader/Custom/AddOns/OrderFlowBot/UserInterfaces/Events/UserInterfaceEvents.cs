@@ -1,5 +1,6 @@
 ﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.Configs;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Events;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.States;
 using System;
 
 namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Events
@@ -26,9 +27,17 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Events
         }
 
         /// <summary>
-        /// Event triggered when the Enabled/Disabled button is clicked.
-        /// This is used to enable or disable the control panel except the Enabled/Disabled button.
+        /// Triggered when the "Enable/Disable" button is clicked.
         /// </summary>
+        /// <remarks>
+        /// This method performs the following actions:
+        /// <list type="bullet">
+        /// <item><description>Toggles the trading state by updating <see cref="TradingState.IsTradingEnabled"/>.</description></item>
+        /// <item><description>Resets the <see cref="TradingState.SetInitialTriggeredState"/> to its default configuration.</description></item>
+        /// <item><description>Disables all other control panel buttons except for the "Enable/Disable" button.</description></item>
+        /// <item><description>Closes all open positions.</description></item>
+        /// </list>
+        /// </remarks>
         public void EnabledDisabledTriggered(bool isEnabled)
         {
             _eventManager.InvokeEvent(OnEnabledDisabledTriggered, isEnabled);

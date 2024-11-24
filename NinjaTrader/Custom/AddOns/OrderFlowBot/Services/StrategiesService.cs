@@ -90,10 +90,10 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
 
         private void HandleUpdatedCurrentDataBar()
         {
-            // No further checks needed
-            // Trading is disabled
-            // Strategy triggered
-            // Failed last traded bar number requirement
+            // No further checks needed if:
+            // - Trading is disabled
+            // - Strategy is already triggered
+            // - Failed last traded bar number requirement
             if (
                 !_tradingState.IsTradingEnabled ||
                 _tradingState.StrategyTriggered ||
@@ -104,17 +104,28 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
 
             foreach (StrategyBase strategy in _strategies)
             {
-                if (_tradingState.IsBackTestEnabled && _tradingState.BackTestStrategyName != strategy.StrategyData.Name)
+                if (_tradingState.IsBacktestEnabled)
                 {
-                    continue;
+                    if (_tradingState.BacktestStrategyName != strategy.StrategyData.Name)
+                    {
+                        continue;
+                    }
+                }
+                else
+                {
+                    // Ensure the strategy is in the selected strategies list
+                    if (!_tradingState.SelectedStrategies.Contains(strategy.StrategyData.Name))
+                    {
+                        continue;
+                    }
                 }
 
+                // Check the strategy and trigger events if necessary
                 var strategyData = strategy.CheckStrategy();
 
                 if (strategyData.StrategyTriggered)
                 {
                     _tradingEvents.StrategyTriggered(strategyData);
-
                     return;
                 }
             }

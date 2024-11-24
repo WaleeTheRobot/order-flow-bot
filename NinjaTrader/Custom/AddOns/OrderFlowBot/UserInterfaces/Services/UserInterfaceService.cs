@@ -52,7 +52,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Services
                 grid?.HandleEnabledDisabledTriggered(isEnabled);
             }
 
-            _tradingService.UpdateIsTradingEnabled(isEnabled);
+            _tradingService.HandleEnabledDisabledTriggered(isEnabled);
         }
 
         private void HandleAutoTradeTriggered(bool isEnabled)

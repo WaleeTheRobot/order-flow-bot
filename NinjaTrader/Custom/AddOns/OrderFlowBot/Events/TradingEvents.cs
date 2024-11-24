@@ -10,7 +10,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
         public event Func<IReadOnlyTradingState> OnGetTradingState;
         public event Action<StrategyData> OnStrategyTriggered;
         public event Action OnStrategyTriggeredProcessed;
-        public event Action OnResetTradingState;
+        public event Action OnResetTriggeredTradingState;
         public event Action OnCloseTriggered;
         public event Action<int> OnLastTradedBarNumberTriggered;
         public event Action<int> OnCurrentBarNumberTriggered;
@@ -48,17 +48,15 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
         }
 
         /// <summary>
-        /// Event triggered when the order closes.
-        /// This is used to notify consumers that the strategy order closed.
+        /// Used to reset the triggered trading state.
         /// </summary>
-        public void ResetTradingState()
+        public void ResetTriggeredTradingState()
         {
-            _eventManager.InvokeEvent(OnResetTradingState);
+            _eventManager.InvokeEvent(OnResetTriggeredTradingState);
         }
 
         /// <summary>
-        /// Event triggered when the close button is clicked.
-        /// This is used to notify consumers to close positions.
+        /// Used to close positions.
         /// </summary>
         public void CloseTriggered()
         {

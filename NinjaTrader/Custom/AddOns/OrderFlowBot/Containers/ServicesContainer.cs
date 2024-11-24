@@ -9,10 +9,10 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Containers
         public StrategiesService StrategiesService { get; set; }
         public TradingService TradingService { get; set; }
 
-        public ServicesContainer(EventsContainer eventsContainer, BackTestData backTestData)
+        public ServicesContainer(EventsContainer eventsContainer, BacktestData backtestData)
         {
             DataBarService = new DataBarService(eventsContainer);
-            TradingService = new TradingService(eventsContainer, backTestData);
+            TradingService = new TradingService(eventsContainer, backtestData);
             StrategiesService = new StrategiesService(eventsContainer);
         }
     }
