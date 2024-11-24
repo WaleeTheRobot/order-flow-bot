@@ -14,6 +14,9 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
         public event Action OnCloseTriggered;
         public event Action<int> OnLastTradedBarNumberTriggered;
         public event Action<int> OnCurrentBarNumberTriggered;
+        public event Action OnResetTriggerStrikePrice;
+        public event Action OnResetSelectedTradeDirection;
+        public event Action OnPositionClosedWithAutoDisabled;
 
         public TradingEvents(EventManager eventManager)
         {
@@ -79,6 +82,37 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
         public void CurrentBarNumberTriggered(int barNumber)
         {
             _eventManager.InvokeEvent(OnCurrentBarNumberTriggered, barNumber);
+        }
+
+        /// <summary>
+        /// Used to rest the trigger strike price.
+        /// </summary>
+        public void ResetTriggerStrikePrice()
+        {
+            _eventManager.InvokeEvent(OnResetTriggerStrikePrice);
+        }
+
+        /// <summary>
+        /// Used to reset the selected trade direction.
+        /// </summary>
+        public void ResetSelectedTradeDirection()
+        {
+            _eventManager.InvokeEvent(OnResetSelectedTradeDirection);
+        }
+
+        /// <summary>
+        /// Triggered when the position exits and auto is disabled.
+        /// </summary>
+        /// <remarks>
+        /// This method performs the following user interface actions:
+        /// <list type="bullet">
+        /// <item><description>Resets the trigger strike price.</description></item>
+        /// <item><description>Resets selected trade direction.</description></item>
+        /// </list>
+        /// </remarks>
+        public void PositionClosedWithAutoDisabled()
+        {
+            _eventManager.InvokeEvent(OnPositionClosedWithAutoDisabled);
         }
     }
 }

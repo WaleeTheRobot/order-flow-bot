@@ -1,5 +1,6 @@
 ﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.Configs;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Containers;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.Events;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components.Controls;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Configs;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Events;
@@ -18,11 +19,13 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
 
         public TradeDirectionGrid(
             ServicesContainer servicesContainer,
-            UserInterfaceEvents userInterfaceEvents
+            UserInterfaceEvents userInterfaceEvents,
+            TradingEvents tradingEvents
         ) : base("Trade Direction", servicesContainer, userInterfaceEvents)
         {
             userInterfaceEvents.OnResetTriggerStrikePrice += HandleResetTriggerStrikePrice;
             userInterfaceEvents.OnResetDirectionTriggered += HandleResetDirectionTriggered;
+            tradingEvents.OnPositionClosedWithAutoDisabled += HandlePositionClosedWithAutoDisabled;
         }
 
         public override void Ready()
@@ -287,6 +290,34 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
 
                 if (initialToggleState.ContainsKey(buttonName))
                 {
+                    buttonState.IsToggled = initialToggleState[buttonName];
+
+                    UserInterfaceUtils.ForceRefreshButton(buttons[buttonName]);
+                }
+            }
+        }
+
+        private void HandlePositionClosedWithAutoDisabled()
+        {
+            if (_triggerStrikeTextBox.Dispatcher.CheckAccess())
+            {
+                ResetPositionClosedWithAutoDisabled();
+            }
+            else
+            {
+                _triggerStrikeTextBox.Dispatcher.Invoke(ResetPositionClosedWithAutoDisabled);
+            }
+        }
+
+        private void ResetPositionClosedWithAutoDisabled()
+        {
+            _triggerStrikeTextBox.Text = "";
+
+            foreach (var buttonName in buttons.Keys)
+            {
+                if (buttonName == ButtonName.LONG || buttonName == ButtonName.SHORT)
+                {
+                    ButtonState buttonState = (ButtonState)buttons[buttonName].Tag;
                     buttonState.IsToggled = initialToggleState[buttonName];
 
                     UserInterfaceUtils.ForceRefreshButton(buttons[buttonName]);

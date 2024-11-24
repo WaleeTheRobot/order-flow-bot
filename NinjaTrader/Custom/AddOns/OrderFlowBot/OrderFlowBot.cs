@@ -218,6 +218,11 @@ namespace NinjaTrader.NinjaScript.Strategies
                 _eventsContainer.TradingEvents.CurrentBarNumberTriggered(CurrentBars[0]);
                 _eventsContainer.DataBarEvents.UpdateCurrentDataBar(GetDataBarDataProvider(DataBarConfig.Instance));
             }
+
+            if (!BacktestEnabled)
+            {
+                CheckAtmPosition();
+            }
         }
 
         #region DataBar Setup and Debugging

@@ -123,7 +123,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             };
 
             _tradeManagementGrid = new TradeManagementGrid(_servicesContainer, _userInterfaceEvents);
-            _tradeDirectionGrid = new TradeDirectionGrid(_servicesContainer, _userInterfaceEvents);
+            _tradeDirectionGrid = new TradeDirectionGrid(_servicesContainer, _userInterfaceEvents, _tradingEvents);
             _strategiesGrid = new StrategiesGrid(_servicesContainer, _userInterfaceEvents, _eventsContainer.StrategiesEvents);
 
             Grid.SetRow(_orderFlowLabel, 0);

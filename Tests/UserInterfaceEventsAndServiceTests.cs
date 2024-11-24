@@ -202,8 +202,8 @@ namespace OrderFlowBot.Tests
             );
 
             SimulateStrategyTriggered();
-            // OrderFlowBot.StrategyManager.TradeAlert triangle painted
-            // OrderFlowBot.StrategyManager.ResetAtm
+            // Simulate OrderFlowBot.StrategyManager.TradeAlert triangle painted
+            // Simulate OrderFlowBot.StrategyManager.ResetAtm
             SimulateStrategyTriggeredReset();
 
             _userInterfaceEvents.AlertTriggered(false);
@@ -222,8 +222,15 @@ namespace OrderFlowBot.Tests
         [Fact]
         public void CloseTriggered()
         {
+            // User actions
+            _tradingService.HandleTriggerStrikePriceTriggered(1000);
             // Strategy triggered before closing
             SimulateStrategyTriggered();
+
+            Assert.True(
+                _tradingEvents.GetTradingState().TriggerStrikePrice == 1000,
+                "Expected TriggerStrikePrice to be 1000."
+            );
 
             var eventTriggered = false;
             _userInterfaceEvents.OnCloseTriggered += () => eventTriggered = true;
@@ -236,8 +243,14 @@ namespace OrderFlowBot.Tests
 
             // OrderFlowBot.StrategyManager.HandleCloseAtmPosition
             SimulateStrategyTriggeredReset();
+            _tradingEvents.ResetTriggerStrikePrice();
             // Strategy triggered closed from disabling
             VerifyStrategyTriggeredReset();
+
+            Assert.True(
+                _tradingEvents.GetTradingState().TriggerStrikePrice == 0,
+                "Expected TriggerStrikePrice to be zero."
+            );
         }
 
         [Fact]
@@ -342,6 +355,7 @@ namespace OrderFlowBot.Tests
                 "Inverse selected. Expected StandardInverse to be inverse."
             );
 
+            // Purposely incorrect
             _userInterfaceEvents.StandardTriggered(Direction.Any);
             Assert.True(
                 eventTriggered,
@@ -368,6 +382,36 @@ namespace OrderFlowBot.Tests
                 _tradingEvents.GetTradingState().SelectedTradeDirection == Direction.Long,
                 "Long enabled. Expected SelectedTradeDirection event to be long."
             );
+
+            _userInterfaceEvents.DirectionTriggered(Direction.Short);
+            Assert.True(
+                eventTriggered,
+                "Expected DirectionTriggered event to be triggered."
+            );
+            Assert.True(
+                _tradingEvents.GetTradingState().SelectedTradeDirection == Direction.Short,
+                "Long enabled. Expected SelectedTradeDirection event to be short."
+            );
+
+            _userInterfaceEvents.DirectionTriggered(Direction.Any);
+            Assert.True(
+                eventTriggered,
+                "Expected DirectionTriggered event to be triggered."
+            );
+            Assert.True(
+                _tradingEvents.GetTradingState().SelectedTradeDirection == Direction.Any,
+                "Long enabled. Expected SelectedTradeDirection event to be any."
+            );
+
+            _userInterfaceEvents.DirectionTriggered(Direction.Flat);
+            Assert.True(
+                eventTriggered,
+                "Expected DirectionTriggered event to be triggered."
+            );
+            Assert.True(
+                _tradingEvents.GetTradingState().SelectedTradeDirection == Direction.Flat,
+                "Long enabled. Expected SelectedTradeDirection event to be flat."
+            );
         }
 
         [Fact]
@@ -376,14 +420,24 @@ namespace OrderFlowBot.Tests
             var eventTriggered = false;
             _userInterfaceEvents.OnTriggerStrikePriceTriggered += (price) => eventTriggered = true;
 
-            _userInterfaceEvents.TriggerStrikePriceTriggered(4000.00);
+            _userInterfaceEvents.TriggerStrikePriceTriggered(1000.00);
             Assert.True(
                 eventTriggered,
                 "Expected TriggerStrikePriceTriggered event to be triggered."
             );
             Assert.True(
-                _tradingEvents.GetTradingState().TriggerStrikePrice == 4000.00,
-                "Trigger Strike Price entered. Expected TriggerStrikePrice to be same as entry."
+                _tradingEvents.GetTradingState().TriggerStrikePrice == 1000.00,
+                "Trigger Strike Price entered. Expected TriggerStrikePrice to be 1000."
+            );
+
+            _userInterfaceEvents.TriggerStrikePriceTriggered(0);
+            Assert.True(
+                eventTriggered,
+                "Expected TriggerStrikePriceTriggered event to be triggered."
+            );
+            Assert.True(
+                _tradingEvents.GetTradingState().TriggerStrikePrice == 0,
+                "Trigger Strike Price entered. Expected TriggerStrikePrice to be zero."
             );
         }
 

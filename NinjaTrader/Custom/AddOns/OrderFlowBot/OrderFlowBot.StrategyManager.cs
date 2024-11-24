@@ -14,7 +14,6 @@ namespace NinjaTrader.NinjaScript.Strategies
         private string _alertSoundFilePath;
         private string _atmStrategyId;
         private bool _isAtmStrategyCreated;
-        private bool _blockingAtmIsFlat;
 
         public void InitializeStrategyManager()
         {
@@ -26,7 +25,6 @@ namespace NinjaTrader.NinjaScript.Strategies
             _alertSoundFilePath = "";
             _atmStrategyId = "";
             _isAtmStrategyCreated = false;
-            _blockingAtmIsFlat = true;
 
             // Sound
             string baseDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "NinjaTrader 8", "bin", "Custom", "AddOns", "OrderFlowBot", "Assets");
@@ -138,7 +136,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 return;
             }
 
-            if (_blockingAtmIsFlat)
+            if (!_isAtmStrategyCreated)
             {
                 if (_currentTradingState.TriggeredDirection == Direction.Long)
                 {
@@ -152,21 +150,12 @@ namespace NinjaTrader.NinjaScript.Strategies
                     EnterAtmPosition(false);
                 }
             }
-            else
-            {
-                // ATM strategy active
-                if (_isAtmStrategyCreated && AtmIsFlat() && (_currentTradingState.TriggeredDirection == Direction.Long ||
-                      _currentTradingState.TriggeredDirection == Direction.Short))
-                {
-                    // ATM strategy exited. Reset
-                    ResetAtm();
-                }
-            }
         }
 
         private void EnterAtmPosition(bool isLong)
         {
-            string entryDirection = isLong ? "Long" : "Short";
+            bool finalDirection = _currentTradingState.StandardInverse == Direction.Standard ? isLong : !isLong;
+            string entryDirection = finalDirection ? "Long" : "Short";
 
             _atmStrategyId = GetAtmStrategyUniqueId();
 
@@ -182,9 +171,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             _tradingEvents.LastTradedBarNumberTriggered(_currentDataBar.BarNumber);
             _eventManager.PrintMessage($"Enter {entryDirection} | {_currentDataBar.Time} {_triggeredName}");
 
-            _blockingAtmIsFlat = false;
-
-            if (isLong)
+            if (finalDirection)
             {
                 if (_currentTradingState.IsAlertEnabled)
                 {
@@ -224,23 +211,29 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             _atmStrategyId = null;
             _isAtmStrategyCreated = false;
-            _blockingAtmIsFlat = true;
 
             _eventManager.PrintMessage($"Exit | {_currentDataBar.Time} {_triggeredName}", true);
 
             // Prevent re-entry on exit bar
             _tradingEvents.LastTradedBarNumberTriggered(_dataBarEvents.GetCurrentDataBar().BarNumber);
             _tradingEvents.ResetTriggeredTradingState();
+
+            if (!_currentTradingState.IsAutoTradeEnabled)
+            {
+                _tradingEvents.ResetTriggerStrikePrice();
+                _tradingEvents.ResetSelectedTradeDirection();
+                _tradingEvents.PositionClosedWithAutoDisabled();
+            }
         }
 
-        private bool AtmIsFlat()
+        private void CheckAtmPosition()
         {
-            if (_atmStrategyId == null || _blockingAtmIsFlat)
+            // ATM created. Check if position exited.
+            if (_isAtmStrategyCreated && GetAtmStrategyMarketPosition(_atmStrategyId) == MarketPosition.Flat)
             {
-                return true;
+                // ATM strategy exited. Reset
+                ResetAtm();
             }
-
-            return GetAtmStrategyMarketPosition(_atmStrategyId) == MarketPosition.Flat;
         }
 
         private void HandleCloseAtmPosition()

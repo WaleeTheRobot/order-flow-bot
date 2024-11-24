@@ -95,5 +95,15 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.States
         {
             SelectedStrategies.Clear();
         }
+
+        public void ResetTriggerStrikePrice()
+        {
+            TriggerStrikePrice = 0;
+        }
+
+        public void ResetSelectedTradeDirection()
+        {
+            SelectedTradeDirection = Direction.Flat;
+        }
     }
 }

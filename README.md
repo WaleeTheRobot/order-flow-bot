@@ -13,7 +13,13 @@
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=WaleeTheRobot_order-flow-bot&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=WaleeTheRobot_order-flow-bot)
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=WaleeTheRobot_order-flow-bot&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=WaleeTheRobot_order-flow-bot)
 
+<img src="./images/screenshot.png" alt="OrderFlowBot" style="display: block; margin: 0 auto">
+
+A bot used for trading order flow with a selected ATM strategy. The recommended way to use OrderFlowBot is semi-automated trading to **ASSIST** with entries, but fully automated is an option. OrderFlowBot uses the selected ATM strategy. Just create your ATM strategies and select the one you want to use for the trade. You can create your own strategies and easily hook it to OrderFlowBot for semi-automated or fully automated trading.
+
 # Important
+
+Currently, it does require the user to have some basic programming knowledge for creating strategies.
 
 Requires the lifetime NinjaTrader license for the volumetric data or the Order Flow + subscription.
 
@@ -25,7 +31,7 @@ OrderFlowBot may not work if using a version of NinjaTrader below 8.1.2.1. This 
 
 Consider increasing the ticks per level in the data series for less liquid assets and update it to be the same in the OrderFlowBot properties.
 
-For usage, you can download the zip containing the word release in the release page. You can import this zip file similar to importing a normal NinjaTrader Add-On. https://github.com/WaleeTheRobot/order-flow-bot/releases
+You can find the latest release at https://github.com/WaleeTheRobot/order-flow-bot/releases or you can just fork the repository.
 
 # Issues
 
@@ -68,6 +74,7 @@ Use this to close an ATM position triggered by a strategy.
 
 - Closes ATM position triggered by a strategy
 - Resets the Trigger Strike Price
+- Resets selected Long/Short
 
 #### Reset Direction
 
@@ -83,27 +90,27 @@ This section contains the options for triggering a trade direction. No entries w
 
 #### Trigger Strike Price
 
-The strike price to trigger the strategy to start looking for an entry. A threshold in the strategies properties section is set to allow for a buffer for triggering. The trigger strike price will only be considered if there is a value set in the input.
+The trigger strike price acts as the starting point for the strategy to begin seeking an entry. However, this will only work if the strategy includes the necessary logic to check and verify the requirements. For instance, if your strategy is designed to validate certain conditions and includes logic for the trigger strike price, it will only execute these checks when the trigger price is reached. This is similar to a limit order, but in this case, the strategy only starts evaluating conditions once the limit price is hit.
 
 #### Standard/Inverse
 
-This will enter with the default standard order or inverse. For example, if a strategy triggered long then a standard order will long the position. If inverse is selected then the strategy triggered long will short instead of long the position. This may be useful in range where the strategy is triggering but the market rejects and continues to the opposite direction.
+This will execute using either the default standard order or the inverse order. For example, if a strategy triggers a long position, a standard order will open a long position. However, if the inverse option is selected, the same long trigger will instead open a short position. This can be useful in range-bound markets where the strategy's signals align with market movements, but the market often rejects the anticipated direction and moves in the opposite way.
 
 #### Long
 
-Select this to look for long trades.
+Select this to look for long trades. Resets after position exits.
 
 #### Short
 
-Select this to look for short trades.
+Select this to look for short trades. Resets after position exits.
 
 ## Strategies
 
-This section contains the custom created strategies and are dynamically created from the `StrategiesConfig`. The strategies available are intended to be semi-automated, meaning you select the strategy you want OrderFlowBot to start looking at based on your analysis and OrderFlowBot will assist with finding entries based on the strategy. The default strategies here can be used as examples to create your own custom strategy. More strategies will be considered in the future. Note that a strategy will trigger when the requirements are met, but the requirement may become invalid before the bar completes.
+I'm still deciding how to approach this section to support users without coding skills who want to implement their own custom strategies. For now, I've included the Stacked Imbalance Strategy as a simple example to help you create your own strategies. It doesn't have adjustable properties, so you'll need to modify and compile it yourself if you wish to use or customize it.
 
 #### Stacked Imbalances
 
-This strategy is the common stacked imbalances strategy.
+This strategy is the common stacked imbalances strategy. It will trigger based on finding stacked imbalances. Note that just because it found a stacked imbalance doesn't mean it can revert shortly afterwards causing those stacked imbalances to become invalid.
 
 #### Long
 
@@ -119,7 +126,7 @@ This strategy is the common stacked imbalances strategy.
 
 ## Entries
 
-This does not allow multiple entries on the same bar. However, multiple entries may appear on the same bar when backtesting even though it should be the next bar.
+This does not allow multiple entries on the same bar. However, multiple entries may appear on the same bar when backtesting even though it should in the next bar.
 
 ## Backtesting
 

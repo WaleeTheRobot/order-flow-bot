@@ -24,6 +24,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
             _tradingEvents.OnResetTriggeredTradingState += HandleResetTriggeredTradingState;
             _tradingEvents.OnLastTradedBarNumberTriggered += HandleLastTradedBarNumberTriggered;
             _tradingEvents.OnCurrentBarNumberTriggered += HandleCurrentBarNumberTriggered;
+            _tradingEvents.OnResetTriggerStrikePrice += HandleResetTriggerStrikePrice;
+            _tradingEvents.OnResetSelectedTradeDirection += HandleResetSelectedTradeDirection;
         }
 
         private IReadOnlyTradingState HandleGetTradingState()
@@ -55,6 +57,16 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
         private void HandleCurrentBarNumberTriggered(int barNumber)
         {
             _tradingState.CurrentBarNumber = barNumber;
+        }
+
+        private void HandleResetTriggerStrikePrice()
+        {
+            _tradingState.ResetTriggerStrikePrice();
+        }
+
+        private void HandleResetSelectedTradeDirection()
+        {
+            _tradingState.ResetSelectedTradeDirection();
         }
 
         #region User Interface
