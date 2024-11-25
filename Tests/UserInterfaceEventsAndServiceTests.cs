@@ -330,7 +330,7 @@ namespace OrderFlowBot.Tests
         #region Trade Direction
 
         [Fact]
-        public void ShouldTriggerStandardTriggered()
+        public void StandardTriggered()
         {
             var eventTriggered = false;
             _userInterfaceEvents.OnStandardTriggered += (direction) => eventTriggered = true;
@@ -368,7 +368,7 @@ namespace OrderFlowBot.Tests
         }
 
         [Fact]
-        public void ShouldTriggerDirectionTriggered()
+        public void DirectionTriggered()
         {
             var eventTriggered = false;
             _userInterfaceEvents.OnDirectionTriggered += (direction) => eventTriggered = true;
@@ -415,7 +415,7 @@ namespace OrderFlowBot.Tests
         }
 
         [Fact]
-        public void ShouldTriggerTriggerStrikePriceTriggered()
+        public void TriggerStrikePriceTriggered()
         {
             var eventTriggered = false;
             _userInterfaceEvents.OnTriggerStrikePriceTriggered += (price) => eventTriggered = true;
@@ -442,7 +442,7 @@ namespace OrderFlowBot.Tests
         }
 
         [Fact]
-        public void ShouldTriggerResetTriggerStrikePrice()
+        public void ResetTriggerStrikePrice()
         {
             var eventTriggered = false;
             _userInterfaceEvents.OnResetTriggerStrikePrice += () => eventTriggered = true;
@@ -455,6 +455,103 @@ namespace OrderFlowBot.Tests
             Assert.True(
                 _tradingEvents.GetTradingState().TriggerStrikePrice == 0,
                 "Trigger Strike Price reset. Expected TriggerStrikePrice to be reset."
+            );
+        }
+
+        #endregion
+
+        #region Strategies
+
+        [Fact]
+        public void AddSelectedStrategyTriggered()
+        {
+            var strategy1 = "Stacked Imbalances";
+            var strategy2 = "Test";
+            var eventTriggered = false;
+
+            _userInterfaceEvents.OnAddSelectedStrategyTriggered += (strategy) => eventTriggered = true;
+            _userInterfaceEvents.AddSelectedStrategyTriggered(strategy1);
+
+            Assert.True(eventTriggered, "Expected AddSelectedStrategyTriggered event to be triggered.");
+            Assert.True(
+                _tradingEvents.GetTradingState().SelectedStrategies.Count == 1,
+                "Expected SelectedStrategies to be 1."
+            );
+            Assert.True(
+                _tradingEvents.GetTradingState().SelectedStrategies.Contains(strategy1),
+                $"Expected SelectedStrategies to have {strategy1}."
+            );
+
+            _userInterfaceEvents.AddSelectedStrategyTriggered(strategy2);
+
+            Assert.True(
+                _tradingEvents.GetTradingState().SelectedStrategies.Count == 2,
+                "Expected SelectedStrategies to be 2."
+            );
+            Assert.True(
+                _tradingEvents.GetTradingState().SelectedStrategies.Contains(strategy2),
+                $"Expected SelectedStrategies to have {strategy2}."
+            );
+        }
+
+        [Fact]
+        public void RemoveSelectedStrategyTriggered()
+        {
+            var strategy1 = "Stacked Imbalances";
+            var strategy2 = "Test";
+
+            var eventTriggered = false;
+            _userInterfaceEvents.OnAddSelectedStrategyTriggered += (strategy) => eventTriggered = true;
+            _userInterfaceEvents.AddSelectedStrategyTriggered(strategy1);
+            _userInterfaceEvents.AddSelectedStrategyTriggered(strategy2);
+
+            Assert.True(
+                eventTriggered,
+                "Expected AddSelectedStrategyTriggered event to be triggered."
+            );
+
+            Assert.True(
+                _tradingEvents.GetTradingState().SelectedStrategies.Count == 2,
+                "Expected SelectedStrategies to be 2."
+            );
+            Assert.True(
+                _tradingEvents.GetTradingState().SelectedStrategies.Contains(strategy1),
+                $"Expected SelectedStrategies to have {strategy1}."
+            );
+            Assert.True(
+                _tradingEvents.GetTradingState().SelectedStrategies.Contains(strategy2),
+                $"Expected SelectedStrategies to have {strategy2}."
+            );
+
+            var removeEventTriggered = false;
+            _userInterfaceEvents.OnRemoveSelectedStrategyTriggered += (strategy) => removeEventTriggered = true;
+            _userInterfaceEvents.RemoveSelectedStrategyTriggered(strategy1);
+
+            Assert.True(
+                removeEventTriggered,
+                "Expected RemoveSelectedStrategyTriggered event to be triggered."
+            );
+            Assert.True(
+                _tradingEvents.GetTradingState().SelectedStrategies.Count == 1,
+                "Expected SelectedStrategies to be 1."
+            );
+            Assert.False(
+                _tradingEvents.GetTradingState().SelectedStrategies.Contains(strategy1),
+                $"Expected SelectedStrategies to not have {strategy1}."
+            );
+            Assert.True(
+                _tradingEvents.GetTradingState().SelectedStrategies.Contains(strategy2),
+                $"Expected SelectedStrategies to have {strategy2}."
+            );
+
+            _userInterfaceEvents.RemoveSelectedStrategyTriggered(strategy2);
+            Assert.True(
+                _tradingEvents.GetTradingState().SelectedStrategies.Count == 0,
+                "Expected SelectedStrategies to be zero."
+            );
+            Assert.False(
+                _tradingEvents.GetTradingState().SelectedStrategies.Contains(strategy2),
+                $"Expected SelectedStrategies to not have {strategy2}."
             );
         }
 

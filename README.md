@@ -35,7 +35,7 @@ You can find the latest release at https://github.com/WaleeTheRobot/order-flow-b
 
 # Issues
 
-Sometimes NinjaTrader will complain about an import failed. You can just open the zip file from the release and copy the OrderFlowBot folder into the Add On folder on your computer after removing the previous OrderFlowBot folder. It's normally located at: `C:\Users\<username>\Documents\NinjaTrader 8\bin\Custom\AddOns`. Afterwards, open NinjaTrader and click `New` > `NinjaScript Editor`. Click the NinjaScript Editor and press `F5`. It'll take a few seconds and you'll hear a sound. The icon at the bottom left corner of it will disappear when it's done compiling. Close the NinjaScript Editor and you should be good to go.
+Sometimes NinjaTrader will complain about an import failed. You can just open the zip file from the release and copy the OrderFlowBot directory into the Add On directory on your computer after removing the previous OrderFlowBot directory. It's normally located at: `C:\Users\<username>\Documents\NinjaTrader 8\bin\Custom\AddOns`. Afterwards, open NinjaTrader and click `New` > `NinjaScript Editor`. Click the NinjaScript Editor and press `F5`. It'll take a few seconds and you'll hear a sound. The icon at the bottom left corner of it will disappear when it's done compiling. Close the NinjaScript Editor and you should be good to go.
 
 # Control Panel
 
@@ -55,7 +55,7 @@ The Enabled/Disabled button is used for enabling and disabling trading. An ideal
 
 #### Auto
 
-Automatically trades the selected strategies for both long and short. This is **NOT** recommended, but is an option. Only custom created advanced strategies should be considered if this option is used. None of the default strategies available for OrderFlowBot are designed for fully automated trading.
+Automatically trades the selected strategies for both long and short. This is **NOT** recommended unless you have a profitable strategy and know what you are doing. Only custom created advanced strategies should be considered if this option is used.
 
 - Disables Reset Direction
 - Disables Trigger Strike Price, Long and Short
@@ -104,26 +104,6 @@ Select this to look for long trades. Resets after position exits.
 
 Select this to look for short trades. Resets after position exits.
 
-## Strategies
-
-I'm still deciding how to approach this section to support users without coding skills who want to implement their own custom strategies. For now, I've included the Stacked Imbalance Strategy as a simple example to help you create your own strategies. It doesn't have adjustable properties, so you'll need to modify and compile it yourself if you wish to use or customize it.
-
-#### Stacked Imbalances
-
-This strategy is the common stacked imbalances strategy. It will trigger based on finding stacked imbalances. Note that just because it found a stacked imbalance doesn't mean it can revert shortly afterwards causing those stacked imbalances to become invalid.
-
-#### Long
-
-- Bullish bar
-- Open above trigger strike price if trigger strike price is used
-- Has valid ask stacked imbalances
-
-#### Short
-
-- Bearish bar
-- Open below trigger strike price if trigger strike price is used
-- Has valid bid stacked imbalances
-
 ## Entries
 
 This does not allow multiple entries on the same bar. However, multiple entries may appear on the same bar when backtesting even though it should in the next bar.
@@ -131,3 +111,33 @@ This does not allow multiple entries on the same bar. However, multiple entries 
 ## Backtesting
 
 You can backtest your strategies by enabling the backtesting. Entries uses the 1 tick data series for better granularity. You won't be able to use high resolution option.
+
+## Strategies
+
+I'm still deciding how to approach this section to support users without coding skills who want to implement their own custom strategies. For now, I've included the Stacked Imbalance Strategy as a simple example to help you create your own strategies. It doesn't have adjustable properties, so you'll need to modify and compile it yourself if you wish to use or customize it.
+
+#### Stacked Imbalances
+
+This strategy is the common stacked imbalances strategy. It will trigger based on finding stacked imbalances. Note that just because it found a stacked imbalance doesn't mean it can revert shortly afterwards causing those stacked imbalances to become invalid. This is just an example strategy and you should customize it to your own liking.
+
+#### Long
+
+- Previous bar is bullish
+- Current bar is bullish
+- Current bar is above fast EMA
+- Triggers at trigger strike price if its used
+- Has valid ask stacked imbalances
+
+#### Short
+
+- Previous bar is bearish
+- Current bar is bearish
+- Current bar is below fast EMA
+- Triggers at trigger strike price if its used
+- Has valid bid stacked imbalances
+
+## Build Your Own Strategy
+
+You can design your own custom trading strategy and leverage all the properties of the data bar. To get started, simply create a new file and place it in the `Models/Strategies/Implementations` directory. Ensure your class inherits from `StrategyBase`.
+
+For guidance, check out the `StackedImbalances` class as an example. Once you've completed your implementation, compile the project, and OFB will automatically generate a button for your new strategy in the control panel, giving you greater control over its operation.

@@ -28,14 +28,14 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Events
         }
 
         /// <summary>
-        /// Triggered when the "Enable/Disable" button is clicked.
+        /// Triggered when the Enable/Disable button is clicked.
         /// </summary>
         /// <remarks>
         /// This method performs the following actions:
         /// <list type="bullet">
         /// <item><description>Toggles if trading is enabled or disabled by updating <see cref="TradingState.IsTradingEnabled"/>.</description></item>
         /// <item><description>Resets the <see cref="TradingState.SetInitialTriggeredState"/> to its default configuration.</description></item>
-        /// <item><description>Disables all other control panel buttons except for the "Enable/Disable" button.</description></item>
+        /// <item><description>Disables all other control panel buttons except for the Enable/Disable button.</description></item>
         /// <item><description>Closes all triggered ATM open positions.</description></item>
         /// </list>
         /// </remarks>
@@ -45,9 +45,15 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Events
         }
 
         /// <summary>
-        /// Event triggered when the Auto Enabled/Disabled button is clicked.
-        /// This is used to enable or disable the auto trading.
+        /// Triggered when the Auto Enabled/Disabled button is clicked.
         /// </summary>
+        /// <remarks>
+        /// This method performs the following actions:
+        /// <list type="bullet">
+        /// <item><description>Toggles if auto trading is enabled or disabled by updating <see cref="TradingState.IsAutoTradeEnabled"/>.</description></item>
+        /// <item><description>Disables Reset Direction, Trigger Strike Price, Long and Short buttons.</description></item>
+        /// </list>
+        /// </remarks>
         public void AutoTradeTriggered(bool isEnabled)
         {
             _eventManager.InvokeEvent(OnAutoTradeTriggered, isEnabled);

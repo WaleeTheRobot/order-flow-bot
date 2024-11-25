@@ -81,8 +81,6 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
         public void UpdateIsAutoTradeEnabled(bool isEnabled)
         {
             _tradingState.IsAutoTradeEnabled = isEnabled;
-
-            _eventManager.PrintMessage($"IsAutoTradeEnabled: {_tradingState.IsAutoTradeEnabled}");
         }
 
         public void UpdateIsAlertEnabled(bool isEnabled)
@@ -103,8 +101,6 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
         public void UpdateSelectedTradeDirection(Direction direction)
         {
             _tradingState.SelectedTradeDirection = direction;
-
-            _eventManager.PrintMessage($"SelectedTradeDirection: {_tradingState.SelectedTradeDirection}");
         }
 
         public void UpdateStandardInverse(Direction direction)
@@ -117,8 +113,6 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
             {
                 _tradingState.StandardInverse = Direction.Standard;
             }
-
-            _eventManager.PrintMessage($"StandardInverse: {_tradingState.StandardInverse}");
         }
 
         public void HandleCloseTriggered()
@@ -129,22 +123,16 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
         public void HandleTriggerStrikePriceTriggered(double price)
         {
             _tradingState.TriggerStrikePrice = price;
-
-            _eventManager.PrintMessage($"TriggerStrikePrice: {_tradingState.TriggerStrikePrice}");
         }
 
         public void HandleAddSelectedStrategyTriggered(string name)
         {
             _tradingState.AddStrategyByName(name);
-            _eventManager.PrintMessage($"Added: {name}");
-            _eventManager.PrintMessage($"Count: {_tradingState.SelectedStrategies.Count}");
         }
 
         public void HandleRemoveSelectedStrategyTriggered(string name)
         {
             _tradingState.RemoveStrategyByName(name);
-            _eventManager.PrintMessage($"Removed: {name}");
-            _eventManager.PrintMessage($"Count: {_tradingState.SelectedStrategies.Count}");
         }
 
         #endregion
