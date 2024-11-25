@@ -1,6 +1,7 @@
 using Xunit;
 using Moq;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Containers;
+using OrderFlowBot.Tests.Mocks.Data;
 
 namespace OrderFlowBot.Tests
 {
@@ -20,7 +21,8 @@ namespace OrderFlowBot.Tests
         public void ShouldInitializeAllServices()
         {
             var eventsContainer = new EventsContainer();
-            var servicesContainer = new ServicesContainer(eventsContainer);
+            var backtestData = new BacktestConfigData();
+            var servicesContainer = new ServicesContainer(eventsContainer, backtestData);
 
             Assert.NotNull(servicesContainer.DataBarService);
             Assert.NotNull(servicesContainer.StrategiesService);

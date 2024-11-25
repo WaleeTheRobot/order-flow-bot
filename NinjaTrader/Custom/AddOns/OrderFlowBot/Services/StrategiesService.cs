@@ -1,6 +1,7 @@
 ﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.Containers;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Events;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.States;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,18 +13,23 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
     {
         private readonly EventManager _eventManager;
         private readonly TradingEvents _tradingEvents;
-        private readonly List<object> _strategies;
+        private readonly IReadOnlyTradingState _tradingState;
+        private readonly List<StrategyBase> _strategies;
 
         public StrategiesService(EventsContainer eventsContainer)
         {
             _eventManager = eventsContainer.EventManager;
 
+            var strategiesEvents = eventsContainer.StrategiesEvents;
+            strategiesEvents.OnGetStrategies += HandleGetStrategies;
+
             var dataBarEvents = eventsContainer.DataBarEvents;
             dataBarEvents.OnUpdatedCurrentDataBar += HandleUpdatedCurrentDataBar;
 
             _tradingEvents = eventsContainer.TradingEvents;
+            _tradingState = _tradingEvents.GetTradingState();
 
-            _strategies = new List<object>();
+            _strategies = new List<StrategyBase>();
 
             InitializeStrategies(eventsContainer);
         }
@@ -53,7 +59,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
                         object instance = CreateInstance(type, eventsContainer);
                         if (instance != null)
                         {
-                            _strategies.Add(instance);
+                            _strategies.Add((StrategyBase)instance);
                         }
                     }
                     catch (Exception ex)
@@ -84,23 +90,50 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
 
         private void HandleUpdatedCurrentDataBar()
         {
-            // Strategy already triggered. No further checks needed.
-            if (_tradingEvents.GetTradingState().StrategyTriggered)
+            // No further checks needed if:
+            // - Trading is disabled
+            // - Strategy is already triggered
+            // - Failed last traded bar number requirement
+            if (
+                !_tradingState.IsTradingEnabled ||
+                _tradingState.StrategyTriggered ||
+                _tradingState.CurrentBarNumber <= _tradingState.LastTradedBarNumber)
             {
                 return;
             }
 
             foreach (StrategyBase strategy in _strategies)
             {
+                if (_tradingState.IsBacktestEnabled)
+                {
+                    if (_tradingState.BacktestStrategyName != strategy.StrategyData.Name)
+                    {
+                        continue;
+                    }
+                }
+                else
+                {
+                    // Ensure the strategy is in the selected strategies list
+                    if (!_tradingState.SelectedStrategies.Contains(strategy.StrategyData.Name))
+                    {
+                        continue;
+                    }
+                }
+
+                // Check the strategy and trigger events if necessary
                 var strategyData = strategy.CheckStrategy();
 
                 if (strategyData.StrategyTriggered)
                 {
                     _tradingEvents.StrategyTriggered(strategyData);
-
                     return;
                 }
             }
+        }
+
+        private List<StrategyBase> HandleGetStrategies()
+        {
+            return _strategies;
         }
     }
 }

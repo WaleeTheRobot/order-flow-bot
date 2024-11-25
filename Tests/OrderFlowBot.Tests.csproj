@@ -17,6 +17,10 @@
     <Compile Include="..\NinjaTrader\Custom\AddOns\OrderFlowBot\Models\**\*.cs" />
     <Compile Include="..\NinjaTrader\Custom\AddOns\OrderFlowBot\Services\**\*.cs" />
     <Compile Include="..\NinjaTrader\Custom\AddOns\OrderFlowBot\States\**\*.cs" />
+    <Compile Include="..\NinjaTrader\Custom\AddOns\OrderFlowBot\UserInterfaces\Configs\**\*.cs" />
+    <Compile Include="..\NinjaTrader\Custom\AddOns\OrderFlowBot\UserInterfaces\Components\IGrid.cs" />
+    <Compile Include="..\NinjaTrader\Custom\AddOns\OrderFlowBot\UserInterfaces\Events\**\*.cs" />
+    <Compile Include="..\NinjaTrader\Custom\AddOns\OrderFlowBot\UserInterfaces\Services\**\*.cs" />
     <Compile Include="..\NinjaTrader\Custom\AddOns\OrderFlowBot\Utils\**\*.cs" />
   </ItemGroup>
 

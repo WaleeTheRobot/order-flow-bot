@@ -5,13 +5,17 @@ using NinjaTrader.Custom.AddOns.OrderFlowBot.Containers;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Events;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars.Base;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.States;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Configs;
+using NinjaTrader.Data;
 using NinjaTrader.NinjaScript.BarsTypes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 
 #endregion
 
@@ -22,18 +26,18 @@ namespace NinjaTrader.NinjaScript.Strategies
     {
         public const string GROUP_NAME_GENERAL = "General";
         public const string GROUP_NAME_DATA_BAR = "Data Bar";
-        public const string GROUP_NAME_TESTING = "Testing";
+        public const string GROUP_NAME_TEST = "Backtest";
     }
 
     [Gui.CategoryOrder(GroupConstants.GROUP_NAME_GENERAL, 0)]
     [Gui.CategoryOrder(GroupConstants.GROUP_NAME_DATA_BAR, 1)]
-    [Gui.CategoryOrder(GroupConstants.GROUP_NAME_TESTING, 2)]
+    [Gui.CategoryOrder(GroupConstants.GROUP_NAME_TEST, 2)]
     public partial class OrderFlowBot : Strategy
     {
         private EventsContainer _eventsContainer;
         [SuppressMessage("SonarLint", "S4487", Justification = "Instantiated for event handling")]
         private ServicesContainer _servicesContainer;
-        private EventManager _eventManager;
+        private Custom.AddOns.OrderFlowBot.Events.EventManager _eventManager;
         private TradingEvents _tradingEvents;
         private DataBarEvents _dataBarEvents;
 
@@ -58,7 +62,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         #region Data Bar Properties
 
         [NinjaScriptProperty]
-        [Display(Name = "TicksPerLevel *", Description = "Set this to the same ticks per level that is being used.", Order = 0, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
+        [Display(Name = "Ticks Per Level *", Description = "Set this to the same ticks per level that is being used.", Order = 0, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
         public int TicksPerLevel { get; set; }
 
         [NinjaScriptProperty]
@@ -79,26 +83,26 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         #endregion
 
-        #region Back Test Properties
+        #region Backtest Properties
 
         [NinjaScriptProperty]
-        [Display(Name = "Back Testing Enabled", Description = "Enable this to back test all strategies and directions.", Order = 0, GroupName = GroupConstants.GROUP_NAME_TESTING)]
-        public bool BackTestingEnabled { get; set; }
+        [Display(Name = "Backtest Enabled", Description = "Enable this to backtest all strategies and directions.", Order = 0, GroupName = GroupConstants.GROUP_NAME_TEST)]
+        public bool BacktestEnabled { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Back Testing Strategy Name", Description = "The strategy name to back test. This should be the same as the file name.", Order = 1, GroupName = GroupConstants.GROUP_NAME_TESTING)]
-        public string BackTestingStrategyName { get; set; }
+        [Display(Name = "Backtest Strategy Name", Description = "The strategy name to backtest. This should be the same as the file name.", Order = 1, GroupName = GroupConstants.GROUP_NAME_TEST)]
+        public string BacktestStrategyName { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Quantity", Description = "The name order quantity.", Order = 2, GroupName = GroupConstants.GROUP_NAME_TESTING)]
+        [Display(Name = "Quantity", Description = "The name order quantity.", Order = 2, GroupName = GroupConstants.GROUP_NAME_TEST)]
         public int Quantity { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Target", Description = "The target in ticks.", Order = 3, GroupName = GroupConstants.GROUP_NAME_TESTING)]
+        [Display(Name = "Target", Description = "The target in ticks.", Order = 3, GroupName = GroupConstants.GROUP_NAME_TEST)]
         public int Target { get; set; }
 
         [NinjaScriptProperty]
-        [Display(Name = "Stop", Description = "The stop in ticks.", Order = 4, GroupName = GroupConstants.GROUP_NAME_TESTING)]
+        [Display(Name = "Stop", Description = "The stop in ticks.", Order = 4, GroupName = GroupConstants.GROUP_NAME_TEST)]
         public int Stop { get; set; }
 
         #endregion
@@ -128,13 +132,13 @@ namespace NinjaTrader.NinjaScript.Strategies
                 // See the Help Guide for additional information
                 IsInstantiatedOnEachOptimizationIteration = true;
 
-                BackTestingEnabled = false;
-                BackTestingStrategyName = "Stacked Imbalances";
-                Target = 40;
-                Stop = 40;
+                BacktestEnabled = false;
+                BacktestStrategyName = "Test";
+                Target = 60;
+                Stop = 60;
                 Quantity = 1;
 
-                TicksPerLevel = 1;
+                TicksPerLevel = 5;
                 ImbalanceRatio = 1.5;
                 StackedImbalance = 3;
                 ImbalanceMinDelta = 10;
@@ -143,13 +147,18 @@ namespace NinjaTrader.NinjaScript.Strategies
             else if (State == State.Configure)
             {
                 SetConfigs();
+                AddDataSeries(BarsPeriodType.Tick, 1);
             }
             else if (State == State.DataLoaded)
             {
                 _dataBarDataProvider = new DataBarDataProvider();
 
                 _eventsContainer = new EventsContainer();
-                _servicesContainer = new ServicesContainer(_eventsContainer);
+                _servicesContainer = new ServicesContainer(_eventsContainer, new BacktestData
+                {
+                    Name = BacktestStrategyName,
+                    IsBacktestEnabled = BacktestEnabled
+                });
 
                 _eventManager = _eventsContainer.EventManager;
                 _tradingEvents = _eventsContainer.TradingEvents;
@@ -158,12 +167,28 @@ namespace NinjaTrader.NinjaScript.Strategies
                 _eventsContainer.EventManager.OnPrintMessage += HandlePrintMessage;
 
                 InitializeStrategyManager();
+                InitializeUIManager();
+            }
+            else if (State == State.Realtime)
+            {
+                ReadyControlPanel();
+            }
+            else if (State == State.Terminated)
+            {
+                UnloadControlPanel();
             }
         }
 
         [SuppressMessage("SonarLint", "S125", Justification = "Commented code may be used later")]
         protected override void OnBarUpdate()
         {
+            // Ensure we have defaults at the start of the session across multiple sessions
+            if (IsFirstTickOfBar)
+            {
+                _tradingEvents.ResetTriggeredTradingState();
+                _eventsContainer.StrategiesEvents.ResetStrategyData();
+            }
+
             if (CurrentBars[0] < BarsRequiredToTrade)
             {
                 return;
@@ -188,7 +213,16 @@ namespace NinjaTrader.NinjaScript.Strategies
                 */
             }
 
-            _eventsContainer.DataBarEvents.UpdateCurrentDataBar(GetDataBarDataProvider(DataBarConfig.Instance));
+            if (BarsInProgress == 0)
+            {
+                _eventsContainer.TradingEvents.CurrentBarNumberTriggered(CurrentBars[0]);
+                _eventsContainer.DataBarEvents.UpdateCurrentDataBar(GetDataBarDataProvider(DataBarConfig.Instance));
+            }
+
+            if (!BacktestEnabled)
+            {
+                CheckAtmPosition();
+            }
         }
 
         #region DataBar Setup and Debugging
@@ -289,6 +323,9 @@ namespace NinjaTrader.NinjaScript.Strategies
             DataBarConfig.Instance.ImbalanceRatio = ImbalanceRatio;
             DataBarConfig.Instance.ImbalanceMinDelta = ImbalanceMinDelta;
             DataBarConfig.Instance.ValueAreaPercentage = ValueAreaPercentage;
+
+            UserInterfaceConfig.Instance.AssetsPath =
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "NinjaTrader 8", "bin", "Custom", "AddOns", "OrderFlowBot", "Assets");
         }
 
         // Used for debugging event messages
@@ -302,6 +339,6 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
         }
 
-        #endregion
+        #endregion       
     }
 }

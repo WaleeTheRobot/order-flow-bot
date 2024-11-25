@@ -10,14 +10,16 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies
     {
         protected readonly EventsContainer eventsContainer;
         protected IReadOnlyDataBar currentDataBar;
-        protected List<IReadOnlyDataBar> currentDataBars;
-        public StrategyData StrategyData { get; set; }
+        protected List<IReadOnlyDataBar> dataBars;
+        public IStrategyData StrategyData { get; set; }
 
         protected StrategyBase(EventsContainer eventsContainer)
         {
             this.eventsContainer = eventsContainer;
             currentDataBar = new DataBar(DataBarConfig.Instance);
-            currentDataBars = new List<IReadOnlyDataBar>();
+            dataBars = new List<IReadOnlyDataBar>();
+
+            eventsContainer.StrategiesEvents.OnResetStrategyData += HandleResetStrategyData;
 
             StrategyData = new StrategyData
             {
@@ -27,10 +29,10 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies
             };
         }
 
-        public virtual StrategyData CheckStrategy()
+        public virtual IStrategyData CheckStrategy()
         {
             currentDataBar = GetCurrentDataBar();
-            currentDataBars = GetDataBars();
+            dataBars = GetDataBars();
 
             if (IsValidSelectedLongDirection() && CheckLong())
             {
@@ -74,14 +76,6 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies
 
         public abstract bool CheckShort();
 
-        public virtual void ResetStrategyTriggeredData()
-        {
-            StrategyData.UpdateTriggeredDataProvider(
-                Direction.Flat,
-                false
-            );
-        }
-
         protected bool IsValidSelectedLongDirection()
         {
             var currentState = GetCurrentTradingState();
@@ -92,6 +86,12 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies
         {
             var currentState = GetCurrentTradingState();
             return currentState.SelectedTradeDirection == Direction.Short || currentState.SelectedTradeDirection == Direction.Any;
+        }
+
+        private void HandleResetStrategyData()
+        {
+            StrategyData.TriggeredDirection = Direction.Flat;
+            StrategyData.StrategyTriggered = false;
         }
     }
 }

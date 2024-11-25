@@ -8,9 +8,15 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
     {
         private readonly EventManager _eventManager;
         public event Func<IReadOnlyTradingState> OnGetTradingState;
-        public event Action<StrategyData> OnStrategyTriggered;
+        public event Action<IStrategyData> OnStrategyTriggered;
         public event Action OnStrategyTriggeredProcessed;
-        public event Action OnResetTradingState;
+        public event Action OnResetTriggeredTradingState;
+        public event Action OnCloseTriggered;
+        public event Action<int> OnLastTradedBarNumberTriggered;
+        public event Action<int> OnCurrentBarNumberTriggered;
+        public event Action OnResetTriggerStrikePrice;
+        public event Action OnResetSelectedTradeDirection;
+        public event Action OnPositionClosedWithAutoDisabled;
 
         public TradingEvents(EventManager eventManager)
         {
@@ -30,7 +36,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
         /// Event triggered when the strategy entry is found.
         /// This is used to set the strategy triggered state.
         /// </summary>
-        public void StrategyTriggered(StrategyData strategyTriggeredData)
+        public void StrategyTriggered(IStrategyData strategyTriggeredData)
         {
             _eventManager.InvokeEvent(OnStrategyTriggered, strategyTriggeredData);
         }
@@ -45,12 +51,68 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
         }
 
         /// <summary>
-        /// Event triggered when the order closes.
-        /// This is used to notify consumers that the strategy order closed.
+        /// Used to reset the triggered trading state.
         /// </summary>
-        public void ResetTradingState()
+        public void ResetTriggeredTradingState()
         {
-            _eventManager.InvokeEvent(OnResetTradingState);
+            _eventManager.InvokeEvent(OnResetTriggeredTradingState);
+        }
+
+        /// <summary>
+        /// Used to close positions.
+        /// </summary>
+        public void CloseTriggered()
+        {
+            _eventManager.InvokeEvent(OnCloseTriggered);
+        }
+
+        /// <summary>
+        /// Event triggered when the last traded bar number is triggered.
+        /// This is used to notify consumers with the last traded bar number.
+        /// </summary>
+        public void LastTradedBarNumberTriggered(int barNumber)
+        {
+            _eventManager.InvokeEvent(OnLastTradedBarNumberTriggered, barNumber);
+        }
+
+        /// <summary>
+        /// Event triggered when the current bar number is triggered.
+        /// This is used to notify consumers with the current bar number.
+        /// </summary>
+        public void CurrentBarNumberTriggered(int barNumber)
+        {
+            _eventManager.InvokeEvent(OnCurrentBarNumberTriggered, barNumber);
+        }
+
+        /// <summary>
+        /// Used to rest the trigger strike price.
+        /// </summary>
+        public void ResetTriggerStrikePrice()
+        {
+            _eventManager.InvokeEvent(OnResetTriggerStrikePrice);
+        }
+
+        /// <summary>
+        /// Used to reset the selected trade direction.
+        /// </summary>
+        public void ResetSelectedTradeDirection()
+        {
+            _eventManager.InvokeEvent(OnResetSelectedTradeDirection);
+        }
+
+        /// <summary>
+        /// Triggered when the position exits and auto is disabled.
+        /// </summary>
+        /// <remarks>
+        /// This method performs the following user interface actions:
+        /// <list type="bullet">
+        /// <item><description>Resets the trigger strike price.</description></item>
+        /// <item><description>Resets selected trade direction.</description></item>
+        /// </list>
+        /// </remarks>
+        public void PositionClosedWithAutoDisabled()
+        {
+            _eventManager.InvokeEvent(OnPositionClosedWithAutoDisabled);
         }
     }
 }

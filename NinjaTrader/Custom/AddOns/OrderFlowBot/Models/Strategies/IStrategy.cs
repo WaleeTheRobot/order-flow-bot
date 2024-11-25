@@ -2,8 +2,8 @@
 {
     public interface IStrategy
     {
-        StrategyData StrategyData { get; set; }
-        StrategyData CheckStrategy();
+        IStrategyData StrategyData { get; set; }
+        IStrategyData CheckStrategy();
         bool CheckLong();
         bool CheckShort();
     }

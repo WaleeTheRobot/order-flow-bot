@@ -4,7 +4,7 @@ using NinjaTrader.Custom.AddOns.OrderFlowBot.Containers;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Events;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Services;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.States;
-using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies;
+using OrderFlowBot.Tests.Mocks.Data;
 
 namespace OrderFlowBot.Tests
 {
@@ -17,6 +17,7 @@ namespace OrderFlowBot.Tests
         {
             _eventManager = new EventManager();
             _tradingEvents = new TradingEvents(_eventManager);
+            var backtestData = new BacktestConfigData();
 
             var eventsContainer = new EventsContainer
             {
@@ -24,7 +25,7 @@ namespace OrderFlowBot.Tests
                 TradingEvents = _tradingEvents
             };
 
-            new TradingService(eventsContainer);
+            new TradingService(eventsContainer, backtestData);
         }
 
         [Fact]
@@ -55,7 +56,7 @@ namespace OrderFlowBot.Tests
         public void ShouldTriggerStrategyTriggeredEvent()
         {
             var eventTriggered = false;
-            var strategyDataMock = new Mock<StrategyData>();
+            var strategyDataMock = new Mock<StrategyConfigData>();
 
             _tradingEvents.OnStrategyTriggered += (strategyData) =>
             {
@@ -88,8 +89,8 @@ namespace OrderFlowBot.Tests
         {
             var eventTriggered = false;
 
-            _tradingEvents.OnResetTradingState += () => eventTriggered = true;
-            _tradingEvents.ResetTradingState();
+            _tradingEvents.OnResetTriggeredTradingState += () => eventTriggered = true;
+            _tradingEvents.ResetTriggeredTradingState();
 
             Assert.True(eventTriggered, "Expected the OnResetTradingState event to be triggered.");
         }
