@@ -49,13 +49,29 @@ namespace NinjaTrader.NinjaScript.Strategies
         #region General Properties
 
         [NinjaScriptProperty]
-        [Display(Name = "Version", Description = "OrderFlowBot version.", Order = 0, GroupName = GroupConstants.GROUP_NAME_GENERAL)]
+        [Display(Name = "_Version", Description = "OrderFlowBot version.", Order = 0, GroupName = GroupConstants.GROUP_NAME_GENERAL)]
         [ReadOnly(true)]
         public string Version
         {
             get { return "3.0.0"; }
             set { }
         }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Daily Profit Enabled", Description = "Enable this to disable OFB after the daily realized profit is hit.", Order = 0, GroupName = GroupConstants.GROUP_NAME_GENERAL)]
+        public bool DailyProfitEnabled { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Daily Profit", Description = "The daily realized profit to disable OFB.", Order = 0, GroupName = GroupConstants.GROUP_NAME_GENERAL)]
+        public double DailyProfit { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Daily Loss Enabled", Description = "Enable this to disable OFB after the daily realized loss is hit.", Order = 0, GroupName = GroupConstants.GROUP_NAME_GENERAL)]
+        public bool DailyLossEnabled { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Daily Loss", Description = "The daily realized loss to disable OFB.", Order = 0, GroupName = GroupConstants.GROUP_NAME_GENERAL)]
+        public double DailyLoss { get; set; }
 
         #endregion
 
@@ -131,6 +147,11 @@ namespace NinjaTrader.NinjaScript.Strategies
                 // Disable this property for performance gains in Strategy Analyzer optimizations
                 // See the Help Guide for additional information
                 IsInstantiatedOnEachOptimizationIteration = true;
+
+                DailyProfitEnabled = false;
+                DailyProfit = 1000;
+                DailyLossEnabled = false;
+                DailyLoss = 1000;
 
                 BacktestEnabled = false;
                 BacktestStrategyName = "Test";
@@ -219,8 +240,13 @@ namespace NinjaTrader.NinjaScript.Strategies
                 _eventsContainer.DataBarEvents.UpdateCurrentDataBar(GetDataBarDataProvider(DataBarConfig.Instance));
             }
 
-            if (!BacktestEnabled)
+            if (!BacktestEnabled && _currentTradingState.IsTradingEnabled && _userInterfaceEvents != null)
             {
+                if (ValidDailyProfitLossHit())
+                {
+                    UpdateDailyProfitLossUserInterface();
+                }
+
                 CheckAtmPosition();
             }
         }
@@ -340,5 +366,35 @@ namespace NinjaTrader.NinjaScript.Strategies
         }
 
         #endregion       
+
+        private bool ValidDailyProfitLossHit()
+        {
+            if (Account == null)
+            {
+                return false;
+            }
+
+            double realizedProfitLoss = Account.Get(AccountItem.RealizedProfitLoss, Currency.UsDollar);
+
+            if (
+                (DailyProfitEnabled && realizedProfitLoss > DailyProfit) ||
+                (DailyLossEnabled && realizedProfitLoss < (DailyLoss * -1)))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private void UpdateDailyProfitLossUserInterface()
+        {
+            _servicesContainer.TradingService.HandleEnabledDisabledTriggered(false);
+
+            if (_userInterfaceEvents != null)
+            {
+                _userInterfaceEvents.UpdateControlPanelLabel("Profit/Loss Hit");
+                _userInterfaceEvents.DisableAllControls();
+            }
+        }
     }
 }

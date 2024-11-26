@@ -22,6 +22,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.States
         public List<string> SelectedStrategies { get; set; }
         public int LastTradedBarNumber { get; set; }
         public int CurrentBarNumber { get; set; }
+        public bool HasMarketPosition { get; set; }
 
         public TradingState(IBacktestData backtestData)
         {
@@ -48,6 +49,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.States
             SelectedStrategies = new List<string>();
             LastTradedBarNumber = 0;
             CurrentBarNumber = 0;
+            HasMarketPosition = false;
 
             SetInitialTriggeredState();
             SetInitialTradeDirection();

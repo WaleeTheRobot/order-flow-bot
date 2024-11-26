@@ -60,21 +60,42 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             ChartControl?.Dispatcher.InvokeAsync(() =>
             {
+                _userInterfaceEvents.OnUpdateControlPanelLabel += UpdateControlPanelLabel;
+
                 if (!BacktestEnabled)
                 {
-                    UpdateControlPanelLabel("OrderFlowBot");
-                    _tradeManagementGrid.Ready();
-                    _tradeDirectionGrid.Ready();
-                    _strategiesGrid.Ready();
+                    if (ValidDailyProfitLossHit())
+                    {
+                        UpdateDailyProfitLossUserInterface();
+                    }
+                    else
+                    {
+                        UpdateControlPanelLabel("OrderFlowBot");
+                        _tradeManagementGrid.Ready();
+                        _tradeDirectionGrid.Ready();
+                        _strategiesGrid.Ready();
+                    }
                 }
                 else
                 {
-                    UpdateControlPanelLabel("Back Testing");
+                    UpdateControlPanelLabel("Backtesting");
                 }
             });
         }
 
         private void UpdateControlPanelLabel(string text)
+        {
+            if (_orderFlowLabel.Dispatcher.CheckAccess())
+            {
+                HandleUpdateControlPanelLabel(text);
+            }
+            else
+            {
+                _orderFlowLabel.Dispatcher.Invoke(() => HandleUpdateControlPanelLabel(text));
+            }
+        }
+
+        private void HandleUpdateControlPanelLabel(string text)
         {
             _orderFlowLabel.Text = text;
         }
