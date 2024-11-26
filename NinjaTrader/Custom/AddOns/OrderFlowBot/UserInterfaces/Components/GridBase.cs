@@ -34,6 +34,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
             this.userInterfaceEvents.OnEnabledDisabledTriggered += HandleEnabledDisabledTriggered;
             this.userInterfaceEvents.OnAutoTradeTriggered += HandleAutoTradeTriggered;
             this.userInterfaceEvents.OnDisableAllControls += HandleDisableAllControls;
+            this.userInterfaceEvents.OnEnableAllControls += HandleEnableAllControls;
             this.strategiesEvents = strategiesEvents;
 
             _icon = icon;
@@ -171,6 +172,37 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
             else if (uiElement is ContentControl contentControl && contentControl.Content is UIElement content)
             {
                 DisableControls(content);
+            }
+        }
+
+        private void HandleEnableAllControls()
+        {
+            if (Dispatcher.CheckAccess())
+            {
+                EnableControls(this);
+            }
+            else
+            {
+                Dispatcher.Invoke(() => EnableControls(this));
+            }
+        }
+
+        private void EnableControls(UIElement uiElement)
+        {
+            if (uiElement is Control control)
+            {
+                control.IsEnabled = true;
+            }
+            else if (uiElement is Panel panel)
+            {
+                foreach (UIElement child in panel.Children)
+                {
+                    EnableControls(child);
+                }
+            }
+            else if (uiElement is ContentControl contentControl && contentControl.Content is UIElement content)
+            {
+                EnableControls(content);
             }
         }
     }

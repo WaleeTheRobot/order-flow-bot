@@ -53,7 +53,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (Position.MarketPosition == MarketPosition.Flat)
             {
                 ResetBacktestStrategy();
-                _eventsContainer.StrategiesEvents.ResetStrategyData();
+                _strategiesEvents.ResetStrategyData();
             }
         }
 
@@ -218,6 +218,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             _tradingEvents.LastTradedBarNumberTriggered(_dataBarEvents.GetCurrentDataBar().BarNumber);
             _tradingEvents.ResetTriggeredTradingState();
             _tradingEvents.MarketPositionTriggered(false);
+            _strategiesEvents.ResetStrategyData();
 
             if (!_currentTradingState.IsAutoTradeEnabled)
             {

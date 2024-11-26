@@ -1,4 +1,5 @@
-﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.Containers;
+﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.Configs;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.Containers;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Events;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.States;
@@ -93,10 +94,12 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
             // No further checks needed if:
             // - Trading is disabled
             // - Strategy is already triggered
+            // - Selected trade direction is flat
             // - Failed last traded bar number requirement
             if (
                 !_tradingState.IsTradingEnabled ||
                 _tradingState.StrategyTriggered ||
+                _tradingState.SelectedTradeDirection == Direction.Flat ||
                 _tradingState.CurrentBarNumber <= _tradingState.LastTradedBarNumber)
             {
                 return;
