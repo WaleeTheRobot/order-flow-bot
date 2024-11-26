@@ -51,8 +51,6 @@ The Enabled/Disabled button is used for enabling and disabling trading. An ideal
 - Enables or disables all other buttons
 - Closes ATM positions
 
---- TODO ---
-
 #### Auto
 
 Automatically trades the selected strategies for both long and short. This is **NOT** recommended unless you have a profitable strategy and know what you are doing. Only custom created advanced strategies should be considered if this option is used.
