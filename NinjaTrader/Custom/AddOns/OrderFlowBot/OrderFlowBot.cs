@@ -37,14 +37,18 @@ namespace NinjaTrader.NinjaScript.Strategies
         private EventsContainer _eventsContainer;
         [SuppressMessage("SonarLint", "S4487", Justification = "Instantiated for event handling")]
         private ServicesContainer _servicesContainer;
-        private Custom.AddOns.OrderFlowBot.Events.EventManager _eventManager;
+        private EventManager _eventManager;
         private TradingEvents _tradingEvents;
+        private StrategiesEvents _strategiesEvents;
         private DataBarEvents _dataBarEvents;
 
         private IReadOnlyDataBar _currentDataBar;
         private IReadOnlyTradingState _currentTradingState;
 
         private DataBarDataProvider _dataBarDataProvider;
+        private bool _validTimeRange;
+        private bool _timeStartChecked;
+        private bool _timeEndChecked;
 
         #region General Properties
 
@@ -56,6 +60,34 @@ namespace NinjaTrader.NinjaScript.Strategies
             get { return "3.0.0"; }
             set { }
         }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Daily Profit Enabled", Description = "Enable this to disable OFB after the daily realized profit is hit.", Order = 1, GroupName = GroupConstants.GROUP_NAME_GENERAL)]
+        public bool DailyProfitEnabled { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Daily Profit", Description = "The daily realized profit to disable OFB.", Order = 2, GroupName = GroupConstants.GROUP_NAME_GENERAL)]
+        public double DailyProfit { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Daily Loss Enabled", Description = "Enable this to disable OFB after the daily realized loss is hit.", Order = 3, GroupName = GroupConstants.GROUP_NAME_GENERAL)]
+        public bool DailyLossEnabled { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Daily Loss", Description = "The daily realized loss to disable OFB.", Order = 4, GroupName = GroupConstants.GROUP_NAME_GENERAL)]
+        public double DailyLoss { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Time Enabled", Description = "Enable this to enable time start/end.", Order = 5, GroupName = GroupConstants.GROUP_NAME_GENERAL)]
+        public bool TimeEnabled { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Time Start", Description = "The allowed time to enable OFB.", Order = 6, GroupName = GroupConstants.GROUP_NAME_GENERAL)]
+        public int TimeStart { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Time End", Description = "The allowed time to disable and close positions for OFB.", Order = 7, GroupName = GroupConstants.GROUP_NAME_GENERAL)]
+        public int TimeEnd { get; set; }
 
         #endregion
 
@@ -132,6 +164,14 @@ namespace NinjaTrader.NinjaScript.Strategies
                 // See the Help Guide for additional information
                 IsInstantiatedOnEachOptimizationIteration = true;
 
+                DailyProfitEnabled = false;
+                DailyProfit = 1000;
+                DailyLossEnabled = false;
+                DailyLoss = 1000;
+                TimeEnabled = false;
+                TimeStart = 093000;
+                TimeEnd = 155500;
+
                 BacktestEnabled = false;
                 BacktestStrategyName = "Test";
                 Target = 60;
@@ -148,6 +188,8 @@ namespace NinjaTrader.NinjaScript.Strategies
             {
                 SetConfigs();
                 AddDataSeries(BarsPeriodType.Tick, 1);
+                // Helps with time range check
+                AddDataSeries(BarsPeriodType.Minute, 1);
             }
             else if (State == State.DataLoaded)
             {
@@ -162,18 +204,23 @@ namespace NinjaTrader.NinjaScript.Strategies
 
                 _eventManager = _eventsContainer.EventManager;
                 _tradingEvents = _eventsContainer.TradingEvents;
+                _strategiesEvents = _eventsContainer.StrategiesEvents;
                 _dataBarEvents = _eventsContainer.DataBarEvents;
 
                 _eventsContainer.EventManager.OnPrintMessage += HandlePrintMessage;
 
                 InitializeStrategyManager();
-                InitializeUIManager();
+
+                if (Category != Category.Backtest)
+                {
+                    InitializeUIManager();
+                }
             }
-            else if (State == State.Realtime)
+            else if (State == State.Realtime && Category != Category.Backtest)
             {
                 ReadyControlPanel();
             }
-            else if (State == State.Terminated)
+            else if (State == State.Terminated && Category != Category.Backtest)
             {
                 UnloadControlPanel();
             }
@@ -183,10 +230,13 @@ namespace NinjaTrader.NinjaScript.Strategies
         protected override void OnBarUpdate()
         {
             // Ensure we have defaults at the start of the session across multiple sessions
-            if (IsFirstTickOfBar)
+            if (Bars.IsFirstBarOfSession)
             {
                 _tradingEvents.ResetTriggeredTradingState();
                 _eventsContainer.StrategiesEvents.ResetStrategyData();
+                _validTimeRange = false;
+                _timeStartChecked = false;
+                _timeEndChecked = false;
             }
 
             if (CurrentBars[0] < BarsRequiredToTrade)
@@ -219,8 +269,23 @@ namespace NinjaTrader.NinjaScript.Strategies
                 _eventsContainer.DataBarEvents.UpdateCurrentDataBar(GetDataBarDataProvider(DataBarConfig.Instance));
             }
 
-            if (!BacktestEnabled)
+            if (TimeEnabled)
             {
+                ValidStartEndTime();
+
+                if (!_validTimeRange)
+                {
+                    return;
+                }
+            }
+
+            if (!BacktestEnabled && _currentTradingState.IsTradingEnabled && _userInterfaceEvents != null)
+            {
+                if (ValidDailyProfitLossHit())
+                {
+                    UpdateDailyProfitLossUserInterface();
+                }
+
                 CheckAtmPosition();
             }
         }
@@ -339,6 +404,85 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
         }
 
-        #endregion       
+        #endregion
+
+        #region Time Range and Profit/Loss
+
+        private bool ValidDailyProfitLossHit()
+        {
+            if (Account == null)
+            {
+                return false;
+            }
+
+            double realizedProfitLoss = Account.Get(AccountItem.RealizedProfitLoss, Currency.UsDollar);
+
+            if (
+                (DailyProfitEnabled && realizedProfitLoss > DailyProfit) ||
+                (DailyLossEnabled && realizedProfitLoss < (DailyLoss * -1)))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private void UpdateDailyProfitLossUserInterface()
+        {
+            _servicesContainer.TradingService.HandleEnabledDisabledTriggered(false);
+
+            if (_userInterfaceEvents != null)
+            {
+                _userInterfaceEvents.UpdateControlPanelLabel("Profit/Loss Hit");
+                _userInterfaceEvents.DisableAllControls();
+            }
+        }
+
+        private void ValidStartEndTime()
+        {
+            _validTimeRange = ValidTimeRange();
+
+            // Helps enable/disable control panel
+            if (!_timeStartChecked && _validTimeRange)
+            {
+                // Time is within range
+                _timeStartChecked = true;
+                UpdateValidStartEndTimeUserInterface(true);
+            }
+
+            if (_timeStartChecked && !_timeEndChecked && ToTime(Times[2][1]) >= TimeEnd)
+            {
+                // Initial time start checked and time >= TimeEnd
+                _timeEndChecked = true;
+                UpdateValidStartEndTimeUserInterface(false);
+            }
+        }
+
+        private bool ValidTimeRange()
+        {
+            // Looks at previous bar otherwise it'll trigger the bar building to the time.
+            return (ToTime(Times[2][1]) >= TimeStart && ToTime(Times[2][1]) <= TimeEnd);
+        }
+
+        private void UpdateValidStartEndTimeUserInterface(bool validStartEndTime)
+        {
+            _servicesContainer.TradingService.HandleEnabledDisabledTriggered(validStartEndTime);
+
+            if (_userInterfaceEvents != null)
+            {
+                if (validStartEndTime)
+                {
+                    _userInterfaceEvents.UpdateControlPanelLabel("OrderFlowBot");
+                    _userInterfaceEvents.EnableAllControls();
+                }
+                else
+                {
+                    _userInterfaceEvents.UpdateControlPanelLabel("Invalid Time");
+                    _userInterfaceEvents.DisableAllControls();
+                }
+            }
+        }
+
+        #endregion
     }
 }

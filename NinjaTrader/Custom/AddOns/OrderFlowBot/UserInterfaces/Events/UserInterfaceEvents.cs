@@ -21,6 +21,9 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Events
         public event Action OnResetTriggerStrikePrice;
         public event Action<string> OnAddSelectedStrategyTriggered;
         public event Action<string> OnRemoveSelectedStrategyTriggered;
+        public event Action<string> OnUpdateControlPanelLabel;
+        public event Action OnDisableAllControls;
+        public event Action OnEnableAllControls;
 
         public UserInterfaceEvents(EventManager eventManager)
         {
@@ -172,6 +175,33 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Events
         public void RemoveSelectedStrategyTriggered(string name)
         {
             _eventManager.InvokeEvent(OnRemoveSelectedStrategyTriggered, name);
+        }
+
+        /// <summary>
+        /// Event triggered for updating control panel label.
+        /// This is used to update the control panel label.
+        /// </summary>
+        public void UpdateControlPanelLabel(string name)
+        {
+            _eventManager.InvokeEvent(OnUpdateControlPanelLabel, name);
+        }
+
+        /// <summary>
+        /// Event triggered for disabling all controls.
+        /// This is used to disable all the controls.
+        /// </summary>
+        public void DisableAllControls()
+        {
+            _eventManager.InvokeEvent(OnDisableAllControls);
+        }
+
+        /// <summary>
+        /// Event triggered for enabling all controls.
+        /// This is used to enable all the controls.
+        /// </summary>
+        public void EnableAllControls()
+        {
+            _eventManager.InvokeEvent(OnEnableAllControls);
         }
     }
 }

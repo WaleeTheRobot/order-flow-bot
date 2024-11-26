@@ -53,15 +53,8 @@ namespace NinjaTrader.NinjaScript.Strategies
             if (Position.MarketPosition == MarketPosition.Flat)
             {
                 ResetBacktestStrategy();
-                _eventsContainer.StrategiesEvents.ResetStrategyData();
+                _strategiesEvents.ResetStrategyData();
             }
-        }
-
-        private void HandleEnabledDisabledTriggered(bool isEnabled)
-        {
-            Print(isEnabled);
-            Print("SM: Handling Trading enabled " + _currentTradingState.IsTradingEnabled);
-
         }
 
         private void HandleStrategyTriggeredProcessed()
@@ -88,31 +81,35 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         private void ProcessBacktestTriggeredStrategy()
         {
-            if (Position.MarketPosition == MarketPosition.Flat)
+            if (Position.MarketPosition != MarketPosition.Flat && _currentTradingState.HasMarketPosition)
             {
-                if (_currentTradingState.TriggeredDirection == Direction.Long)
-                {
-                    SetProfitTarget(_triggeredName, CalculationMode.Ticks, Target);
-                    SetStopLoss(_triggeredName, CalculationMode.Ticks, Stop, false);
-                    // Enter using tick series
-                    EnterLong(1, Quantity, _triggeredName);
+                return;
+            }
 
-                    _tradingEvents.LastTradedBarNumberTriggered(_currentDataBar.BarNumber);
-                    _eventManager.PrintMessage($"Enter Long | {_currentDataBar.Time} {_triggeredName}");
+            if (_currentTradingState.TriggeredDirection == Direction.Long)
+            {
+                SetProfitTarget(_triggeredName, CalculationMode.Ticks, Target);
+                SetStopLoss(_triggeredName, CalculationMode.Ticks, Stop, false);
+                // Enter using tick series
+                EnterLong(1, Quantity, _triggeredName);
 
-                    return;
-                }
+                _tradingEvents.LastTradedBarNumberTriggered(_currentDataBar.BarNumber);
+                _tradingEvents.MarketPositionTriggered(true);
+                _eventManager.PrintMessage($"Enter Long | {_currentDataBar.Time} {_triggeredName}");
 
-                if (_currentTradingState.TriggeredDirection == Direction.Short)
-                {
-                    SetProfitTarget(_triggeredName, CalculationMode.Ticks, Target);
-                    SetStopLoss(_triggeredName, CalculationMode.Ticks, Stop, false);
-                    // Enter using tick series
-                    EnterShort(1, Quantity, _triggeredName);
+                return;
+            }
 
-                    _tradingEvents.LastTradedBarNumberTriggered(_currentDataBar.BarNumber);
-                    _eventManager.PrintMessage($"Enter Short | {_currentDataBar.Time} {_triggeredName}");
-                }
+            if (_currentTradingState.TriggeredDirection == Direction.Short)
+            {
+                SetProfitTarget(_triggeredName, CalculationMode.Ticks, Target);
+                SetStopLoss(_triggeredName, CalculationMode.Ticks, Stop, false);
+                // Enter using tick series
+                EnterShort(1, Quantity, _triggeredName);
+
+                _tradingEvents.LastTradedBarNumberTriggered(_currentDataBar.BarNumber);
+                _tradingEvents.MarketPositionTriggered(true);
+                _eventManager.PrintMessage($"Enter Short | {_currentDataBar.Time} {_triggeredName}");
             }
         }
 
@@ -123,6 +120,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             // Prevent re-entry on exit bar
             _tradingEvents.LastTradedBarNumberTriggered(_dataBarEvents.GetCurrentDataBar().BarNumber);
             _tradingEvents.ResetTriggeredTradingState();
+            _tradingEvents.MarketPositionTriggered(false);
         }
 
         #endregion
@@ -131,7 +129,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         private void ProcessAtmTriggeredStrategy()
         {
-            if (State < State.Realtime)
+            if (State < State.Realtime && _currentTradingState.HasMarketPosition)
             {
                 return;
             }
@@ -185,6 +183,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     if (atmCallbackId == _atmStrategyId && atmCallbackErrorCode == ErrorCode.NoError)
                     {
                         _isAtmStrategyCreated = true;
+                        _tradingEvents.MarketPositionTriggered(true);
                     }
                 });
             }
@@ -202,6 +201,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                     if (atmCallbackId == _atmStrategyId && atmCallbackErrorCode == ErrorCode.NoError)
                     {
                         _isAtmStrategyCreated = true;
+                        _tradingEvents.MarketPositionTriggered(true);
                     }
                 });
             }
@@ -217,6 +217,8 @@ namespace NinjaTrader.NinjaScript.Strategies
             // Prevent re-entry on exit bar
             _tradingEvents.LastTradedBarNumberTriggered(_dataBarEvents.GetCurrentDataBar().BarNumber);
             _tradingEvents.ResetTriggeredTradingState();
+            _tradingEvents.MarketPositionTriggered(false);
+            _strategiesEvents.ResetStrategyData();
 
             if (!_currentTradingState.IsAutoTradeEnabled)
             {
@@ -238,7 +240,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         private void HandleCloseAtmPosition()
         {
-            if (_atmStrategyId != null)
+            if (_atmStrategyId != "" && State == State.Realtime)
             {
                 AtmStrategyClose(_atmStrategyId);
                 ResetAtm();

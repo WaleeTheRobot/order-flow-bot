@@ -14,6 +14,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
         public event Action OnCloseTriggered;
         public event Action<int> OnLastTradedBarNumberTriggered;
         public event Action<int> OnCurrentBarNumberTriggered;
+        public event Action<bool> OnMarketPositionTriggered;
         public event Action OnResetTriggerStrikePrice;
         public event Action OnResetSelectedTradeDirection;
         public event Action OnPositionClosedWithAutoDisabled;
@@ -82,6 +83,15 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
         public void CurrentBarNumberTriggered(int barNumber)
         {
             _eventManager.InvokeEvent(OnCurrentBarNumberTriggered, barNumber);
+        }
+
+        /// <summary>
+        /// Event triggered OFB enters a position.
+        /// Helps confirm that there is an actual position.
+        /// </summary>
+        public void MarketPositionTriggered(bool hasMarketPosition)
+        {
+            _eventManager.InvokeEvent(OnMarketPositionTriggered, hasMarketPosition);
         }
 
         /// <summary>

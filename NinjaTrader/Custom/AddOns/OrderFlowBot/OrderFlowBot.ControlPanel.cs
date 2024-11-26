@@ -60,21 +60,52 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             ChartControl?.Dispatcher.InvokeAsync(() =>
             {
+                _userInterfaceEvents.OnUpdateControlPanelLabel += UpdateControlPanelLabel;
+
                 if (!BacktestEnabled)
                 {
-                    UpdateControlPanelLabel("OrderFlowBot");
-                    _tradeManagementGrid.Ready();
-                    _tradeDirectionGrid.Ready();
-                    _strategiesGrid.Ready();
+                    if (TimeEnabled && !_validTimeRange)
+                    {
+                        UpdateValidStartEndTimeUserInterface(false);
+                    }
+                    else if (ValidDailyProfitLossHit())
+                    {
+                        UpdateDailyProfitLossUserInterface();
+                    }
+                    else
+                    {
+                        UpdateControlPanelLabel("OrderFlowBot");
+
+                        _tradeManagementGrid.Ready();
+                        _tradeDirectionGrid.Ready();
+                        _strategiesGrid.Ready();
+                    }
+
+                    // Enable the grids
+                    _tradeManagementGrid.IsEnabled = true;
+                    _tradeDirectionGrid.IsEnabled = true;
+                    _strategiesGrid.IsEnabled = true;
                 }
                 else
                 {
-                    UpdateControlPanelLabel("Back Testing");
+                    UpdateControlPanelLabel("Backtesting");
                 }
             });
         }
 
         private void UpdateControlPanelLabel(string text)
+        {
+            if (_orderFlowLabel.Dispatcher.CheckAccess())
+            {
+                HandleUpdateControlPanelLabel(text);
+            }
+            else
+            {
+                _orderFlowLabel.Dispatcher.Invoke(() => HandleUpdateControlPanelLabel(text));
+            }
+        }
+
+        private void HandleUpdateControlPanelLabel(string text)
         {
             _orderFlowLabel.Text = text;
         }
@@ -122,9 +153,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Text = "Loading..."
             };
 
-            _tradeManagementGrid = new TradeManagementGrid(_servicesContainer, _userInterfaceEvents);
-            _tradeDirectionGrid = new TradeDirectionGrid(_servicesContainer, _userInterfaceEvents, _tradingEvents);
-            _strategiesGrid = new StrategiesGrid(_servicesContainer, _userInterfaceEvents, _eventsContainer.StrategiesEvents);
+            _tradeManagementGrid = new TradeManagementGrid(_servicesContainer, _userInterfaceEvents) { IsEnabled = false };
+            _tradeDirectionGrid = new TradeDirectionGrid(_servicesContainer, _userInterfaceEvents, _tradingEvents) { IsEnabled = false };
+            _strategiesGrid = new StrategiesGrid(_servicesContainer, _userInterfaceEvents, _eventsContainer.StrategiesEvents) { IsEnabled = false };
 
             Grid.SetRow(_orderFlowLabel, 0);
             Grid.SetRow(_tradeManagementGrid, 1);

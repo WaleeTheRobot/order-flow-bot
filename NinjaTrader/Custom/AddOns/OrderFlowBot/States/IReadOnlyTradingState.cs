@@ -19,5 +19,6 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.States
         List<string> SelectedStrategies { get; }
         int LastTradedBarNumber { get; set; }
         int CurrentBarNumber { get; set; }
+        bool HasMarketPosition { get; set; }
     }
 }
