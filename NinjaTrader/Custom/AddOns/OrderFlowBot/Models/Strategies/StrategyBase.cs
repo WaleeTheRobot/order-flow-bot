@@ -1,6 +1,7 @@
 ﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.Configs;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Containers;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.TechnicalLevelsModel;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.States;
 using System.Collections.Generic;
 
@@ -11,6 +12,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies
         protected readonly EventsContainer eventsContainer;
         protected IReadOnlyDataBar currentDataBar;
         protected List<IReadOnlyDataBar> dataBars;
+        protected IReadOnlyTechnicalLevels currentTechnicalLevels;
+        protected List<IReadOnlyTechnicalLevels> technicalLevelsList;
         public IStrategyData StrategyData { get; set; }
 
         protected StrategyBase(EventsContainer eventsContainer)
@@ -18,6 +21,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies
             this.eventsContainer = eventsContainer;
             currentDataBar = new DataBar(DataBarConfig.Instance);
             dataBars = new List<IReadOnlyDataBar>();
+            currentTechnicalLevels = new TechnicalLevels();
+            technicalLevelsList = new List<IReadOnlyTechnicalLevels>();
 
             eventsContainer.StrategiesEvents.OnResetStrategyData += HandleResetStrategyData;
 
@@ -33,6 +38,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies
         {
             currentDataBar = GetCurrentDataBar();
             dataBars = GetDataBars();
+            currentTechnicalLevels = GetCurrentTechnicalLevels();
+            technicalLevelsList = GetGetTechnicalLevels();
 
             if (IsValidSelectedLongDirection() && CheckLong())
             {
@@ -65,6 +72,16 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies
         protected List<IReadOnlyDataBar> GetDataBars()
         {
             return eventsContainer.DataBarEvents.GetDataBars();
+        }
+
+        protected IReadOnlyTechnicalLevels GetCurrentTechnicalLevels()
+        {
+            return eventsContainer.TechnicalLevelsEvents.GetCurrentTechnicalLevels();
+        }
+
+        protected List<IReadOnlyTechnicalLevels> GetGetTechnicalLevels()
+        {
+            return eventsContainer.TechnicalLevelsEvents.GetTechnicalLevelsList();
         }
 
         protected IReadOnlyTradingState GetCurrentTradingState()

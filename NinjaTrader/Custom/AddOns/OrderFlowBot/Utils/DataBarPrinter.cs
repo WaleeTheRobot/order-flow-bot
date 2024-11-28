@@ -8,38 +8,42 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Utils
     {
         private static EventManager _eventManager;
 
-        public static void PrintDataBar(EventManager eventManager, IReadOnlyDataBar dataBar, IDataBarPrintConfig dataBarPrintConfig)
+        public static void PrintDataBar(
+            EventManager eventManager,
+            IReadOnlyDataBar dataBar,
+            IDataBarPrintConfig config
+        )
         {
             _eventManager = eventManager;
 
-            if (dataBarPrintConfig.ShowBasic)
+            if (config.ShowBasic)
             {
                 PrintBasic(dataBar);
             }
 
-            if (dataBarPrintConfig.ShowDeltas)
+            if (config.ShowDeltas)
             {
                 PrintDelta(dataBar);
             }
 
-            if (dataBarPrintConfig.ShowImbalances)
+            if (config.ShowImbalances)
             {
                 PrintImbalances(dataBar);
             }
 
-            if (dataBarPrintConfig.ShowPrices)
+            if (config.ShowPrices)
             {
                 PrintPrices(dataBar);
             }
 
-            if (dataBarPrintConfig.ShowRatios)
+            if (config.ShowRatios)
             {
                 PrintRatios(dataBar);
             }
 
-            if (dataBarPrintConfig.ShowVolumes)
+            if (config.ShowVolumes)
             {
-                PrintVolumes(dataBar, dataBarPrintConfig);
+                PrintVolumes(dataBar, config);
             }
 
             Print("\n");

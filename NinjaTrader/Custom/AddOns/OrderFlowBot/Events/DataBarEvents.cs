@@ -9,7 +9,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
     {
         private readonly EventManager _eventManager;
         public event Action<IDataBarDataProvider> OnUpdateCurrentDataBar;
-        public event Action OnUpdateCurrentDataBarList;
+        public event Action OnUpdateDataBarList;
         public event Action<IDataBarPrintConfig> OnPrintDataBar;
         public event Action OnUpdatedCurrentDataBar;
         public event Func<IReadOnlyDataBar> OnGetCurrentDataBar;
@@ -24,18 +24,18 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
         /// Event triggered when the current DataBar needs to be updated.
         /// This is used to update the current DataBar.
         /// </summary>
-        public void UpdateCurrentDataBar(IDataBarDataProvider dataBarDataProvider)
+        public void UpdateCurrentDataBar(IDataBarDataProvider dataProvider)
         {
-            _eventManager.InvokeEvent(OnUpdateCurrentDataBar, dataBarDataProvider);
+            _eventManager.InvokeEvent(OnUpdateCurrentDataBar, dataProvider);
         }
 
         /// <summary>
         /// Event triggered when the current DataBar needs to be added to the list.
         /// This is used to update the DataBar list with the current DataBar.
         /// </summary>
-        public void UpdateCurrentDataBarList()
+        public void UpdateDataBarList()
         {
-            _eventManager.InvokeEvent(OnUpdateCurrentDataBarList);
+            _eventManager.InvokeEvent(OnUpdateDataBarList);
         }
 
         /// <summary>
@@ -69,9 +69,9 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
         /// Event triggered when printing of DataBar is requested.
         /// This is used to print the DataBar for debugging purposes.
         /// </summary>
-        public void PrintDataBar(IDataBarPrintConfig dataBarPrintConfig)
+        public void PrintDataBar(IDataBarPrintConfig config)
         {
-            _eventManager.InvokeEvent(OnPrintDataBar, dataBarPrintConfig);
+            _eventManager.InvokeEvent(OnPrintDataBar, config);
         }
     }
 }
