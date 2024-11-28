@@ -15,6 +15,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies
         protected IReadOnlyTechnicalLevels currentTechnicalLevels;
         protected List<IReadOnlyTechnicalLevels> technicalLevelsList;
         public IStrategyData StrategyData { get; set; }
+        protected double validTriggerStrikePrice;
 
         protected StrategyBase(EventsContainer eventsContainer)
         {
@@ -23,8 +24,10 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies
             dataBars = new List<IReadOnlyDataBar>();
             currentTechnicalLevels = new TechnicalLevels();
             technicalLevelsList = new List<IReadOnlyTechnicalLevels>();
+            validTriggerStrikePrice = 0;
 
             eventsContainer.StrategiesEvents.OnResetStrategyData += HandleResetStrategyData;
+            eventsContainer.TradingEvents.OnTriggerStrikePriceTriggered += HandleTriggerStrikePriceTriggered;
 
             StrategyData = new StrategyData
             {
@@ -109,6 +112,25 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies
         {
             StrategyData.TriggeredDirection = Direction.Flat;
             StrategyData.StrategyTriggered = false;
+        }
+
+        private void HandleTriggerStrikePriceTriggered()
+        {
+            validTriggerStrikePrice = eventsContainer.TradingEvents.GetTradingState().TriggerStrikePrice;
+        }
+
+        protected bool IsValidTriggerStrikePrice()
+        {
+            // SonarLint zero equality check
+            if (validTriggerStrikePrice.Equals(default))
+            {
+                return true;
+            }
+
+            double highPrice = currentDataBar.Prices.High;
+            double lowPrice = currentDataBar.Prices.Low;
+
+            return validTriggerStrikePrice >= lowPrice && validTriggerStrikePrice <= highPrice;
         }
     }
 }

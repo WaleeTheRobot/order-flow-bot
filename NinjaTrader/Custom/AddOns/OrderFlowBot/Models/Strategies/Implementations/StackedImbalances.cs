@@ -4,7 +4,7 @@ using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars;
 
 namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies.Implementations
 {
-    // Example strategy showing how to use current, previous bar and technical levels
+    // Example strategy showing how to use trigger strike price, current, previous bar and technical levels
     public class StackedImbalances : StrategyBase
     {
         private readonly int _validBarCount;
@@ -25,6 +25,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies.Implementatio
             return
                 IsValidBarCount() &&
                 IsValidVolume() &&
+                IsValidTriggerStrikePrice() &&
                 IsValidDelta(true) &&
                 IsValidCurrentBar(true) &&
                 IsValidOneBarAgoBar(true) &&
@@ -37,6 +38,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies.Implementatio
             return
                 IsValidBarCount() &&
                 IsValidVolume() &&
+                IsValidTriggerStrikePrice() &&
                 IsValidDelta() &&
                 IsValidCurrentBar() &&
                 IsValidOneBarAgoBar() &&

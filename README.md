@@ -15,7 +15,11 @@
 
 <img src="./images/screenshot.png" alt="OrderFlowBot" style="display: block; margin: 0 auto">
 
-A bot used for trading order flow with a selected ATM strategy. The recommended way to use OrderFlowBot is semi-automated trading to **ASSIST** with entries, but fully automated is an option. OrderFlowBot uses the selected ATM strategy. Just create your ATM strategies and select the one you want to use for the trade. You can create your own strategies and easily hook it to OrderFlowBot for semi-automated or fully automated trading.
+OrderFlowBot is a trading tool designed to leverage order flow data with a customizable ATM strategy. While the bot is most effective for semi-automated trading, assisting traders in optimizing entry points, it also supports full automation for those who prefer a hands-off approach.
+
+With OrderFlowBot, you can create and integrate your own ATM strategies seamlessly. Simply design your strategies, select the one you wish to apply, and let the bot handle the execution—whether you prefer semi-automated or fully automated trading workflows.
+
+OrderFlowBot includes access to imbalances, stacked imbalances, and value areas for each bar which are currently not available with NinjaTrader’s volumetric bars. By combining these tools, OrderFlowBot empowers traders with greater precision and control over their strategies.
 
 # Important
 
@@ -61,14 +65,14 @@ Automatically trades the selected strategies for both long and short. This is **
 
 #### Alert
 
-This is useful if you want to see your strategy entries, but want to further analyze for an actual entry. You can manually place the trade when it satisfies your requirements. Note that the close in the Trade Management section will not close manual entries.
+This is useful if you want to see your strategy entries, but want to further analyze for an actual entry. You can manually place the trade when it satisfies your requirements.
 
 - Does not submit an order
 - Draws a triangle and plays sound based on triggered strategy
 
 #### Close
 
-Use this to close an ATM position triggered by a strategy.
+Use this to close an ATM position triggered by a strategy. Note that the close in the Trade Management section will not close manual entries.
 
 - Closes ATM position triggered by a strategy
 - Resets the Trigger Strike Price
@@ -88,7 +92,7 @@ This section contains the options for triggering a trade direction. No entries w
 
 #### Trigger Strike Price
 
-The trigger strike price acts as the starting point for the strategy to begin seeking an entry. However, this will only work if the strategy includes the necessary logic to check and verify the requirements. For instance, if your strategy is designed to validate certain conditions and includes logic for the trigger strike price, it will only execute these checks when the trigger price is reached. This is similar to a limit order, but in this case, the strategy only starts evaluating conditions once the limit price is hit.
+The trigger strike price acts as the starting point for the strategy to begin seeking an entry. This will be valid if the trigger strike price falls within the high and low of the bar.
 
 #### Standard/Inverse
 
@@ -116,14 +120,20 @@ I'm still deciding how to approach this section to support users without coding 
 
 #### Stacked Imbalances
 
-This strategy is the common stacked imbalances strategy. It will trigger based on finding stacked imbalances. Note that just because it found a stacked imbalance doesn't mean it can revert shortly afterwards causing those stacked imbalances to become invalid. This is just an example strategy and you should customize it to your own liking.
+This strategy is the common stacked imbalances strategy. It will trigger based on finding stacked imbalances. Note that just because it found a stacked imbalance doesn't mean it can revert shortly afterwards causing those stacked imbalances to become invalid. This is just an example strategy to display how to access the databar and technical levels and you should customize it to your own liking.
+
+#### Both
+
+- Has valid bar count
+- Has valid volume
+- Triggers at trigger strike price if its used
 
 #### Long
 
 - Previous bar is bullish
 - Current bar is bullish
 - Current bar is above fast EMA
-- Triggers at trigger strike price if its used
+- Current delta is above valid delta
 - Has valid ask stacked imbalances
 
 #### Short
@@ -131,7 +141,7 @@ This strategy is the common stacked imbalances strategy. It will trigger based o
 - Previous bar is bearish
 - Current bar is bearish
 - Current bar is below fast EMA
-- Triggers at trigger strike price if its used
+- Current delta is below valid delta
 - Has valid bid stacked imbalances
 
 ## Build Your Own Strategy
@@ -139,3 +149,7 @@ This strategy is the common stacked imbalances strategy. It will trigger based o
 You can design your own custom trading strategy and leverage all the properties of the data bar. To get started, simply create a new file and place it in the `Models/Strategies/Implementations` directory. Ensure your class inherits from `StrategyBase`.
 
 For guidance, check out the `StackedImbalances` class as an example. Once you've completed your implementation, compile the project, and OFB will automatically generate a button for your new strategy in the control panel, giving you greater control over its operation.
+
+## Adding Your Own Technical Levels
+
+You can add your own technical levels. The `OrderFlowBot.TechnicalLevels` class shows how to add the EMA. This uses the EMA provided by NinjaTrader and adds it to the `TechnicalLevels`. For guidance, check out how the EMA was created in the `Models/TechnicalLevelsModel` directory.
