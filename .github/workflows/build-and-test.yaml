@@ -47,10 +47,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install Python3
+      - name: Install Python3 and Bash
         run: |
           apt-get update
-          apt-get install -y python3 curl
+          apt-get install -y python3 curl bash
+
+      - name: Download and Debug DeepSource CLI
+        run: |
+          curl -L https://deepsource.io/cli -o deepsource-cli.py
+          cat deepsource-cli.py  # Inspect the downloaded script for issues
+          python3 deepsource-cli.py --install
 
       - name: Run Tests and Generate Coverage
         run: |
@@ -62,7 +68,6 @@ jobs:
         env:
           DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
         run: |
-          curl -L https://deepsource.io/cli | python3 - --install
           export PATH="$PATH:/root/.deepsource/bin"
           deepsource report \
             --analyzer test-coverage \
