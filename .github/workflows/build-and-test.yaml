@@ -82,5 +82,5 @@ jobs:
           export PATH="$PATH:/root/.deepsource/bin"
           deepsource report \
             --analyzer test-coverage \
-            --key dotnet-coverage \
+            --key csharp \
             --value-file $(find ./TestResults -name "coverage.cobertura.xml")
