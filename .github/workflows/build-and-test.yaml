@@ -1,4 +1,4 @@
-name: Build and Test
+name: Build, Test, and Report Coverage
 
 on:
   push:
@@ -36,3 +36,36 @@ jobs:
 
       - name: Run Tests
         run: dotnet test ./Tests/OrderFlowBot.Tests.csproj --configuration Release
+
+  coverage:
+    needs: test
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/dotnet/sdk:8.0
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run Tests and Generate Coverage
+        run: |
+          dotnet test ./Tests/OrderFlowBot.Tests.csproj --configuration Release \
+            --collect:"XPlat Code Coverage" \
+            --results-directory ./TestResults
+
+      - name: Upload Coverage to DeepSource
+        env:
+          DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
+        run: |
+          curl -L https://deepsource.io/cli | python3 - --install
+          export PATH="$PATH:/root/.deepsource/bin"
+          deepsource report \
+            --analyzer test-coverage \
+            --key dotnet-coverage \
+            --value-file $(find ./TestResults -name "coverage.cobertura.xml")
+
+      - name: Upload Coverage File (Optional for Debugging)
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-results
+          path: ./TestResults
