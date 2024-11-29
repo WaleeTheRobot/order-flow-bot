@@ -47,29 +47,26 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0 # Fetch all history for DeepSource
+          fetch-depth: 0
 
       - name: Install Dependencies
         run: |
           apt-get update
-          apt-get install -y python3 curl bash
+          apt-get install -y python3 curl bash git
+
+      - name: Configure Git
+        run: |
+          git config --global --add safe.directory "*"
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
 
       - name: Download and Install DeepSource CLI
         run: |
-          # Set installation directory
           INSTALL_DIR=/root/.deepsource/bin
-
-          # Download the script
           curl -L https://deepsource.io/cli -o deepsource-cli.sh
-
-          # Set executable permissions
           chmod +x deepsource-cli.sh
-
-          # Install the CLI to the specified directory
           ./deepsource-cli.sh -b $INSTALL_DIR
-
-          # Add the binary directory to PATH
-          export PATH="$PATH:$INSTALL_DIR"
+          echo "$INSTALL_DIR" >> $GITHUB_PATH
 
       - name: Run Tests and Generate Coverage
         run: |
@@ -77,11 +74,17 @@ jobs:
             --collect:"XPlat Code Coverage" \
             --results-directory ./TestResults
 
+      - name: Debug Git Status
+        run: |
+          pwd
+          ls -la
+          git status
+          git rev-parse HEAD
+
       - name: Upload Coverage to DeepSource
         env:
           DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
         run: |
-          export PATH="$PATH:/root/.deepsource/bin"
           deepsource report \
             --analyzer test-coverage \
             --key csharp \
