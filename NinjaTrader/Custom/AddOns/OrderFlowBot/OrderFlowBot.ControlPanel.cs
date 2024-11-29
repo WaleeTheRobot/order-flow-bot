@@ -50,10 +50,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         private void UnloadControlPanel()
         {
-            ChartControl?.Dispatcher.InvokeAsync(() =>
-            {
-                DisposeWPFControls();
-            });
+            ChartControl?.Dispatcher.InvokeAsync(DisposeWPFControls);
         }
 
         private void ReadyControlPanel()

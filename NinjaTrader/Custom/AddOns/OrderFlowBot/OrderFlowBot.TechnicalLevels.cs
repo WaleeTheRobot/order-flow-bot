@@ -22,7 +22,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         private Ema GetEma(int barsAgo)
         {
-            Ema ema = new Ema
+            var ema = new Ema
             {
                 FastEma = Math.Round(EMA(9)[barsAgo], 2),
                 SlowEma = Math.Round(EMA(20)[barsAgo], 2)

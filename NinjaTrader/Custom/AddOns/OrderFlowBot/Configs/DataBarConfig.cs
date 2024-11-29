@@ -8,13 +8,7 @@
         {
         }
 
-        public static DataBarConfig Instance
-        {
-            get
-            {
-                return _instance;
-            }
-        }
+        public static DataBarConfig Instance => _instance;
 
         public double TickSize { get; set; }
         public int TicksPerLevel { get; set; }

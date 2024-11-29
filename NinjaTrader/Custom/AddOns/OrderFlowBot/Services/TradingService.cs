@@ -111,14 +111,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
 
         public void UpdateStandardInverse(Direction direction)
         {
-            if (direction == Direction.Standard || direction == Direction.Inverse)
-            {
-                _tradingState.StandardInverse = direction;
-            }
-            else
-            {
-                _tradingState.StandardInverse = Direction.Standard;
-            }
+            _tradingState.StandardInverse =
+                (direction == Direction.Standard || direction == Direction.Inverse) ? direction : Direction.Standard;
         }
 
         public void HandleCloseTriggered()

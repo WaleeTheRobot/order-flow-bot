@@ -24,7 +24,7 @@ namespace OrderFlowBot.Tests
 
         public OrderFlowBotStrategyManagerTests()
         {
-            EventsContainer eventsContainer = new EventsContainer();
+            var eventsContainer = new EventsContainer();
             var backtestData = new BacktestConfigData();
             backtestData.SetNoBacktest();
             _servicesContainer = new ServicesContainer(eventsContainer, backtestData);

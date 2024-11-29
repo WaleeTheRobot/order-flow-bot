@@ -72,7 +72,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
 
         public virtual void AddHeadingLabel(string label)
         {
-            StackPanel headingContainer = new StackPanel
+            var headingContainer = new StackPanel
             {
                 Orientation = Orientation.Horizontal,
                 HorizontalAlignment = HorizontalAlignment.Center,

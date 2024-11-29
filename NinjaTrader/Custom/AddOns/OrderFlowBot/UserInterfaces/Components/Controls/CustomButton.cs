@@ -27,7 +27,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components.Contr
 
         private Button CreateButton(ButtonModel config)
         {
-            Button button = new Button
+            var button = new Button
             {
                 Name = config.Name,
                 Content = config.IsToggleable && config.InitialToggleState ? config.ToggledContent : config.Content,
@@ -77,7 +77,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components.Contr
 
         private Style CreateCustomButtonStyle(Button button)
         {
-            Style style = new Style(typeof(Button));
+            var style = new Style(typeof(Button));
 
             var config = ((ButtonState)button.Tag).Config;
 
@@ -113,15 +113,15 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components.Contr
 
         private ControlTemplate CreateButtonTemplate()
         {
-            ControlTemplate template = new ControlTemplate(typeof(Button));
+            var template = new ControlTemplate(typeof(Button));
 
-            FrameworkElementFactory border = new FrameworkElementFactory(typeof(Border));
+            var border = new FrameworkElementFactory(typeof(Border));
             border.SetBinding(Border.BackgroundProperty, new Binding("Background") { RelativeSource = new RelativeSource(RelativeSourceMode.TemplatedParent) });
             border.SetBinding(Border.BorderBrushProperty, new Binding("BorderBrush") { RelativeSource = new RelativeSource(RelativeSourceMode.TemplatedParent) });
             border.SetBinding(Border.BorderThicknessProperty, new Binding("BorderThickness") { RelativeSource = new RelativeSource(RelativeSourceMode.TemplatedParent) });
             border.SetBinding(Border.PaddingProperty, new Binding("Padding") { RelativeSource = new RelativeSource(RelativeSourceMode.TemplatedParent) });
 
-            FrameworkElementFactory contentPresenter = new FrameworkElementFactory(typeof(ContentPresenter));
+            var contentPresenter = new FrameworkElementFactory(typeof(ContentPresenter));
             contentPresenter.SetValue(FrameworkElement.HorizontalAlignmentProperty, HorizontalAlignment.Center);
             contentPresenter.SetValue(FrameworkElement.VerticalAlignmentProperty, VerticalAlignment.Center);
             border.AppendChild(contentPresenter);

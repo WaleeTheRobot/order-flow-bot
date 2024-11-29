@@ -56,14 +56,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
             IReadOnlyDataBar dataBar;
             int barsAgo = config.BarsAgo;
 
-            if (barsAgo == 0)
-            {
-                dataBar = _currentDataBar;
-            }
-            else
-            {
-                dataBar = _dataBars[_dataBars.Count - barsAgo];
-            }
+            dataBar = (barsAgo == 0) ? _currentDataBar : _dataBars[_dataBars.Count - barsAgo];
 
             DataBarPrinter.PrintDataBar(_eventManager, dataBar, config);
         }

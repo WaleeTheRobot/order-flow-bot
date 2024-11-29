@@ -55,7 +55,7 @@ namespace OrderFlowBot.Tests
         public void ShouldTriggerUpdatedCurrentDataBarEvent()
         {
             Mock<IDataBarConfig> dataBarConfigMock = new Mock<IDataBarConfig>();
-            DataBar dataBarMock = new DataBar(dataBarConfigMock.Object);
+            var dataBarMock = new DataBar(dataBarConfigMock.Object);
             List<DataBar> dataBarsMock = new List<DataBar>();
             dataBarsMock.Add(dataBarMock);
 

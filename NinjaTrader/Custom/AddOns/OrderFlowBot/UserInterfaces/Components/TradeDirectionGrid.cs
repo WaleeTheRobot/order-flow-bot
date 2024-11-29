@@ -64,7 +64,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
 
         private void AddTriggerStrikePrice()
         {
-            TextBlock triggerStrikePriceLabel = new TextBlock()
+            var triggerStrikePriceLabel = new TextBlock()
             {
                 FontSize = 11,
                 Foreground = UserInterfaceUtils.GetSolidColorBrushFromHex(CustomColors.TEXT_COLOR),
@@ -266,9 +266,9 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
                     continue;
                 }
 
-                if (initialToggleState.ContainsKey(buttonName))
+                if (initialToggleState.TryGetValue(buttonName, out bool toggleState))
                 {
-                    buttonState.IsToggled = initialToggleState[buttonName];
+                    buttonState.IsToggled = toggleState;
                 }
 
                 SetButtonEnabled(buttons[buttonName], !isEnabled);
@@ -288,9 +288,9 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
             {
                 ButtonState buttonState = (ButtonState)buttons[buttonName].Tag;
 
-                if (initialToggleState.ContainsKey(buttonName))
+                if (initialToggleState.TryGetValue(buttonName, out bool toggleState))
                 {
-                    buttonState.IsToggled = initialToggleState[buttonName];
+                    buttonState.IsToggled = toggleState;
 
                     UserInterfaceUtils.ForceRefreshButton(buttons[buttonName]);
                 }

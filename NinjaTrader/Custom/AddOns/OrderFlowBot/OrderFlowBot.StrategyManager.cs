@@ -30,15 +30,9 @@ namespace NinjaTrader.NinjaScript.Strategies
             string baseDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "NinjaTrader 8", "bin", "Custom", "AddOns", "OrderFlowBot", "Assets");
             string alertSoundFilePath = Path.Combine(baseDirectory, "alert.wav");
 
-            if (File.Exists(alertSoundFilePath))
-            {
-                _alertSoundFilePath = alertSoundFilePath;
-            }
-            else
-            {
-                // Fallback
-                _alertSoundFilePath = @"C:\Program Files\NinjaTrader 8\sounds\Alert2.wav";
-            }
+            _alertSoundFilePath = File.Exists(alertSoundFilePath)
+                ? alertSoundFilePath
+                : @"C:\Program Files\NinjaTrader 8\sounds\Alert2.wav";
         }
 
         protected override void OnExecutionUpdate(

@@ -56,14 +56,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
             IReadOnlyTechnicalLevels technicalLevels;
             int barsAgo = config.BarsAgo;
 
-            if (barsAgo == 0)
-            {
-                technicalLevels = _currentTechnicalLevels;
-            }
-            else
-            {
-                technicalLevels = _technicalLevelsList[_technicalLevelsList.Count - barsAgo];
-            }
+            technicalLevels = (barsAgo == 0) ? _currentTechnicalLevels : _technicalLevelsList[_technicalLevelsList.Count - barsAgo];
 
             TechnicalLevelsPrinter.PrintTechnicalLevels(_eventManager, technicalLevels, config);
         }

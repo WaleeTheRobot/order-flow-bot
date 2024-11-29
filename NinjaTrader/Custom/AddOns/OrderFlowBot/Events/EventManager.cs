@@ -50,11 +50,9 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
                 {
                     return eventHandler();
                 }
-                else
-                {
-                    PrintMessage("Event handler is null");
-                    return default;
-                }
+
+                PrintMessage("Event handler is null");
+                return default;
             }
             catch (Exception ex)
             {

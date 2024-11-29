@@ -11,22 +11,22 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars.Base
         public void SetRatios(List<BidAskVolume> bidAskVolumes)
         {
             double secondBottomBid, bottomBid;
-            GetBottomBidVolumes(bidAskVolumes, out secondBottomBid, out bottomBid);
+            SetBottomBidVolumes(bidAskVolumes, out secondBottomBid, out bottomBid);
             BidRatio = BarUtils.CalculateRatio(secondBottomBid, bottomBid);
 
             double topAsk, secondTopAsk;
-            GetTopAskVolumes(bidAskVolumes, out topAsk, out secondTopAsk);
+            SetTopAskVolumes(bidAskVolumes, out topAsk, out secondTopAsk);
             AskRatio = BarUtils.CalculateRatio(secondTopAsk, topAsk);
         }
 
-        private void GetBottomBidVolumes(List<BidAskVolume> bidAskVolumes, out double secondBottomBid, out double bottomBid)
+        private static void SetBottomBidVolumes(List<BidAskVolume> bidAskVolumes, out double secondBottomBid, out double bottomBid)
         {
             int lastIndex = bidAskVolumes.Count - 1;
             secondBottomBid = bidAskVolumes[lastIndex - 1].BidVolume;
             bottomBid = bidAskVolumes[lastIndex].BidVolume;
         }
 
-        private void GetTopAskVolumes(List<BidAskVolume> bidAskVolumes, out double topAsk, out double secondTopAsk)
+        private static void SetTopAskVolumes(List<BidAskVolume> bidAskVolumes, out double topAsk, out double secondTopAsk)
         {
             topAsk = bidAskVolumes[0].AskVolume;
             secondTopAsk = bidAskVolumes[1].AskVolume;

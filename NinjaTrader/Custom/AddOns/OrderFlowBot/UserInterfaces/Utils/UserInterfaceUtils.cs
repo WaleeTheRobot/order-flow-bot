@@ -34,7 +34,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Utils
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error creating SolidColorBrush from hex color: {hexColor}", ex);
+                throw new InvalidOperationException($"Error creating SolidColorBrush from hex color: {hexColor}", ex);
             }
         }
 
@@ -48,7 +48,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Utils
 
         public static Image CreateCogIcon(Action onClickAction)
         {
-            Image cogIcon = new Image
+            var cogIcon = new Image
             {
                 Source = new BitmapImage(new Uri(Path.Combine(UserInterfaceConfig.Instance.AssetsPath, "cog.png"))),
                 Width = 13,
