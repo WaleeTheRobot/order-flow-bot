@@ -1,4 +1,8 @@
 version = 1
 
 [[analyzers]]
-name = "csharp"
+name = "test-coverage"
+enabled = true
+
+[analyzers.meta]
+language = "csharp"

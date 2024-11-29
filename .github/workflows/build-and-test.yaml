@@ -5,40 +5,7 @@ on:
   pull_request:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    container:
-      image: mcr.microsoft.com/dotnet/sdk:8.0
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Install dependencies
-        run: |
-          apt-get update
-          apt-get install -y curl libssl-dev
-          curl -sL https://deb.nodesource.com/setup_20.x | bash -
-          apt-get install -y nodejs
-
-      - name: Restore dependencies
-        run: dotnet restore ./Tests/OrderFlowBot.Tests.csproj
-
-  test:
-    needs: build
-    runs-on: ubuntu-latest
-    container:
-      image: mcr.microsoft.com/dotnet/sdk:8.0
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Run Tests
-        run: dotnet test ./Tests/OrderFlowBot.Tests.csproj --configuration Release
-
   coverage:
-    needs: test
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/dotnet/sdk:8.0
@@ -53,8 +20,7 @@ jobs:
         run: |
           apt-get update
           apt-get install -y python3 curl bash git
-          dotnet tool install --global coverlet.console
-          dotnet tool install --global dotnet-reportgenerator-globaltool
+          dotnet tool install --global dotnet-coverage
 
       - name: Configure Git
         run: |
@@ -62,29 +28,28 @@ jobs:
           git config --global user.email "actions@github.com"
           git config --global user.name "GitHub Actions"
 
-      - name: Download and Install DeepSource CLI
-        run: |
-          curl https://deepsource.io/cli | sh
-
       - name: Create TestResults Directory
         run: mkdir -p TestResults
 
-      - name: Run Tests and Generate Coverage
+      - name: Restore Dependencies
+        run: dotnet restore ./Tests/OrderFlowBot.Tests.csproj
+
+      - name: Generate Coverage
         run: |
-          dotnet test ./Tests/OrderFlowBot.Tests.csproj \
-            --configuration Release \
-            /p:CollectCoverage=true \
-            /p:CoverletOutputFormat=cobertura \
-            /p:CoverletOutput=./TestResults/coverage.cobertura.xml
+          dotnet-coverage collect 'dotnet test ./Tests/OrderFlowBot.Tests.csproj' -f cobertura -o ./TestResults/coverage.cobertura.xml
+
+      - name: Download and Install DeepSource CLI
+        run: |
+          curl https://deepsource.io/cli | sh
 
       - name: Debug Information
         run: |
           echo "Current directory content:"
           ls -la
           echo "TestResults directory content:"
-          ls -la TestResults || echo "TestResults directory is empty or not accessible"
+          ls -la TestResults
           echo "Full path search for coverage file:"
-          find . -name "coverage.cobertura.xml" || echo "No coverage file found"
+          find . -name "coverage.cobertura.xml"
           echo "Current working directory:"
           pwd
 
