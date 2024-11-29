@@ -5,4 +5,5 @@ name = "test-coverage"
 enabled = true
 
 [analyzers.meta]
-language = "csharp"
+category = "coverage"
+format = "cobertura"
