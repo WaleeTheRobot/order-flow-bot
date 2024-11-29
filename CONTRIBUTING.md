@@ -17,7 +17,7 @@ To contribute to this project, you will need:
 - [NinjaTrader 8](https://ninjatrader.com/) (you'll need the lifetime license or the OrderFlow+ package to work with the volumetric data)
 - [Visual Studio](https://visualstudio.microsoft.com/) (the Community version works great)
 - C#8 and NinjaScript knowledge
-- Make sure you install SonarLint to your IDE. This project uses SonarCloud for static analysis.
+- Make sure you install SonarLint to your IDE this will help with static analysis.
 
 Ensure that NinjaTrader's AddOns directory is configured correctly to include `OrderFlowBot`.
 
@@ -51,7 +51,7 @@ The project structure is unconventional. The `OrderFlowBot` code resides in the 
 
 5. **Static Analysis**
 
-   - This project uses SonarCloud for static analysis in the GitHub Actions pipeline. Installing SonarLint to your IDE will help identify some warnings and issues before pushing your changes.
+   - This project uses SonarLint for local static analysis. It uses DeepSource in the GitHub Actions pipeline. Installing SonarLint to your IDE will help identify some warnings and issues before pushing your changes.
 
 6. **Test your changes in NinjaTrader.**
 
