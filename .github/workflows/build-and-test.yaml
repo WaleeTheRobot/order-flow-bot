@@ -47,16 +47,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install Python3 and Bash
+      - name: Install Dependencies
         run: |
           apt-get update
           apt-get install -y python3 curl bash
 
-      - name: Download and Debug DeepSource CLI
+      - name: Download and Install DeepSource CLI
         run: |
-          curl -L https://deepsource.io/cli -o deepsource-cli.py
-          cat deepsource-cli.py  # Inspect the downloaded script for issues
-          python3 deepsource-cli.py --install
+          # Download the script
+          curl -L https://deepsource.io/cli -o deepsource-cli.sh
+
+          # Set executable permissions
+          chmod +x deepsource-cli.sh
+
+          # Execute as a Bash script
+          bash ./deepsource-cli.sh --install
 
       - name: Run Tests and Generate Coverage
         run: |
