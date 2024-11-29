@@ -1,5 +1,6 @@
 # OrderFlowBot
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/d230ca76cfd7470086d6f1ed40a2860a)](https://app.codacy.com/gh/WaleeTheRobot/order-flow-bot?utm_source=github.com&utm_medium=referral&utm_content=WaleeTheRobot/order-flow-bot&utm_campaign=Badge_Grade)
 [![Actions Status](https://github.com/WaleeTheRobot/order-flow-bot/workflows/Build%20and%20Test/badge.svg)](https://github.com/WaleeTheRobot/order-flow-bot/actions)
 [![Actions Status](https://github.com/WaleeTheRobot/order-flow-bot/workflows/Formatting/badge.svg)](https://github.com/WaleeTheRobot/order-flow-bot/actions)
 [![Actions Status](https://github.com/WaleeTheRobot/order-flow-bot/workflows/SonarCloud/badge.svg)](https://github.com/WaleeTheRobot/order-flow-bot/actions)
