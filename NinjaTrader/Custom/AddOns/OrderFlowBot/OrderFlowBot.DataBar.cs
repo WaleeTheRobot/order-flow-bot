@@ -78,7 +78,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             {
                 if (counter == 0)
                 {
-                    BidAskVolume bidAskVolume = new BidAskVolume
+                    var bidAskVolume = new BidAskVolume
                     {
                         Price = high,
                         BidVolume = volumes.GetBidVolumeForPrice(high),

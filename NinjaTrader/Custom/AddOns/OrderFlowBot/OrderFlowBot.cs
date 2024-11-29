@@ -49,11 +49,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         [NinjaScriptProperty]
         [Display(Name = "Version", Description = "OrderFlowBot version.", Order = 0, GroupName = GroupConstants.GROUP_NAME_GENERAL)]
         [ReadOnly(true)]
-        public string Version
-        {
-            get { return "3.0.0"; }
-            set { }
-        }
+        public string Version => "3.0.0";
 
         [NinjaScriptProperty]
         [Display(Name = "Daily Profit Enabled", Description = "Enable this to disable OFB after the daily realized profit is hit.", Order = 1, GroupName = GroupConstants.GROUP_NAME_GENERAL)]
@@ -429,7 +425,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
         {
-            return new StandardValuesCollection(new string[] { "Session", "Bar" });
+            return new StandardValuesCollection(new[] { "Session", "Bar" });
         }
     }
 }

@@ -8,13 +8,7 @@
         {
         }
 
-        public static UserInterfaceConfig Instance
-        {
-            get
-            {
-                return _instance;
-            }
-        }
+        public static UserInterfaceConfig Instance => _instance;
 
         public string AssetsPath { get; set; }
     }
