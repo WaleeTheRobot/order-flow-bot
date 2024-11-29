@@ -1,5 +1,8 @@
 version = 1
 
 [[analyzers]]
+name = "csharp"
+
+[[analyzers]]
 name = "test-coverage"
 enabled = true
