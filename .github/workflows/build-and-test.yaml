@@ -62,30 +62,30 @@ jobs:
 
       - name: Download and Install DeepSource CLI
         run: |
-          INSTALL_DIR=/root/.deepsource/bin
-          curl -L https://deepsource.io/cli -o deepsource-cli.sh
-          chmod +x deepsource-cli.sh
-          ./deepsource-cli.sh -b $INSTALL_DIR
-          echo "$INSTALL_DIR" >> $GITHUB_PATH
+          mkdir -p $GITHUB_WORKSPACE/bin
+          curl https://deepsource.io/cli | sh
+          mv ./bin/deepsource $GITHUB_WORKSPACE/bin/
+          chmod +x $GITHUB_WORKSPACE/bin/deepsource
 
       - name: Run Tests and Generate Coverage
         run: |
           dotnet test ./Tests/OrderFlowBot.Tests.csproj --configuration Release \
             --collect:"XPlat Code Coverage" \
-            --results-directory ./TestResults
+            --results-directory $GITHUB_WORKSPACE/TestResults
 
-      - name: Debug Git Status
+      - name: Debug Information
         run: |
-          pwd
-          ls -la
-          git status
-          git rev-parse HEAD
+          echo "Working directory: $GITHUB_WORKSPACE"
+          ls -la $GITHUB_WORKSPACE/bin
+          ls -la $GITHUB_WORKSPACE/TestResults
+          find $GITHUB_WORKSPACE/TestResults -name "coverage.cobertura.xml"
 
       - name: Upload Coverage to DeepSource
         env:
-          DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
+          DEEPSOURCE_DSN: ${{ env.DEEPSOURCE_DSN }}
         run: |
-          deepsource report \
+          COVERAGE_FILE=$(find $GITHUB_WORKSPACE/TestResults -name "coverage.cobertura.xml")
+          $GITHUB_WORKSPACE/bin/deepsource report \
             --analyzer test-coverage \
             --key csharp \
-            --value-file $(find ./TestResults -name "coverage.cobertura.xml")
+            --value-file $COVERAGE_FILE
