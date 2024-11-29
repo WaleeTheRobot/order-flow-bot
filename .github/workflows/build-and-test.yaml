@@ -66,16 +66,29 @@ jobs:
 
       - name: Run Tests and Generate Coverage
         run: |
-          dotnet test ./Tests/OrderFlowBot.Tests.csproj --configuration Release \
-            --collect:"XPlat Code Coverage" \
-            --results-directory $GITHUB_WORKSPACE/TestResults
+          dotnet tool install --global coverlet.console
+          dotnet test ./Tests/OrderFlowBot.Tests.csproj \
+            --configuration Release \
+            /p:CollectCoverage=true \
+            /p:CoverletOutputFormat=cobertura \
+            /p:CoverletOutput=$GITHUB_WORKSPACE/TestResults/coverage.cobertura.xml
+
+      - name: Debug Coverage File
+        run: |
+          echo "Current directory content:"
+          ls -la
+          echo "TestResults directory content:"
+          ls -la $GITHUB_WORKSPACE/TestResults
+          echo "Coverage file location:"
+          find $GITHUB_WORKSPACE -name "coverage.cobertura.xml"
+          echo "Coverage file content preview:"
+          head -n 10 $GITHUB_WORKSPACE/TestResults/coverage.cobertura.xml
 
       - name: Upload Coverage to DeepSource
         env:
           DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
         run: |
-          COVERAGE_FILE=$(find $GITHUB_WORKSPACE/TestResults -name "coverage.cobertura.xml")
           ./bin/deepsource report \
             --analyzer test-coverage \
             --key csharp \
-            --value-file $COVERAGE_FILE
+            --value-file $GITHUB_WORKSPACE/TestResults/coverage.cobertura.xml

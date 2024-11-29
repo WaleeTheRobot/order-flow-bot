@@ -1,7 +1,10 @@
 # OrderFlowBot
 
-[![Actions Status](https://github.com/WaleeTheRobot/order-flow-bot/workflows/build-and-test.yaml/badge.svg)](https://github.com/WaleeTheRobot/order-flow-bot/actions)
-[![Actions Status](https://github.com/WaleeTheRobot/order-flow-bot/workflows/formatting.yaml/badge.svg)](https://github.com/WaleeTheRobot/order-flow-bot/actions)
+[![Build and Test](https://github.com/WaleeTheRobot/order-flow-bot/actions/workflows/build-and-test.yaml/badge.svg)](https://github.com/WaleeTheRobot/order-flow-bot/actions/workflows/build-and-test.yaml)
+[![Formatting Status](https://github.com/WaleeTheRobot/order-flow-bot/actions/workflows/formatting.yaml/badge.svg)](https://github.com/WaleeTheRobot/order-flow-bot/actions/workflows/formatting.yaml)
+
+[![DeepSource](https://app.deepsource.com/gh/WaleeTheRobot/order-flow-bot.svg/?label=code+coverage&show_trend=true&token=TyZyloPBqsTeRPlQqGuTcLBh)](https://app.deepsource.com/gh/WaleeTheRobot/order-flow-bot/)
+[![DeepSource](https://app.deepsource.com/gh/WaleeTheRobot/order-flow-bot.svg/?label=active+issues&show_trend=true&token=TyZyloPBqsTeRPlQqGuTcLBh)](https://app.deepsource.com/gh/WaleeTheRobot/order-flow-bot/)
 
 <img src="./images/screenshot.png" alt="OrderFlowBot" style="display: block; margin: 0 auto">
 
