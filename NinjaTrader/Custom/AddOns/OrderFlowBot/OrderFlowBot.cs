@@ -4,18 +4,13 @@ using NinjaTrader.Custom.AddOns.OrderFlowBot.Configs;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Containers;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Events;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars;
-using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars.Base;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.States;
-using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Configs;
 using NinjaTrader.Data;
-using NinjaTrader.NinjaScript.BarsTypes;
-using System;
-using System.Collections.Generic;
+using NinjaTrader.NinjaScript.Indicators;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 
 #endregion
 
@@ -45,7 +40,6 @@ namespace NinjaTrader.NinjaScript.Strategies
         private IReadOnlyDataBar _currentDataBar;
         private IReadOnlyTradingState _currentTradingState;
 
-        private DataBarDataProvider _dataBarDataProvider;
         private bool _validTimeRange;
         private bool _timeStartChecked;
         private bool _timeEndChecked;
@@ -113,6 +107,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Display(Name = "Value Area Percentage", Description = "The percent to determine the value area.", Order = 4, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
         public double ValueAreaPercentage { get; set; }
 
+        [NinjaScriptProperty]
+        [Display(Name = "Cumulative Delta Period", Description = "The cumulative delta period.", Order = 5, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
+        [TypeConverter(typeof(CumulativeDeltaSelectedPeriodConverter))]
+        public string CumulativeDeltaSelectedPeriod { get; set; }
+
         #endregion
 
         #region Backtest Properties
@@ -173,16 +172,17 @@ namespace NinjaTrader.NinjaScript.Strategies
                 TimeEnd = 155500;
 
                 BacktestEnabled = false;
-                BacktestStrategyName = "Test";
+                BacktestStrategyName = "Stacked Imbalances";
                 Target = 60;
                 Stop = 60;
                 Quantity = 1;
 
-                TicksPerLevel = 5;
+                TicksPerLevel = 1;
                 ImbalanceRatio = 1.5;
                 StackedImbalance = 3;
                 ImbalanceMinDelta = 10;
                 ValueAreaPercentage = 70;
+                CumulativeDeltaSelectedPeriod = "Session";
             }
             else if (State == State.Configure)
             {
@@ -193,7 +193,18 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
             else if (State == State.DataLoaded)
             {
-                _dataBarDataProvider = new DataBarDataProvider();
+                // Couldn't suppress this for IDE. Created per documentation example and compiles fine.
+                if (CumulativeDeltaSelectedPeriod == "Session")
+                {
+                    _cumulativeDelta = OrderFlowCumulativeDelta(CumulativeDeltaType.BidAsk, CumulativeDeltaPeriod.Session, 0);
+                }
+                else if (CumulativeDeltaSelectedPeriod == "Bar")
+                {
+                    _cumulativeDelta = OrderFlowCumulativeDelta(CumulativeDeltaType.BidAsk, CumulativeDeltaPeriod.Bar, 0);
+                }
+
+                InitializeDataBar();
+                InitializeTechnicalLevels();
 
                 _eventsContainer = new EventsContainer();
                 _servicesContainer = new ServicesContainer(_eventsContainer, new BacktestData
@@ -244,29 +255,42 @@ namespace NinjaTrader.NinjaScript.Strategies
                 return;
             }
 
+            // First index data series should be the tick to support the cumulative delta bar
+            if (BarsInProgress == 1)
+            {
+                _cumulativeDelta.Update(_cumulativeDelta.BarsArray[1].Count - 1, 1);
+            }
+
             if (BarsInProgress == 0 && IsFirstTickOfBar)
             {
-                _eventsContainer.DataBarEvents.UpdateCurrentDataBarList();
+                _eventsContainer.DataBarEvents.UpdateDataBarList();
+                _eventsContainer.TechnicalLevelsEvents.UpdateTechnicalLevelsList();
 
-                /*
-                _eventsContainer.DataBarEvents.PrintDataBar(new DataBarPrintConfig
-                {
-                    BarsAgo = 1,
-                    ShowBasic = true,
-                    ShowDeltas = false,
-                    ShowImbalances = false,
-                    ShowPrices = false,
-                    ShowRatios = false,
-                    ShowVolumes = false,
-                    ShowBidAskVolumePerBar = false,
-                });
-                */
+                //_eventsContainer.DataBarEvents.PrintDataBar(new DataBarPrintConfig
+                //{
+                //    BarsAgo = 1,
+                //    ShowBasic = true,
+                //    ShowDeltas = false,
+                //    ShowImbalances = false,
+                //    ShowPrices = false,
+                //    ShowRatios = false,
+                //    ShowVolumes = false,
+                //    ShowBidAskVolumePerBar = false,
+                //    ShowCumulativeDeltaBar = true,
+                //});
+
+                //_eventsContainer.TechnicalLevelsEvents.PrintTechnicalLevels(new TechnicalLevelsPrintConfig
+                //{
+                //    BarsAgo = 1,
+                //    ShowEma = true,
+                //});
             }
 
             if (BarsInProgress == 0)
             {
                 _eventsContainer.TradingEvents.CurrentBarNumberTriggered(CurrentBars[0]);
                 _eventsContainer.DataBarEvents.UpdateCurrentDataBar(GetDataBarDataProvider(DataBarConfig.Instance));
+                _eventsContainer.TechnicalLevelsEvents.UpdateCurrentTechnicalLevels(GetTechnicalLevelsDataProvider());
             }
 
             if (TimeEnabled)
@@ -288,109 +312,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 
                 CheckAtmPosition();
             }
-        }
 
-        #region DataBar Setup and Debugging
-
-        private IDataBarDataProvider GetDataBarDataProvider(IDataBarConfig config, int barsAgo = 0)
-        {
-            _dataBarDataProvider.Time = ToTime(Time[barsAgo]);
-            _dataBarDataProvider.CurrentBar = CurrentBars[0];
-            _dataBarDataProvider.BarsAgo = barsAgo;
-            _dataBarDataProvider.High = High[barsAgo];
-            _dataBarDataProvider.Low = Low[barsAgo];
-            _dataBarDataProvider.Open = Open[barsAgo];
-            _dataBarDataProvider.Close = Close[barsAgo];
-
-            VolumetricBarsType volumetricBar = Bars.BarsSeries.BarsType as VolumetricBarsType;
-            _dataBarDataProvider.VolumetricBar = PopulateCustomVolumetricBar(volumetricBar, config);
-
-            return _dataBarDataProvider;
-        }
-
-        private ICustomVolumetricBar PopulateCustomVolumetricBar(VolumetricBarsType volumetricBar, IDataBarConfig config)
-        {
-            ICustomVolumetricBar customBar = new CustomVolumetricBar();
-
-            double high = _dataBarDataProvider.High;
-            double low = _dataBarDataProvider.Low;
-
-            var volumes = volumetricBar.Volumes[_dataBarDataProvider.CurrentBar - _dataBarDataProvider.BarsAgo];
-
-            customBar.TotalVolume = volumes.TotalVolume;
-            customBar.TotalBuyingVolume = volumes.TotalBuyingVolume;
-            customBar.TotalSellingVolume = volumes.TotalSellingVolume;
-
-            volumes.GetMaximumVolume(null, out double pointOfControl);
-            customBar.PointOfControl = pointOfControl;
-
-            // Get bid/ask volume for each price in bar
-            List<BidAskVolume> bidAskVolumeList = new List<BidAskVolume>();
-            int ticksPerLevel = config.TicksPerLevel;
-            int totalLevels = 0;
-            int counter = 0;
-
-            while (high >= low)
+            if (!BacktestEnabled && _currentTradingState.IsTradingEnabled && _userInterfaceEvents != null)
             {
-                if (counter == 0)
+                if (ValidDailyProfitLossHit())
                 {
-                    BidAskVolume bidAskVolume = new BidAskVolume
-                    {
-                        Price = high,
-                        BidVolume = volumes.GetBidVolumeForPrice(high),
-                        AskVolume = volumes.GetAskVolumeForPrice(high)
-                    };
-
-                    bidAskVolumeList.Add(bidAskVolume);
+                    UpdateDailyProfitLossUserInterface();
                 }
 
-                if (counter == ticksPerLevel - 1)
-                {
-                    counter = 0;
-                }
-                else
-                {
-                    counter++;
-                }
-
-                totalLevels++;
-                high -= config.TickSize;
+                CheckAtmPosition();
             }
-
-            // Remove the first item if total levels are not divisible by ticksPerLevel and more than 4 levels
-            // Sometimes bidAskVolumeList doesn't correlate visually due to an extra level or lack of a level
-            // This seems to resolve probably many of the realistic scenarios
-            if (totalLevels % ticksPerLevel > 0 && bidAskVolumeList.Count > 4)
-            {
-                bidAskVolumeList.RemoveAt(0);
-            }
-
-            customBar.BidAskVolumes = bidAskVolumeList;
-
-            // Deltas
-            customBar.BarDelta = volumes.BarDelta;
-            customBar.MinSeenDelta = volumes.MinSeenDelta;
-            customBar.MaxSeenDelta = volumes.MaxSeenDelta;
-            customBar.DeltaSh = volumes.DeltaSh;
-            customBar.DeltaSl = volumes.DeltaSl;
-            customBar.CumulativeDelta = volumes.CumulativeDelta;
-            customBar.DeltaPercentage = Math.Round(volumes.GetDeltaPercent(), 2);
-            customBar.DeltaChange = volumes.BarDelta - volumetricBar.Volumes[_dataBarDataProvider.CurrentBar - _dataBarDataProvider.BarsAgo - 1].BarDelta;
-
-            return customBar;
-        }
-
-        private void SetConfigs()
-        {
-            DataBarConfig.Instance.TicksPerLevel = TicksPerLevel;
-            DataBarConfig.Instance.TickSize = TickSize;
-            DataBarConfig.Instance.StackedImbalance = StackedImbalance;
-            DataBarConfig.Instance.ImbalanceRatio = ImbalanceRatio;
-            DataBarConfig.Instance.ImbalanceMinDelta = ImbalanceMinDelta;
-            DataBarConfig.Instance.ValueAreaPercentage = ValueAreaPercentage;
-
-            UserInterfaceConfig.Instance.AssetsPath =
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "NinjaTrader 8", "bin", "Custom", "AddOns", "OrderFlowBot", "Assets");
         }
 
         // Used for debugging event messages
@@ -403,8 +334,6 @@ namespace NinjaTrader.NinjaScript.Strategies
                 Print("");
             }
         }
-
-        #endregion
 
         #region Time Range and Profit/Loss
 
@@ -484,5 +413,23 @@ namespace NinjaTrader.NinjaScript.Strategies
         }
 
         #endregion
+    }
+
+    public class CumulativeDeltaSelectedPeriodConverter : TypeConverter
+    {
+        public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
+        {
+            return true;
+        }
+
+        public override bool GetStandardValuesExclusive(ITypeDescriptorContext context)
+        {
+            return true;
+        }
+
+        public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
+        {
+            return new StandardValuesCollection(new string[] { "Session", "Bar" });
+        }
     }
 }

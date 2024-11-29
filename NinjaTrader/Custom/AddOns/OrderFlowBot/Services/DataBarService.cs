@@ -20,7 +20,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
 
             _dataBarEvents = eventsContainer.DataBarEvents;
             _dataBarEvents.OnUpdateCurrentDataBar += HandleUpdateCurrentDataBar;
-            _dataBarEvents.OnUpdateCurrentDataBarList += HandleUpdateCurrentDataBarList;
+            _dataBarEvents.OnUpdateDataBarList += HandleUpdateDataBarList;
             _dataBarEvents.OnGetCurrentDataBar += HandleGetCurrentDataBar;
             _dataBarEvents.OnGetDataBars += HandleGetDataBars;
             _dataBarEvents.OnPrintDataBar += HandlePrintDataBar;
@@ -29,13 +29,13 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
             _currentDataBar = new DataBar(DataBarConfig.Instance);
         }
 
-        private void HandleUpdateCurrentDataBar(IDataBarDataProvider dataBarDataProvider)
+        private void HandleUpdateCurrentDataBar(IDataBarDataProvider dataProvider)
         {
-            _currentDataBar.SetCurrentDataBar(dataBarDataProvider);
+            _currentDataBar.SetCurrentDataBar(dataProvider);
             _dataBarEvents.UpdatedCurrentDataBar();
         }
 
-        private void HandleUpdateCurrentDataBarList()
+        private void HandleUpdateDataBarList()
         {
             _dataBars.Add(_currentDataBar);
             _currentDataBar = new DataBar(DataBarConfig.Instance);
@@ -51,10 +51,10 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
             return _dataBars;
         }
 
-        private void HandlePrintDataBar(IDataBarPrintConfig dataBarPrintConfig)
+        private void HandlePrintDataBar(IDataBarPrintConfig config)
         {
             IReadOnlyDataBar dataBar;
-            int barsAgo = dataBarPrintConfig.BarsAgo;
+            int barsAgo = config.BarsAgo;
 
             if (barsAgo == 0)
             {
@@ -65,7 +65,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
                 dataBar = _dataBars[_dataBars.Count - barsAgo];
             }
 
-            DataBarPrinter.PrintDataBar(_eventManager, dataBar, dataBarPrintConfig);
+            DataBarPrinter.PrintDataBar(_eventManager, dataBar, config);
         }
     }
 }

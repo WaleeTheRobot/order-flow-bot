@@ -8,6 +8,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Containers
         public DataBarEvents DataBarEvents { get; set; }
         public TradingEvents TradingEvents { get; set; }
         public StrategiesEvents StrategiesEvents { get; set; }
+        public TechnicalLevelsEvents TechnicalLevelsEvents { get; set; }
 
         public EventsContainer()
         {
@@ -15,6 +16,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Containers
             DataBarEvents = new DataBarEvents(EventManager);
             TradingEvents = new TradingEvents(EventManager);
             StrategiesEvents = new StrategiesEvents(EventManager);
+            TechnicalLevelsEvents = new TechnicalLevelsEvents(EventManager);
         }
     }
 }

@@ -16,6 +16,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
         public event Action<int> OnCurrentBarNumberTriggered;
         public event Action<bool> OnMarketPositionTriggered;
         public event Action OnResetTriggerStrikePrice;
+        public event Action OnTriggerStrikePriceTriggered;
         public event Action OnResetSelectedTradeDirection;
         public event Action OnPositionClosedWithAutoDisabled;
 
@@ -100,6 +101,14 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Events
         public void ResetTriggerStrikePrice()
         {
             _eventManager.InvokeEvent(OnResetTriggerStrikePrice);
+        }
+
+        /// <summary>
+        /// Used to let consumers know the trigger strike price triggered.
+        /// </summary>
+        public void TriggerStrikePriceTriggered()
+        {
+            _eventManager.InvokeEvent(OnTriggerStrikePriceTriggered);
         }
 
         /// <summary>

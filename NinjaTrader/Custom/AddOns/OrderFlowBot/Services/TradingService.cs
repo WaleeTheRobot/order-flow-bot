@@ -129,6 +129,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Services
         public void HandleTriggerStrikePriceTriggered(double price)
         {
             _tradingState.TriggerStrikePrice = price;
+            _tradingEvents.TriggerStrikePriceTriggered();
         }
 
         public void HandleAddSelectedStrategyTriggered(string name)

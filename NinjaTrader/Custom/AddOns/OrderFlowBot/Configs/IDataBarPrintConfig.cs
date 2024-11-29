@@ -2,13 +2,14 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Configs
 {
     public interface IDataBarPrintConfig
     {
-        public int BarsAgo { get; set; }
-        public bool ShowBasic { get; set; }
-        public bool ShowDeltas { get; set; }
-        public bool ShowImbalances { get; set; }
-        public bool ShowPrices { get; set; }
-        public bool ShowRatios { get; set; }
-        public bool ShowVolumes { get; set; }
-        public bool ShowBidAskVolumePerBar { get; set; }
+        int BarsAgo { get; set; }
+        bool ShowBasic { get; set; }
+        bool ShowDeltas { get; set; }
+        bool ShowImbalances { get; set; }
+        bool ShowPrices { get; set; }
+        bool ShowRatios { get; set; }
+        bool ShowVolumes { get; set; }
+        bool ShowBidAskVolumePerBar { get; set; }
+        bool ShowCumulativeDeltaBar { get; set; }
     }
 }

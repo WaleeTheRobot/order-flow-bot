@@ -45,8 +45,8 @@ namespace OrderFlowBot.Tests
         public void ShouldTriggerUpdateCurrentDataBarListEvent()
         {
             var eventTriggered = false;
-            _dataBarEvents.OnUpdateCurrentDataBarList += () => eventTriggered = true;
-            _dataBarEvents.UpdateCurrentDataBarList();
+            _dataBarEvents.OnUpdateDataBarList += () => eventTriggered = true;
+            _dataBarEvents.UpdateDataBarList();
 
             Assert.True(eventTriggered, "Expected the OnUpdateCurrentDataBarList event to be triggered.");
         }
@@ -96,8 +96,8 @@ namespace OrderFlowBot.Tests
         [Fact]
         public void ShouldVerifyMultipleDataBarsInList()
         {
-            _dataBarEvents.UpdateCurrentDataBarList();
-            _dataBarEvents.UpdateCurrentDataBarList();
+            _dataBarEvents.UpdateDataBarList();
+            _dataBarEvents.UpdateDataBarList();
 
             var dataBars = _dataBarEvents.GetDataBars();
             Assert.NotNull(dataBars);

@@ -1,6 +1,7 @@
 ﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.Configs;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Containers;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.TechnicalLevelsModel;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.States;
 using System.Collections.Generic;
 
@@ -11,15 +12,22 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies
         protected readonly EventsContainer eventsContainer;
         protected IReadOnlyDataBar currentDataBar;
         protected List<IReadOnlyDataBar> dataBars;
+        protected IReadOnlyTechnicalLevels currentTechnicalLevels;
+        protected List<IReadOnlyTechnicalLevels> technicalLevelsList;
         public IStrategyData StrategyData { get; set; }
+        protected double validTriggerStrikePrice;
 
         protected StrategyBase(EventsContainer eventsContainer)
         {
             this.eventsContainer = eventsContainer;
             currentDataBar = new DataBar(DataBarConfig.Instance);
             dataBars = new List<IReadOnlyDataBar>();
+            currentTechnicalLevels = new TechnicalLevels();
+            technicalLevelsList = new List<IReadOnlyTechnicalLevels>();
+            validTriggerStrikePrice = 0;
 
             eventsContainer.StrategiesEvents.OnResetStrategyData += HandleResetStrategyData;
+            eventsContainer.TradingEvents.OnTriggerStrikePriceTriggered += HandleTriggerStrikePriceTriggered;
 
             StrategyData = new StrategyData
             {
@@ -33,6 +41,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies
         {
             currentDataBar = GetCurrentDataBar();
             dataBars = GetDataBars();
+            currentTechnicalLevels = GetCurrentTechnicalLevels();
+            technicalLevelsList = GetGetTechnicalLevels();
 
             if (IsValidSelectedLongDirection() && CheckLong())
             {
@@ -67,6 +77,16 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies
             return eventsContainer.DataBarEvents.GetDataBars();
         }
 
+        protected IReadOnlyTechnicalLevels GetCurrentTechnicalLevels()
+        {
+            return eventsContainer.TechnicalLevelsEvents.GetCurrentTechnicalLevels();
+        }
+
+        protected List<IReadOnlyTechnicalLevels> GetGetTechnicalLevels()
+        {
+            return eventsContainer.TechnicalLevelsEvents.GetTechnicalLevelsList();
+        }
+
         protected IReadOnlyTradingState GetCurrentTradingState()
         {
             return eventsContainer.TradingEvents.GetTradingState();
@@ -92,6 +112,25 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies
         {
             StrategyData.TriggeredDirection = Direction.Flat;
             StrategyData.StrategyTriggered = false;
+        }
+
+        private void HandleTriggerStrikePriceTriggered()
+        {
+            validTriggerStrikePrice = eventsContainer.TradingEvents.GetTradingState().TriggerStrikePrice;
+        }
+
+        protected bool IsValidTriggerStrikePrice()
+        {
+            // SonarLint zero equality check
+            if (validTriggerStrikePrice.Equals(default))
+            {
+                return true;
+            }
+
+            double highPrice = currentDataBar.Prices.High;
+            double lowPrice = currentDataBar.Prices.Low;
+
+            return validTriggerStrikePrice >= lowPrice && validTriggerStrikePrice <= highPrice;
         }
     }
 }
