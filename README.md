@@ -1,7 +1,7 @@
 # OrderFlowBot
 
-[![Actions Status](https://github.com/WaleeTheRobot/order-flow-bot/workflows/Build%20and%20Test/badge.svg)](https://github.com/WaleeTheRobot/order-flow-bot/actions)
-[![Actions Status](https://github.com/WaleeTheRobot/order-flow-bot/workflows/Formatting/badge.svg)](https://github.com/WaleeTheRobot/order-flow-bot/actions)
+[![Actions Status](https://github.com/WaleeTheRobot/order-flow-bot/workflows/build-and-test.yaml/badge.svg)](https://github.com/WaleeTheRobot/order-flow-bot/actions)
+[![Actions Status](https://github.com/WaleeTheRobot/order-flow-bot/workflows/formatting.yaml/badge.svg)](https://github.com/WaleeTheRobot/order-flow-bot/actions)
 
 <img src="./images/screenshot.png" alt="OrderFlowBot" style="display: block; margin: 0 auto">
 
