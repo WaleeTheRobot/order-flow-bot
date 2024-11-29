@@ -53,6 +53,8 @@ jobs:
         run: |
           apt-get update
           apt-get install -y python3 curl bash git
+          dotnet tool install --global coverlet.console
+          dotnet tool install --global dotnet-reportgenerator-globaltool
 
       - name: Configure Git
         run: |
@@ -64,31 +66,38 @@ jobs:
         run: |
           curl https://deepsource.io/cli | sh
 
+      - name: Create TestResults Directory
+        run: mkdir -p TestResults
+
       - name: Run Tests and Generate Coverage
         run: |
-          dotnet tool install --global coverlet.console
           dotnet test ./Tests/OrderFlowBot.Tests.csproj \
             --configuration Release \
             /p:CollectCoverage=true \
             /p:CoverletOutputFormat=cobertura \
-            /p:CoverletOutput=$GITHUB_WORKSPACE/TestResults/coverage.cobertura.xml
+            /p:CoverletOutput=./TestResults/coverage.cobertura.xml
 
-      - name: Debug Coverage File
+      - name: Debug Information
         run: |
           echo "Current directory content:"
           ls -la
           echo "TestResults directory content:"
-          ls -la $GITHUB_WORKSPACE/TestResults
-          echo "Coverage file location:"
-          find $GITHUB_WORKSPACE -name "coverage.cobertura.xml"
-          echo "Coverage file content preview:"
-          head -n 10 $GITHUB_WORKSPACE/TestResults/coverage.cobertura.xml
+          ls -la TestResults || echo "TestResults directory is empty or not accessible"
+          echo "Full path search for coverage file:"
+          find . -name "coverage.cobertura.xml" || echo "No coverage file found"
+          echo "Current working directory:"
+          pwd
 
       - name: Upload Coverage to DeepSource
         env:
           DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
         run: |
-          ./bin/deepsource report \
-            --analyzer test-coverage \
-            --key csharp \
-            --value-file $GITHUB_WORKSPACE/TestResults/coverage.cobertura.xml
+          if [ -f "./TestResults/coverage.cobertura.xml" ]; then
+            ./bin/deepsource report \
+              --analyzer test-coverage \
+              --key csharp \
+              --value-file ./TestResults/coverage.cobertura.xml
+          else
+            echo "Coverage file not found!"
+            exit 1
+          fi
