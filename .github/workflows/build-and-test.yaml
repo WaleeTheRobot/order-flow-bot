@@ -5,40 +5,7 @@ on:
   pull_request:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    container:
-      image: mcr.microsoft.com/dotnet/sdk:8.0
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Install dependencies
-        run: |
-          apt-get update
-          apt-get install -y curl libssl-dev
-          curl -sL https://deb.nodesource.com/setup_20.x | bash -
-          apt-get install -y nodejs
-
-      - name: Restore dependencies
-        run: dotnet restore ./Tests/OrderFlowBot.Tests.csproj
-
-  test:
-    needs: build
-    runs-on: ubuntu-latest
-    container:
-      image: mcr.microsoft.com/dotnet/sdk:8.0
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Run Tests
-        run: dotnet test ./Tests/OrderFlowBot.Tests.csproj --configuration Release
-
   coverage:
-    needs: test
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/dotnet/sdk:8.0
@@ -53,6 +20,8 @@ jobs:
         run: |
           apt-get update
           apt-get install -y python3 curl bash git
+          dotnet tool install --global dotnet-coverage
+          echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
       - name: Configure Git
         run: |
@@ -60,22 +29,46 @@ jobs:
           git config --global user.email "actions@github.com"
           git config --global user.name "GitHub Actions"
 
+      - name: Create TestResults Directory
+        run: mkdir -p TestResults
+
+      - name: Restore Dependencies
+        run: dotnet restore ./Tests/OrderFlowBot.Tests.csproj
+
+      - name: Generate Coverage
+        run: |
+          export PATH="$PATH:$HOME/.dotnet/tools"
+          dotnet-coverage collect 'dotnet test ./Tests/OrderFlowBot.Tests.csproj' -f cobertura -o ./TestResults/coverage.cobertura.xml
+
       - name: Download and Install DeepSource CLI
         run: |
           curl https://deepsource.io/cli | sh
 
-      - name: Run Tests and Generate Coverage
+      - name: Debug Information
         run: |
-          dotnet test ./Tests/OrderFlowBot.Tests.csproj --configuration Release \
-            --collect:"XPlat Code Coverage" \
-            --results-directory $GITHUB_WORKSPACE/TestResults
+          echo "Current directory content:"
+          ls -la
+          echo "TestResults directory content:"
+          ls -la TestResults
+          echo "Full path search for coverage file:"
+          find . -name "coverage.cobertura.xml"
+          echo "Current working directory:"
+          pwd
+          echo "PATH environment:"
+          echo $PATH
+          echo "Dotnet tools location:"
+          ls -la $HOME/.dotnet/tools
 
       - name: Upload Coverage to DeepSource
         env:
           DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
         run: |
-          COVERAGE_FILE=$(find $GITHUB_WORKSPACE/TestResults -name "coverage.cobertura.xml")
-          ./bin/deepsource report \
-            --analyzer test-coverage \
-            --key csharp \
-            --value-file $COVERAGE_FILE
+          if [ -f "./TestResults/coverage.cobertura.xml" ]; then
+            ./bin/deepsource report \
+              --analyzer test-coverage \
+              --key csharp \
+              --value-file ./TestResults/coverage.cobertura.xml
+          else
+            echo "Coverage file not found!"
+            exit 1
+          fi

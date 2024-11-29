@@ -1,4 +1,9 @@
 version = 1
 
 [[analyzers]]
-name = "csharp"
+name = "test-coverage"
+enabled = true
+
+[analyzers.meta]
+category = "coverage"
+format = "cobertura"
