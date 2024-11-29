@@ -21,6 +21,7 @@ jobs:
           apt-get update
           apt-get install -y python3 curl bash git
           dotnet tool install --global dotnet-coverage
+          echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
       - name: Configure Git
         run: |
@@ -36,6 +37,7 @@ jobs:
 
       - name: Generate Coverage
         run: |
+          export PATH="$PATH:$HOME/.dotnet/tools"
           dotnet-coverage collect 'dotnet test ./Tests/OrderFlowBot.Tests.csproj' -f cobertura -o ./TestResults/coverage.cobertura.xml
 
       - name: Download and Install DeepSource CLI
@@ -52,6 +54,10 @@ jobs:
           find . -name "coverage.cobertura.xml"
           echo "Current working directory:"
           pwd
+          echo "PATH environment:"
+          echo $PATH
+          echo "Dotnet tools location:"
+          ls -la $HOME/.dotnet/tools
 
       - name: Upload Coverage to DeepSource
         env:
