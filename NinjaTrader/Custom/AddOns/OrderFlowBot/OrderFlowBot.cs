@@ -166,12 +166,12 @@ namespace NinjaTrader.NinjaScript.Strategies
                 TimeEnd = 155500;
 
                 BacktestEnabled = false;
-                BacktestStrategyName = "Test";
+                BacktestStrategyName = "";
                 Target = 60;
                 Stop = 60;
                 Quantity = 1;
 
-                TicksPerLevel = 5;
+                TicksPerLevel = 1;
                 ImbalanceRatio = 1.5;
                 StackedImbalance = 3;
                 ImbalanceMinDelta = 10;
