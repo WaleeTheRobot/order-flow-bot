@@ -10,6 +10,7 @@ namespace OrderFlowBot.Tests.Mocks.Data
         public bool ShowRatios { get; set; }
         public bool ShowVolumes { get; set; }
         public bool ShowBidAskVolumePerBar { get; set; }
+        public bool ShowCumulativeDeltaBar { get; set; }
 
         public DataBarPrintConfigData()
         {
@@ -21,6 +22,7 @@ namespace OrderFlowBot.Tests.Mocks.Data
             ShowRatios = true;
             ShowVolumes = true;
             ShowBidAskVolumePerBar = true;
+            ShowCumulativeDeltaBar = true;
         }
     }
 }

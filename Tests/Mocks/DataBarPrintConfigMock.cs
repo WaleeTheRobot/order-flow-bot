@@ -19,6 +19,7 @@ namespace OrderFlowBot.Tests.Mocks
             mock.SetupProperty(x => x.ShowRatios, configData.ShowRatios);
             mock.SetupProperty(x => x.ShowVolumes, configData.ShowVolumes);
             mock.SetupProperty(x => x.ShowBidAskVolumePerBar, configData.ShowBidAskVolumePerBar);
+            mock.SetupProperty(x => x.ShowCumulativeDeltaBar, configData.ShowCumulativeDeltaBar);
 
             return mock;
         }

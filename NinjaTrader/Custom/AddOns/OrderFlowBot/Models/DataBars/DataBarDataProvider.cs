@@ -1,4 +1,6 @@
-﻿namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars
+﻿using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars.Base;
+
+namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars
 {
     public class DataBarDataProvider : IDataBarDataProvider
     {
@@ -10,6 +12,7 @@
         public double Low { get; set; }
         public double Open { get; set; }
         public double Close { get; set; }
+        public CumulativeDeltaBar CumulativeDeltaBar { get; set; }
 
         public DataBarDataProvider()
         {
@@ -21,6 +24,7 @@
             Low = 0;
             Open = 0;
             Close = 0;
+            CumulativeDeltaBar = null;
         }
     }
 }

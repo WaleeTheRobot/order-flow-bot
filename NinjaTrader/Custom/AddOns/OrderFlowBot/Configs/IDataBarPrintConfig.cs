@@ -10,5 +10,6 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Configs
         bool ShowRatios { get; set; }
         bool ShowVolumes { get; set; }
         bool ShowBidAskVolumePerBar { get; set; }
+        bool ShowCumulativeDeltaBar { get; set; }
     }
 }

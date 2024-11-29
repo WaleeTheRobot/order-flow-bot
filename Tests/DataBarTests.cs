@@ -109,6 +109,7 @@ namespace OrderFlowBot.Tests
         [Fact]
         public void ShouldPopulateDataBarImbalances()
         {
+            // There is an issue testing the stacked imbalances. For some reason they are empty, but only in testing.
             var dataBarConfig = DataBarConfigMock.CreateDataBarConfig().Object;
             var dataBarDataProvider = DataBarDataProviderMock.CreateDataBarDataProvider().Object;
             var dataBar = new DataBar(_dataBarConfig.Object);
@@ -151,6 +152,18 @@ namespace OrderFlowBot.Tests
             }
         }
 
-        // There is an issue testing the stacked imbalances. For some reason they are empty, but only in testing.
+        [Fact]
+        public void ShouldPopulateCumulativeDeltaBar()
+        {
+            var dataBarDataProvider = DataBarDataProviderMock.CreateDataBarDataProvider().Object;
+            var dataBar = new DataBar(_dataBarConfig.Object);
+
+            dataBar.SetCurrentDataBar(dataBarDataProvider);
+
+            Assert.Equal(10, dataBar.CumulativeDeltaBar.High);
+            Assert.Equal(1, dataBar.CumulativeDeltaBar.Low);
+            Assert.Equal(5, dataBar.CumulativeDeltaBar.Open);
+            Assert.Equal(7, dataBar.CumulativeDeltaBar.Close);
+        }
     }
 }

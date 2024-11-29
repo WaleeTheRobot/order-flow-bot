@@ -1,4 +1,5 @@
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars.Base;
 
 namespace OrderFlowBot.Tests.Mocks.Data
 {
@@ -12,6 +13,7 @@ namespace OrderFlowBot.Tests.Mocks.Data
         public static double Low { get; set; }
         public static double Open { get; set; }
         public static double Close { get; set; }
+        public static CumulativeDeltaBar CumulativeDeltaBar { get; set; }
 
         static DataBarDataProviderData()
         {
@@ -23,6 +25,13 @@ namespace OrderFlowBot.Tests.Mocks.Data
             Low = 18667.25;
             Open = 18692.50;
             Close = 18667.25;
+            CumulativeDeltaBar = new CumulativeDeltaBar
+            {
+                High = 10,
+                Low = 1,
+                Open = 5,
+                Close = 7
+            };
         }
     }
 }

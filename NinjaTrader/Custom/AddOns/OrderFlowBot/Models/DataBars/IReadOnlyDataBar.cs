@@ -14,5 +14,6 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars
         Volumes Volumes { get; }
         Deltas Deltas { get; }
         Imbalances Imbalances { get; }
+        CumulativeDeltaBar CumulativeDeltaBar { get; }
     }
 }

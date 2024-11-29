@@ -3,6 +3,7 @@ using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars.Base;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Configs;
 using NinjaTrader.NinjaScript.BarsTypes;
+using NinjaTrader.NinjaScript.Indicators;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +13,7 @@ namespace NinjaTrader.NinjaScript.Strategies
     public partial class OrderFlowBot : Strategy
     {
         private DataBarDataProvider _dataBarDataProvider;
+        private OrderFlowCumulativeDelta _cumulativeDelta;
 
         private void InitializeDataBar()
         {
@@ -30,6 +32,22 @@ namespace NinjaTrader.NinjaScript.Strategies
 
             VolumetricBarsType volumetricBar = Bars.BarsSeries.BarsType as VolumetricBarsType;
             _dataBarDataProvider.VolumetricBar = PopulateCustomVolumetricBar(volumetricBar, config);
+
+            try
+            {
+                _dataBarDataProvider.CumulativeDeltaBar = new CumulativeDeltaBar
+                {
+                    Open = _cumulativeDelta.DeltaOpen[barsAgo],
+                    Close = _cumulativeDelta.DeltaClose[barsAgo],
+                    High = _cumulativeDelta.DeltaHigh[barsAgo],
+                    Low = _cumulativeDelta.DeltaLow[barsAgo],
+                };
+            }
+            catch
+            {
+                // Fallback
+                _dataBarDataProvider.CumulativeDeltaBar = new CumulativeDeltaBar();
+            }
 
             return _dataBarDataProvider;
         }

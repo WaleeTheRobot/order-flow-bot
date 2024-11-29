@@ -7,6 +7,7 @@ using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.States;
 using NinjaTrader.Data;
+using NinjaTrader.NinjaScript.Indicators;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
@@ -106,6 +107,11 @@ namespace NinjaTrader.NinjaScript.Strategies
         [Display(Name = "Value Area Percentage", Description = "The percent to determine the value area.", Order = 4, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
         public double ValueAreaPercentage { get; set; }
 
+        [NinjaScriptProperty]
+        [Display(Name = "Cumulative Delta Period", Description = "The cumulative delta period.", Order = 5, GroupName = GroupConstants.GROUP_NAME_DATA_BAR)]
+        [TypeConverter(typeof(CumulativeDeltaSelectedPeriodConverter))]
+        public string CumulativeDeltaSelectedPeriod { get; set; }
+
         #endregion
 
         #region Backtest Properties
@@ -166,7 +172,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 TimeEnd = 155500;
 
                 BacktestEnabled = false;
-                BacktestStrategyName = "";
+                BacktestStrategyName = "Stacked Imbalances";
                 Target = 60;
                 Stop = 60;
                 Quantity = 1;
@@ -176,6 +182,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 StackedImbalance = 3;
                 ImbalanceMinDelta = 10;
                 ValueAreaPercentage = 70;
+                CumulativeDeltaSelectedPeriod = "Session";
             }
             else if (State == State.Configure)
             {
@@ -186,6 +193,16 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
             else if (State == State.DataLoaded)
             {
+                // Couldn't suppress this for IDE. Created per documentation example and compiles fine.
+                if (CumulativeDeltaSelectedPeriod == "Session")
+                {
+                    _cumulativeDelta = OrderFlowCumulativeDelta(CumulativeDeltaType.BidAsk, CumulativeDeltaPeriod.Session, 0);
+                }
+                else if (CumulativeDeltaSelectedPeriod == "Bar")
+                {
+                    _cumulativeDelta = OrderFlowCumulativeDelta(CumulativeDeltaType.BidAsk, CumulativeDeltaPeriod.Bar, 0);
+                }
+
                 InitializeDataBar();
                 InitializeTechnicalLevels();
 
@@ -238,6 +255,12 @@ namespace NinjaTrader.NinjaScript.Strategies
                 return;
             }
 
+            // First index data series should be the tick to support the cumulative delta bar
+            if (BarsInProgress == 1)
+            {
+                _cumulativeDelta.Update(_cumulativeDelta.BarsArray[1].Count - 1, 1);
+            }
+
             if (BarsInProgress == 0 && IsFirstTickOfBar)
             {
                 _eventsContainer.DataBarEvents.UpdateDataBarList();
@@ -253,6 +276,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 //    ShowRatios = false,
                 //    ShowVolumes = false,
                 //    ShowBidAskVolumePerBar = false,
+                //    ShowCumulativeDeltaBar = true,
                 //});
 
                 //_eventsContainer.TechnicalLevelsEvents.PrintTechnicalLevels(new TechnicalLevelsPrintConfig
@@ -379,5 +403,23 @@ namespace NinjaTrader.NinjaScript.Strategies
         }
 
         #endregion
+    }
+
+    public class CumulativeDeltaSelectedPeriodConverter : TypeConverter
+    {
+        public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
+        {
+            return true;
+        }
+
+        public override bool GetStandardValuesExclusive(ITypeDescriptorContext context)
+        {
+            return true;
+        }
+
+        public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
+        {
+            return new StandardValuesCollection(new string[] { "Session", "Bar" });
+        }
     }
 }

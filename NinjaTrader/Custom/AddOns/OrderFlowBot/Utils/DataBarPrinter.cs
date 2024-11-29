@@ -46,6 +46,11 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Utils
                 PrintVolumes(dataBar, config);
             }
 
+            if (config.ShowCumulativeDeltaBar)
+            {
+                PrintCumulativeDeltaBar(dataBar);
+            }
+
             Print("\n");
         }
 
@@ -140,6 +145,15 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Utils
                     Print(string.Format("{0} : {1} : {2}", kvp.BidVolume, kvp.AskVolume, kvp.Price));
                 }
             }
+        }
+
+        private static void PrintCumulativeDeltaBar(IReadOnlyDataBar dataBar)
+        {
+            Print("**** Cumulative Delta Bar ****");
+            Print(string.Format("High: {0}", dataBar.CumulativeDeltaBar.High));
+            Print(string.Format("Low: {0}", dataBar.CumulativeDeltaBar.Low));
+            Print(string.Format("Open: {0}", dataBar.CumulativeDeltaBar.Open));
+            Print(string.Format("Close: {0}", dataBar.CumulativeDeltaBar.Close));
         }
 
         private static void Print(string message)
