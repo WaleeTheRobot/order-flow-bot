@@ -72,7 +72,7 @@ jobs:
 
       - name: Upload Coverage to DeepSource
         env:
-          DEEPSOURCE_DSN: ${{ env.DEEPSOURCE_DSN }}
+          DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
         run: |
           COVERAGE_FILE=$(find $GITHUB_WORKSPACE/TestResults -name "coverage.cobertura.xml")
           ./bin/deepsource report \
