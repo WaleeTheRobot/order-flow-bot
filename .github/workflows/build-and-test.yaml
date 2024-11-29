@@ -54,14 +54,20 @@ jobs:
 
       - name: Download and Install DeepSource CLI
         run: |
+          # Set installation directory
+          INSTALL_DIR=/root/.deepsource/bin
+
           # Download the script
           curl -L https://deepsource.io/cli -o deepsource-cli.sh
 
           # Set executable permissions
           chmod +x deepsource-cli.sh
 
-          # Execute as a Bash script
-          bash ./deepsource-cli.sh --install
+          # Install the CLI to the specified directory
+          ./deepsource-cli.sh -b $INSTALL_DIR
+
+          # Add the binary directory to PATH
+          export PATH="$PATH:$INSTALL_DIR"
 
       - name: Run Tests and Generate Coverage
         run: |
