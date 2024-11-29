@@ -62,10 +62,7 @@ jobs:
 
       - name: Download and Install DeepSource CLI
         run: |
-          mkdir -p $GITHUB_WORKSPACE/bin
           curl https://deepsource.io/cli | sh
-          mv ./bin/deepsource $GITHUB_WORKSPACE/bin/
-          chmod +x $GITHUB_WORKSPACE/bin/deepsource
 
       - name: Run Tests and Generate Coverage
         run: |
@@ -73,19 +70,12 @@ jobs:
             --collect:"XPlat Code Coverage" \
             --results-directory $GITHUB_WORKSPACE/TestResults
 
-      - name: Debug Information
-        run: |
-          echo "Working directory: $GITHUB_WORKSPACE"
-          ls -la $GITHUB_WORKSPACE/bin
-          ls -la $GITHUB_WORKSPACE/TestResults
-          find $GITHUB_WORKSPACE/TestResults -name "coverage.cobertura.xml"
-
       - name: Upload Coverage to DeepSource
         env:
           DEEPSOURCE_DSN: ${{ env.DEEPSOURCE_DSN }}
         run: |
           COVERAGE_FILE=$(find $GITHUB_WORKSPACE/TestResults -name "coverage.cobertura.xml")
-          $GITHUB_WORKSPACE/bin/deepsource report \
+          ./bin/deepsource report \
             --analyzer test-coverage \
             --key csharp \
             --value-file $COVERAGE_FILE
