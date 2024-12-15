@@ -3,9 +3,5 @@
     public class Atr : IValue
     {
         public double Value { get; set; }
-
-        public Atr()
-        {
-        }
     }
 }

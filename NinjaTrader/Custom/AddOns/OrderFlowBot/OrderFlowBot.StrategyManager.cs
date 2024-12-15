@@ -50,7 +50,7 @@ namespace NinjaTrader.NinjaScript.Strategies
             string orderId,
             DateTime time)
         {
-            if (execution.Order != null && execution.Order.OrderState == OrderState.Filled)
+            if (execution.Order?.OrderState == OrderState.Filled)
             {
                 // Entry logic
                 if (Position.MarketPosition == MarketPosition.Long || Position.MarketPosition == MarketPosition.Short)

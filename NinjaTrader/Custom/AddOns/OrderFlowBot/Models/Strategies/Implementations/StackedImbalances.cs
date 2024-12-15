@@ -14,18 +14,11 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies.Implementatio
         public IReadOnlyDataBar CurrentDataBar { get; set; }
         public IReadOnlyDataBar OneBarAgoDataBar { get; set; }
         public IReadOnlyTechnicalLevels CurrentTechnicalLevels { get; set; }
-
-        public StackedImbalancesStrategyBar()
-        {
-        }
     }
 
     public class StackedImbalanceStrategy
     {
         public StackedImbalancesStrategyBar StackedImbalancesStrategyBar { get; set; }
-        public StackedImbalanceStrategy()
-        {
-        }
 
         public bool Check(bool isLong)
         {
