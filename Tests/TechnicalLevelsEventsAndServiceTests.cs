@@ -41,13 +41,13 @@ namespace OrderFlowBot.Tests
             _technicalLevelsEvents.OnUpdateCurrentTechnicalLevels += (dataProvider) => eventTriggered = true;
             _technicalLevelsEvents.UpdateCurrentTechnicalLevels(technicalLevelsDataProvider);
 
-            var currentEma = _technicalLevelsEvents.GetCurrentTechnicalLevels();
+            var currentTechnicalLevels = _technicalLevelsEvents.GetCurrentTechnicalLevels();
 
             Assert.True(eventTriggered, "Expected the OnUpdateCurrentTechnicalLevels event to be triggered.");
-            Assert.True(currentEma.Ema.FastEma == 9, "Expected FastEma to be 9.");
-            Assert.True(currentEma.Ema.SlowEma == 20, "Expected SlowEma to be 20.");
-            Assert.True(currentEma.Atr.Value == 16, "Expected ATR to be 16.");
-            Assert.True(currentEma.BarNumber == 99, "Expected BarNumber to be 99.");
+            Assert.True(currentTechnicalLevels.Ema.FastEma == 9, "Expected FastEma to be 9.");
+            Assert.True(currentTechnicalLevels.Ema.SlowEma == 20, "Expected SlowEma to be 20.");
+            Assert.True(currentTechnicalLevels.Atr.Value == 16, "Expected ATR to be 16.");
+            Assert.True(currentTechnicalLevels.BarNumber == 99, "Expected BarNumber to be 99.");
         }
 
         [Fact]
