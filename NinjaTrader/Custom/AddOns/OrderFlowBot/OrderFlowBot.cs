@@ -308,16 +308,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 
                 CheckAtmPosition();
             }
-
-            if (!BacktestEnabled && _currentTradingState.IsTradingEnabled && _userInterfaceEvents != null)
-            {
-                if (ValidDailyProfitLossHit())
-                {
-                    UpdateDailyProfitLossUserInterface();
-                }
-
-                CheckAtmPosition();
-            }
         }
 
         // Used for debugging event messages
