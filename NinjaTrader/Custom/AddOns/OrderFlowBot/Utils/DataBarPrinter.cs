@@ -58,6 +58,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Utils
         {
             Print("**** Basic ****");
             Print(string.Format("Time: {0}", dataBar.Time));
+            Print(string.Format("Day: {0}", dataBar.Day));
             Print(string.Format("Bar Number: {0}", dataBar.BarNumber));
             Print(string.Format("Bar Type: {0}", dataBar.BarType));
             Print(string.Format("Delta: {0}", dataBar.Deltas.Delta));

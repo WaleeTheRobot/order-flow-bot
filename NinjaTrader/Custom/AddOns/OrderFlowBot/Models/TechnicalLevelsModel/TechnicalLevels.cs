@@ -7,11 +7,13 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.TechnicalLevelsModel
         public ITechnicalLevelsDataProvider TechnicalLevelsDataProvider { get; private set; }
         public int BarNumber { get; set; }
         public Ema Ema { get; set; }
+        public Atr Atr { get; set; }
 
         public TechnicalLevels()
         {
             TechnicalLevelsDataProvider = new TechnicalLevelsDataProvider();
             Ema = new Ema();
+            Atr = new Atr();
         }
 
         public void SetCurrentTechnicalIndicators(ITechnicalLevelsDataProvider technicalLevelsDataProvider)
@@ -19,12 +21,18 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.TechnicalLevelsModel
             TechnicalLevelsDataProvider = technicalLevelsDataProvider;
 
             PopulateEma();
+            PopulateAtr();
         }
 
         private void PopulateEma()
         {
             Ema.FastEma = TechnicalLevelsDataProvider.Ema.FastEma;
             Ema.SlowEma = TechnicalLevelsDataProvider.Ema.SlowEma;
+        }
+
+        private void PopulateAtr()
+        {
+            Atr.Value = TechnicalLevelsDataProvider.Atr.Value;
         }
     }
 }

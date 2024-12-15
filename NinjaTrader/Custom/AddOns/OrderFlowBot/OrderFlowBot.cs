@@ -8,6 +8,7 @@ using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.States;
 using NinjaTrader.Data;
 using NinjaTrader.NinjaScript.Indicators;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
@@ -22,11 +23,13 @@ namespace NinjaTrader.NinjaScript.Strategies
         public const string GROUP_NAME_GENERAL = "General";
         public const string GROUP_NAME_DATA_BAR = "Data Bar";
         public const string GROUP_NAME_TEST = "Backtest";
+        public const string GROUP_NAME_ADVANCE = "Advance";
     }
 
     [Gui.CategoryOrder(GroupConstants.GROUP_NAME_GENERAL, 0)]
     [Gui.CategoryOrder(GroupConstants.GROUP_NAME_DATA_BAR, 1)]
     [Gui.CategoryOrder(GroupConstants.GROUP_NAME_TEST, 2)]
+    [Gui.CategoryOrder(GroupConstants.GROUP_NAME_ADVANCE, 3)]
     public partial class OrderFlowBot : Strategy
     {
         private EventsContainer _eventsContainer;
@@ -43,6 +46,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         private bool _validTimeRange;
         private bool _timeStartChecked;
         private bool _timeEndChecked;
+
+        private Dictionary<string, int> _dataSeriesIndexMap;
 
         #region General Properties
 
@@ -134,6 +139,31 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         #endregion
 
+        #region Advance Properties
+
+        [NinjaScriptProperty]
+        [Display(Name = "MarketEnvironment", Description = "This allows you to conditionally run different sections of your code for live or test.", Order = 0, GroupName = GroupConstants.GROUP_NAME_ADVANCE)]
+        [TypeConverter(typeof(MarketEnvironmentConverter))]
+        public EnvironmentType MarketEnvironment { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "External Analysis Service Enabled", Description = "Enable this to allow requests to the external analysis service.", Order = 1, GroupName = GroupConstants.GROUP_NAME_ADVANCE)]
+        public bool ExternalAnalysisServiceEnabled { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "External Analysis Service HTTP", Description = "The external HTTP analysis service host.", Order = 2, GroupName = GroupConstants.GROUP_NAME_ADVANCE)]
+        public string ExternalAnalysisService { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Training Data Enabled", Description = "Enable this to write to a file used for training with backtest enabled.", Order = 3, GroupName = GroupConstants.GROUP_NAME_ADVANCE)]
+        public bool TrainingDataEnabled { get; set; }
+
+        [NinjaScriptProperty]
+        [Display(Name = "Training Data Directory", Description = "The direcotry to write the training data to.", Order = 4, GroupName = GroupConstants.GROUP_NAME_ADVANCE)]
+        public string TrainingDataDirectory { get; set; }
+
+        #endregion
+
         protected override void OnStateChange()
         {
             if (State == State.SetDefaults)
@@ -148,7 +178,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 IsFillLimitOnTouch = false;
                 MaximumBarsLookBack = MaximumBarsLookBack.TwoHundredFiftySix;
                 OrderFillResolution = OrderFillResolution.Standard;
-                Slippage = 0;
+                Slippage = 3;
                 StartBehavior = StartBehavior.WaitUntilFlat;
                 TimeInForce = TimeInForce.Gtc;
                 TraceOrders = false;
@@ -158,6 +188,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 // Disable this property for performance gains in Strategy Analyzer optimizations
                 // See the Help Guide for additional information
                 IsInstantiatedOnEachOptimizationIteration = true;
+                IncludeCommission = true;
 
                 DailyProfitEnabled = false;
                 DailyProfit = 1000;
@@ -178,14 +209,31 @@ namespace NinjaTrader.NinjaScript.Strategies
                 StackedImbalance = 3;
                 ImbalanceMinDelta = 10;
                 ValueAreaPercentage = 70;
-                CumulativeDeltaSelectedPeriod = "Session";
+                CumulativeDeltaSelectedPeriod = "Bar";
+
+                MarketEnvironment = EnvironmentType.Live;
+                ExternalAnalysisServiceEnabled = false;
+                ExternalAnalysisService = "http://localhost:5000/analyze";
+                TrainingDataEnabled = false;
+                TrainingDataDirectory = "C://temp/";
             }
             else if (State == State.Configure)
             {
                 SetConfigs();
+                SetMessagingConfigs();
+
+                // Data Series Index Mapping
+                _dataSeriesIndexMap = new Dictionary<string, int>
+                {
+                    {"Ema", 0},
+                    {"Atr", 3},
+                };
+
                 AddDataSeries(BarsPeriodType.Tick, 1);
                 // Helps with time range check
                 AddDataSeries(BarsPeriodType.Minute, 1);
+                // ATR
+                AddDataSeries(BarsPeriodType.Tick, 2000);
             }
             else if (State == State.DataLoaded)
             {
@@ -272,13 +320,14 @@ namespace NinjaTrader.NinjaScript.Strategies
                 //    ShowRatios = false,
                 //    ShowVolumes = false,
                 //    ShowBidAskVolumePerBar = false,
-                //    ShowCumulativeDeltaBar = true,
+                //    ShowCumulativeDeltaBar = false,
                 //});
 
                 //_eventsContainer.TechnicalLevelsEvents.PrintTechnicalLevels(new TechnicalLevelsPrintConfig
                 //{
                 //    BarsAgo = 1,
                 //    ShowEma = true,
+                //    ShowAtr = true,
                 //});
             }
 
@@ -308,6 +357,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 
                 CheckAtmPosition();
             }
+        }
+
+        private void SetMessagingConfigs()
+        {
+            MessagingConfig.Instance.MarketEnvironment = MarketEnvironment;
+            MessagingConfig.Instance.ExternalAnalysisService = ExternalAnalysisService;
+            MessagingConfig.Instance.ExternalAnalysisServiceEnabled = ExternalAnalysisServiceEnabled;
         }
 
         // Used for debugging event messages
@@ -416,6 +472,24 @@ namespace NinjaTrader.NinjaScript.Strategies
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
         {
             return new StandardValuesCollection(new[] { "Session", "Bar" });
+        }
+    }
+
+    public class MarketEnvironmentConverter : TypeConverter
+    {
+        public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
+        {
+            return true;
+        }
+
+        public override bool GetStandardValuesExclusive(ITypeDescriptorContext context)
+        {
+            return true;
+        }
+
+        public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
+        {
+            return new StandardValuesCollection(new[] { EnvironmentType.Live, EnvironmentType.Test });
         }
     }
 }

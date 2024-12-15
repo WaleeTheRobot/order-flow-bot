@@ -7,6 +7,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars
     {
         BarType BarType { get; }
         int Time { get; }
+        int Day { get; }
         int BarNumber { get; }
 
         Prices Prices { get; }

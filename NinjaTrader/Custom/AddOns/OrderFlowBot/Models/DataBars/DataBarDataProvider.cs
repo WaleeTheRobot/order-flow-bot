@@ -6,6 +6,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars
     {
         public ICustomVolumetricBar VolumetricBar { get; set; }
         public int Time { get; set; }
+        public int Day { get; set; }
         public int CurrentBar { get; set; }
         public int BarsAgo { get; set; }
         public double High { get; set; }
@@ -18,6 +19,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars
         {
             VolumetricBar = null;
             Time = 0;
+            Day = 0;
             CurrentBar = 0;
             BarsAgo = 0;
             High = 0;

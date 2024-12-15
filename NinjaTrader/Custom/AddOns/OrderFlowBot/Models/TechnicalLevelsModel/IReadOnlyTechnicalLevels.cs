@@ -6,5 +6,6 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.TechnicalLevelsModel
     {
         int BarNumber { get; }
         Ema Ema { get; }
+        Atr Atr { get; }
     }
 }

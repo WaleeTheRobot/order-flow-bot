@@ -15,6 +15,10 @@ namespace NinjaTrader.NinjaScript.Strategies
         private string _atmStrategyId;
         private bool _isAtmStrategyCreated;
 
+        // Trade Analysis
+        private double _entryPrice;
+        private MarketPosition _initialPosition;
+
         public void InitializeStrategyManager()
         {
             _tradingEvents.OnStrategyTriggeredProcessed += HandleStrategyTriggeredProcessed;
@@ -25,6 +29,8 @@ namespace NinjaTrader.NinjaScript.Strategies
             _alertSoundFilePath = "";
             _atmStrategyId = "";
             _isAtmStrategyCreated = false;
+
+            _entryPrice = 0.0;
 
             // Sound
             string baseDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "NinjaTrader 8", "bin", "Custom", "AddOns", "OrderFlowBot", "Assets");
@@ -44,10 +50,43 @@ namespace NinjaTrader.NinjaScript.Strategies
             string orderId,
             DateTime time)
         {
-            if (Position.MarketPosition == MarketPosition.Flat)
+            if (execution.Order != null && execution.Order.OrderState == OrderState.Filled)
             {
-                ResetBacktestStrategy();
-                _strategiesEvents.ResetStrategyData();
+                // Entry logic
+                if (Position.MarketPosition == MarketPosition.Long || Position.MarketPosition == MarketPosition.Short)
+                {
+                    if (TrainingDataEnabled)
+                    {
+                        _entryPrice = Position.AveragePrice;
+                        _initialPosition = Position.MarketPosition;
+
+                        TradeType tradeType = _initialPosition == MarketPosition.Long ? TradeType.Buy : TradeType.Sell;
+                        _eventsContainer.TradeAnalysisEvents.AddTrainingEntry(tradeType);
+                    }
+                }
+                // Exit logic
+                else if (Position.MarketPosition == MarketPosition.Flat)
+                {
+                    if (TrainingDataEnabled)
+                    {
+                        double exitPrice = price;
+                        int winOrLoss = 0;
+
+                        if (_initialPosition == MarketPosition.Long)
+                        {
+                            winOrLoss = exitPrice > _entryPrice ? 1 : 0;
+                        }
+                        else if (_initialPosition == MarketPosition.Short)
+                        {
+                            winOrLoss = exitPrice < _entryPrice ? 1 : 0;
+                        }
+
+                        _eventsContainer.TradeAnalysisEvents.AddTrainingExit(winOrLoss);
+                    }
+
+                    ResetBacktestStrategy();
+                    _strategiesEvents.ResetStrategyData();
+                }
             }
         }
 

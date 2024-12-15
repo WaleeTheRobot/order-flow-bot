@@ -9,6 +9,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Containers
         public StrategiesService StrategiesService { get; set; }
         public TradingService TradingService { get; set; }
         public TechnicalLevelsService TechnicalLevelsService { get; set; }
+        public TradeAnalysisService TradeAnalysisService { get; set; }
+        public MessagingService MessagingService { get; set; }
 
         public ServicesContainer(EventsContainer eventsContainer, IBacktestData backtestData)
         {
@@ -16,6 +18,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Containers
             TradingService = new TradingService(eventsContainer, backtestData);
             StrategiesService = new StrategiesService(eventsContainer);
             TechnicalLevelsService = new TechnicalLevelsService(eventsContainer);
+            TradeAnalysisService = new TradeAnalysisService(eventsContainer);
+            MessagingService = new MessagingService(eventsContainer);
         }
     }
 }

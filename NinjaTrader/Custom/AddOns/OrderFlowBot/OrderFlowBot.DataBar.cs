@@ -23,6 +23,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         private IDataBarDataProvider GetDataBarDataProvider(IDataBarConfig config, int barsAgo = 0)
         {
             _dataBarDataProvider.Time = ToTime(Time[barsAgo]);
+            _dataBarDataProvider.Day = ToDay(Time[barsAgo]);
             _dataBarDataProvider.CurrentBar = CurrentBars[0];
             _dataBarDataProvider.BarsAgo = barsAgo;
             _dataBarDataProvider.High = High[barsAgo];
@@ -132,6 +133,9 @@ namespace NinjaTrader.NinjaScript.Strategies
             DataBarConfig.Instance.ImbalanceRatio = ImbalanceRatio;
             DataBarConfig.Instance.ImbalanceMinDelta = ImbalanceMinDelta;
             DataBarConfig.Instance.ValueAreaPercentage = ValueAreaPercentage;
+            DataBarConfig.Instance.TrainingDataDirectory = TrainingDataDirectory;
+            DataBarConfig.Instance.Target = Target;
+            DataBarConfig.Instance.Stop = Stop;
 
             UserInterfaceConfig.Instance.AssetsPath =
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "NinjaTrader 8", "bin", "Custom", "AddOns", "OrderFlowBot", "Assets");

@@ -4,5 +4,6 @@
     {
         int BarsAgo { get; set; }
         bool ShowEma { get; set; }
+        bool ShowAtr { get; set; }
     }
 }
