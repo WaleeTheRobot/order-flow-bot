@@ -24,6 +24,11 @@ namespace OrderFlowBot.Tests
 
         public UserInterfaceEventsAndServiceTests()
         {
+            var messagingConfigData = new MessagingConfigData();
+            MessagingConfig.Instance.MarketEnvironment = messagingConfigData.MarketEnvironment;
+            MessagingConfig.Instance.ExternalAnalysisService = messagingConfigData.ExternalAnalysisService;
+            MessagingConfig.Instance.ExternalAnalysisServiceEnabled = messagingConfigData.ExternalAnalysisServiceEnabled;
+
             var eventsContainer = new EventsContainer();
             var backtestData = new BacktestConfigData();
             backtestData.SetNoBacktest();
