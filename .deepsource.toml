@@ -4,9 +4,6 @@ version = 1
 name = "csharp"
 enabled = true
 
-[analyzers.meta]
-target_version = "8.0"
-
 [[analyzers]]
 name = "test-coverage"
 enabled = true
