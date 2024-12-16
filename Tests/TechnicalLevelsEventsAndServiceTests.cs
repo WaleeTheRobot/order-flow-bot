@@ -47,7 +47,6 @@ namespace OrderFlowBot.Tests
             Assert.True(currentTechnicalLevels.Ema.FastEma == 9, "Expected FastEma to be 9.");
             Assert.True(currentTechnicalLevels.Ema.SlowEma == 20, "Expected SlowEma to be 20.");
             Assert.True(currentTechnicalLevels.Atr.Value == 16, "Expected ATR to be 16.");
-            Assert.True(currentTechnicalLevels.BarNumber == 99, "Expected BarNumber to be 99.");
         }
 
         [Fact]

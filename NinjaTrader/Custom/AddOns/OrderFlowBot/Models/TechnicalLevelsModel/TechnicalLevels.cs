@@ -5,7 +5,6 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.TechnicalLevelsModel
     public class TechnicalLevels : IReadOnlyTechnicalLevels
     {
         public ITechnicalLevelsDataProvider TechnicalLevelsDataProvider { get; private set; }
-        public int BarNumber { get; set; }
         public Ema Ema { get; set; }
         public Atr Atr { get; set; }
 

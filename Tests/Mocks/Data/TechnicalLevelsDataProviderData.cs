@@ -3,15 +3,13 @@ using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.TechnicalLevelsModel.Base;
 
 namespace OrderFlowBot.Tests.Mocks.Data
 {
-    public class TechnicalLevelsDataProviderData
+    public class TechnicalLevelsDataProviderData : ITechnicalLevelsDataProvider
     {
-        public int BarNumber { get; set; }
         public Ema Ema { get; set; }
         public Atr Atr { get; set; }
 
         public TechnicalLevelsDataProviderData()
         {
-            BarNumber = 99;
             Ema = new Ema
             {
                 FastEma = 9,

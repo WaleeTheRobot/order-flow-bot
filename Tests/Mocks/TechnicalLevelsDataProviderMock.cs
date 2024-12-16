@@ -6,14 +6,13 @@ namespace OrderFlowBot.Tests.Mocks
 {
     public static class TechnicalLevelsDataProviderMock
     {
-        public static Mock<TechnicalLevelsDataProviderData> CreateTechnicalLevelsDataProvider()
+        public static Mock<ITechnicalLevelsDataProvider> CreateTechnicalLevelsDataProvider()
         {
             var config = new TechnicalLevelsDataProviderData();
-            var mock = new Mock<TechnicalLevelsDataProviderData>();
 
-            mock.SetupGet(x => x.BarNumber).Returns(config.BarNumber);
-            mock.SetupGet(x => x.Ema).Returns(config.Ema);
-            mock.SetupGet(x => x.Atr).Returns(config.Atr);
+            var mock = new Mock<ITechnicalLevelsDataProvider>();
+            mock.Setup(x => x.Ema).Returns(config.Ema);
+            mock.Setup(x => x.Atr).Returns(config.Atr);
 
             return mock;
         }
