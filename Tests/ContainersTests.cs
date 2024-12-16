@@ -17,6 +17,8 @@ namespace OrderFlowBot.Tests
             Assert.NotNull(eventsContainer.TradingEvents);
             Assert.NotNull(eventsContainer.StrategiesEvents);
             Assert.NotNull(eventsContainer.TechnicalLevelsEvents);
+            Assert.NotNull(eventsContainer.TradeAnalysisEvents);
+            Assert.NotNull(eventsContainer.MessagingEvents);
         }
 
         [Fact]
@@ -30,6 +32,8 @@ namespace OrderFlowBot.Tests
             Assert.NotNull(servicesContainer.StrategiesService);
             Assert.NotNull(servicesContainer.TradingService);
             Assert.NotNull(servicesContainer.TechnicalLevelsService);
+            Assert.NotNull(servicesContainer.TradeAnalysisService);
+            Assert.NotNull(servicesContainer.MessagingService);
         }
     }
 }

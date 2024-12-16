@@ -8,5 +8,8 @@
         double ImbalanceRatio { get; set; }
         long ImbalanceMinDelta { get; set; }
         double ValueAreaPercentage { get; set; }
+        string TrainingDataDirectory { get; set; }
+        int Target { get; set; }
+        int Stop { get; set; }
     }
 }

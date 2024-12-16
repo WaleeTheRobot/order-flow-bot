@@ -4,6 +4,7 @@ using NinjaTrader.Custom.AddOns.OrderFlowBot.Configs;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars;
 using OrderFlowBot.Tests.Mocks;
 using OrderFlowBot.Tests.Mocks.Data;
+using System;
 
 namespace OrderFlowBot.Tests
 {
@@ -51,8 +52,8 @@ namespace OrderFlowBot.Tests
 
             dataBar.SetCurrentDataBar(dataBarDataProvider);
 
-            Assert.Equal(3.36, dataBar.Ratios.BidRatio);
-            Assert.Equal(0.69, dataBar.Ratios.AskRatio);
+            Assert.Equal(3.36, Math.Round(dataBar.Ratios.BidRatio, 2));
+            Assert.Equal(0.69, Math.Round(dataBar.Ratios.AskRatio, 2));
         }
 
         [Fact]
@@ -102,8 +103,8 @@ namespace OrderFlowBot.Tests
             Assert.Equal(VolumetricBarData.DeltaChange, dataBar.Deltas.DeltaChange);
             Assert.Equal(VolumetricBarData.DeltaSl, dataBar.Deltas.DeltaSl);
             Assert.Equal(VolumetricBarData.DeltaSh, dataBar.Deltas.DeltaSh);
-            Assert.Equal(1.1, dataBar.Deltas.MinMaxDeltaRatio);
-            Assert.Equal(0.91, dataBar.Deltas.MaxMinDeltaRatio);
+            Assert.Equal(1.1, Math.Round(dataBar.Deltas.MinMaxDeltaRatio, 2));
+            Assert.Equal(0.91, Math.Round(dataBar.Deltas.MaxMinDeltaRatio, 2));
         }
 
         [Fact]

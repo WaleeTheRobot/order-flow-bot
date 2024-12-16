@@ -15,7 +15,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Utils
                 return Math.Round(numerator, 2);
             }
 
-            return Math.Round(numerator / denominator, 2);
+            return numerator / denominator;
         }
     }
 }

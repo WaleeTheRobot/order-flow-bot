@@ -16,6 +16,7 @@ namespace NinjaTrader.NinjaScript.Strategies
         private ITechnicalLevelsDataProvider GetTechnicalLevelsDataProvider(int barsAgo = 0)
         {
             _technicalLevelsDataProvider.Ema = GetEma(barsAgo);
+            _technicalLevelsDataProvider.Atr = GetAtr(barsAgo);
 
             return _technicalLevelsDataProvider;
         }
@@ -29,6 +30,16 @@ namespace NinjaTrader.NinjaScript.Strategies
             };
 
             return ema;
+        }
+
+        private Atr GetAtr(int barsAgo)
+        {
+            var atr = new Atr
+            {
+                Value = Math.Round(ATR(BarsArray[_dataSeriesIndexMap["Atr"]], 9)[barsAgo], 2)
+            };
+
+            return atr;
         }
     }
 }

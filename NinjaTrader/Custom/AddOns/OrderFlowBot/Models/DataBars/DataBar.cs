@@ -10,6 +10,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars
         public IDataBarDataProvider DataBarDataProvider { get; private set; }
         public BarType BarType { get; private set; }
         public int Time { get; private set; }
+        public int Day { get; private set; }
         public int BarNumber { get; private set; }
 
         public Prices Prices { get; private set; }
@@ -66,6 +67,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Models.DataBars
         private void PopulateBasic()
         {
             Time = DataBarDataProvider.Time;
+            Day = DataBarDataProvider.Day;
             BarNumber = DataBarDataProvider.CurrentBar - DataBarDataProvider.BarsAgo;
         }
 

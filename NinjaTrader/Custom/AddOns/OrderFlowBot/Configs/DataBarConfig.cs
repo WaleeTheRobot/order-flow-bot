@@ -16,5 +16,9 @@
         public double ImbalanceRatio { get; set; }
         public long ImbalanceMinDelta { get; set; }
         public double ValueAreaPercentage { get; set; }
+        public string TrainingDataDirectory { get; set; }
+        public int Target { get; set; }
+        public int Stop { get; set; }
+
     }
 }

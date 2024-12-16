@@ -1,18 +1,19 @@
 using Moq;
+using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.Strategies;
 using OrderFlowBot.Tests.Mocks.Data;
 
 namespace OrderFlowBot.Tests.Mocks
 {
     public static class StrategyDataMock
     {
-        public static Mock<StrategyConfigData> CreateStrategyConfig()
+        public static Mock<IStrategyData> CreateStrategyConfig()
         {
             var config = new StrategyConfigData();
 
-            var mock = new Mock<StrategyConfigData>();
-            mock.SetupGet(x => x.Name).Returns(config.Name);
-            mock.SetupGet(x => x.StrategyTriggered).Returns(config.StrategyTriggered);
-            mock.SetupGet(x => x.TriggeredDirection).Returns(config.TriggeredDirection);
+            var mock = new Mock<IStrategyData>();
+            mock.SetupProperty(x => x.Name, config.Name);
+            mock.SetupProperty(x => x.StrategyTriggered, config.StrategyTriggered);
+            mock.SetupProperty(x => x.TriggeredDirection, config.TriggeredDirection);
 
             return mock;
         }

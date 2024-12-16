@@ -1,17 +1,23 @@
+using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.TechnicalLevelsModel;
 using NinjaTrader.Custom.AddOns.OrderFlowBot.Models.TechnicalLevelsModel.Base;
 
 namespace OrderFlowBot.Tests.Mocks.Data
 {
-    public static class TechnicalLevelsDataProviderData
+    public class TechnicalLevelsDataProviderData : ITechnicalLevelsDataProvider
     {
-        public static Ema Ema { get; set; }
+        public Ema Ema { get; set; }
+        public Atr Atr { get; set; }
 
-        static TechnicalLevelsDataProviderData()
+        public TechnicalLevelsDataProviderData()
         {
             Ema = new Ema
             {
                 FastEma = 9,
                 SlowEma = 20,
+            };
+            Atr = new Atr
+            {
+                Value = 16,
             };
         }
     }

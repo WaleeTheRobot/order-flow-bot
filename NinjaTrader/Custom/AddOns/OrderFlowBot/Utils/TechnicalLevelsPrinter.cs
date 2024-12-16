@@ -18,17 +18,28 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.Utils
 
             if (config.ShowEma)
             {
-                PrintBasic(technicalLevels);
+                PrintEma(technicalLevels);
+            }
+
+            if (config.ShowAtr)
+            {
+                PrintAtr(technicalLevels);
             }
 
             Print("\n");
         }
 
-        private static void PrintBasic(IReadOnlyTechnicalLevels technicalLevels)
+        private static void PrintEma(IReadOnlyTechnicalLevels technicalLevels)
         {
             Print("**** EMA ****");
             Print(string.Format("Fast: {0}", technicalLevels.Ema.FastEma.ToString()));
             Print(string.Format("Slow: {0}", technicalLevels.Ema.SlowEma.ToString()));
+        }
+
+        private static void PrintAtr(IReadOnlyTechnicalLevels technicalLevels)
+        {
+            Print("**** ATR ****");
+            Print(string.Format("Value: {0}", technicalLevels.Atr.Value.ToString()));
         }
 
         private static void Print(string message)

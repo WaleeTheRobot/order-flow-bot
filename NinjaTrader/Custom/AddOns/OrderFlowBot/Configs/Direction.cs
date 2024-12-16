@@ -9,4 +9,10 @@
         Standard,
         Inverse
     }
+
+    public enum EnvironmentType
+    {
+        Live,
+        Test
+    }
 }
