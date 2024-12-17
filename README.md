@@ -34,6 +34,16 @@ You can find the latest release at https://github.com/WaleeTheRobot/order-flow-b
 
 Sometimes NinjaTrader will complain about an import failed. You can just open the zip file from the release and copy the OrderFlowBot directory into the Add On directory on your computer after removing the previous OrderFlowBot directory. It's normally located at: `C:\Users\<username>\Documents\NinjaTrader 8\bin\Custom\AddOns`. Afterwards, open NinjaTrader and click `New` > `NinjaScript Editor`. Click the NinjaScript Editor and press `F5`. It'll take a few seconds and you'll hear a sound. The icon at the bottom left corner of it will disappear when it's done compiling. Close the NinjaScript Editor and you should be good to go.
 
+# Development
+
+Install System.Text.Json from Nugget in your IDE. You may also have to add the missing dlls as references in the NinjaScript Editor. When prompted, they should be available at `Documents\NinjaTrader 8\bin\Custom\bin\Debug`.
+
+## Advance
+
+This is currently not in the 3.0.0 release, but in the main branch. This section is more advance and you will have to revise the code for your requirement. You have the option to save your trades into a JSON file for further analysis. You also have the option to connect to an external service for analysis. See the Advance properties section when you first load OFB. See `Models/TradeAnalysis/StackedImbalances` for reference. These are examples that you can use to help build your own metrics for analysis. The `StackedImbalances` strategy also has examples on how to request and receive data from an external service.
+
+Example external service that uses XGBoost: https://github.com/WaleeTheRobot/stacked-imbalances
+
 # Control Panel
 
 ## Trade Management
@@ -146,9 +156,3 @@ For guidance, check out the `StackedImbalances` class as an example. Once you've
 ## Adding Your Own Technical Levels
 
 You can add your own technical levels. The `OrderFlowBot.TechnicalLevels` class shows how to add the EMA. This uses the EMA provided by NinjaTrader and adds it to the `TechnicalLevels`. For guidance, check out how the EMA was created in the `Models/TechnicalLevelsModel` directory.
-
-# Advance
-
-This is currently not in the 3.0.0 release, but in the main branch. This section is more advance and you will have to revise the code for your requirement. You have the option to save your trades into a JSON file for further analysis. You also have the option to connect to an external service for analysis. See the Advance properties section when you first load OFB. You may need to install System.Text.Json from Nugget in your IDE. You may also have to add the missing dlls as references in the NinjaScript Editor. When prompted, they should be available at `Documents\NinjaTrader 8\bin\Custom\bin\Debug`. See `Models/TradeAnalysis/StackedImbalances` for reference. These are examples that you can use to help build your own metrics for analysis. The `StackedImbalances` strategy also has examples on how to request and receive data from an external service.
-
-Example external service that uses XGBoost: https://github.com/WaleeTheRobot/stacked-imbalances
