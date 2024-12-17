@@ -294,7 +294,11 @@ namespace NinjaTrader.NinjaScript.Strategies
                 _timeEndChecked = false;
             }
 
-            if (CurrentBars[0] < BarsRequiredToTrade)
+            if (
+                CurrentBars[0] < BarsRequiredToTrade &&
+                CurrentBars[2] < BarsRequiredToTrade &&
+                CurrentBars[3] < BarsRequiredToTrade
+            )
             {
                 return;
             }
@@ -431,7 +435,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         private bool ValidTimeRange()
         {
-            // Looks at previous bar otherwise it'll trigger the bar building to the time.
+            if (BarsInProgress != 2 || CurrentBars[2] < 2)
+                return false;
+
             return (ToTime(Times[2][1]) >= TimeStart && ToTime(Times[2][1]) <= TimeEnd);
         }
 
