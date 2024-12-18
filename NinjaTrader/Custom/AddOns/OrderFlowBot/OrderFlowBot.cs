@@ -294,11 +294,17 @@ namespace NinjaTrader.NinjaScript.Strategies
                 _timeEndChecked = false;
             }
 
-            if (
-                CurrentBars[0] < BarsRequiredToTrade &&
-                CurrentBars[2] < BarsRequiredToTrade &&
-                CurrentBars[3] < BarsRequiredToTrade
-            )
+            if (BarsInProgress == 0 && CurrentBars[0] < BarsRequiredToTrade)
+            {
+                return;
+            }
+
+            if (BarsInProgress == 2 && CurrentBars[2] < BarsRequiredToTrade)
+            {
+                return;
+            }
+
+            if (BarsInProgress == 3 && CurrentBars[3] < BarsRequiredToTrade)
             {
                 return;
             }
@@ -436,7 +442,9 @@ namespace NinjaTrader.NinjaScript.Strategies
         private bool ValidTimeRange()
         {
             if (BarsInProgress != 2 || CurrentBars[2] < 2)
+            {
                 return false;
+            }
 
             return (ToTime(Times[2][1]) >= TimeStart && ToTime(Times[2][1]) <= TimeEnd);
         }
