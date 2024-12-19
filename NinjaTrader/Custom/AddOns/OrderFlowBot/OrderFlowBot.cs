@@ -348,7 +348,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 _eventsContainer.TechnicalLevelsEvents.UpdateCurrentTechnicalLevels(GetTechnicalLevelsDataProvider());
             }
 
-            if (TimeEnabled)
+            if (TimeEnabled && BarsInProgress == 2)
             {
                 ValidStartEndTime();
 
@@ -423,19 +423,31 @@ namespace NinjaTrader.NinjaScript.Strategies
         {
             _validTimeRange = ValidTimeRange();
 
-            // Helps enable/disable control panel
-            if (!_timeStartChecked && _validTimeRange)
+            // If the time is within range, enable the control panel
+            if (_validTimeRange)
             {
-                // Time is within range
-                _timeStartChecked = true;
-                UpdateValidStartEndTimeUserInterface(true);
-            }
+                if (!_timeStartChecked)
+                {
+                    _timeStartChecked = true;
+                    UpdateValidStartEndTimeUserInterface(true);
+                }
 
-            if (_timeStartChecked && !_timeEndChecked && ToTime(Times[2][1]) >= TimeEnd)
+                // Check if the end time is reached and disable the panel if needed
+                if (!_timeEndChecked && ToTime(Times[2][1]) >= TimeEnd)
+                {
+                    _timeEndChecked = true;
+                    UpdateValidStartEndTimeUserInterface(false);
+                }
+            }
+            else
             {
-                // Initial time start checked and time >= TimeEnd
-                _timeEndChecked = true;
-                UpdateValidStartEndTimeUserInterface(false);
+                // If outside the valid range, ensure the panel is disabled
+                if (_timeStartChecked && !_timeEndChecked)
+                {
+                    _timeStartChecked = false;
+                    _timeEndChecked = true;
+                    UpdateValidStartEndTimeUserInterface(false);
+                }
             }
         }
 
@@ -446,7 +458,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                 return false;
             }
 
-            return (ToTime(Times[2][1]) >= TimeStart && ToTime(Times[2][1]) <= TimeEnd);
+            var currentTime = ToTime(Times[2][1]);
+
+            return (currentTime >= TimeStart && currentTime <= TimeEnd);
         }
 
         private void UpdateValidStartEndTimeUserInterface(bool validStartEndTime)
