@@ -152,7 +152,8 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
             }
             else
             {
-                Dispatcher.Invoke(() => DisableControls(this));
+                // Avoid blocking or potential recursion
+                Dispatcher.BeginInvoke(new Action(() => EnableControls(this)));
             }
         }
 
@@ -179,11 +180,13 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
         {
             if (Dispatcher.CheckAccess())
             {
+                // Already on the UI thread, directly enable controls
                 EnableControls(this);
             }
             else
             {
-                Dispatcher.Invoke(() => EnableControls(this));
+                // Avoid blocking or potential recursion
+                Dispatcher.BeginInvoke(new Action(() => EnableControls(this)));
             }
         }
 
