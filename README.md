@@ -36,7 +36,12 @@ Sometimes NinjaTrader will complain about an import failed. You can just open th
 
 # Development
 
-Install System.Text.Json from Nugget in your IDE. You may also have to add the missing dlls as references in the NinjaScript Editor. When prompted, they should be available at `Documents\NinjaTrader 8\bin\Custom\bin\Debug`.
+Install System.Text.Json from Nugget in your IDE.
+
+I've noticed NT having issues between compile and runtime loading dlls if you copy them over to the `Custom` directory or reference it somewhere else. The ones in the NT directory below should work. Reference those in NinjaScript Editor.
+
+`C:\Program Files\NinjaTrader 8\bin\System.Text.Json.dll`
+`C:\Program Files\NinjaTrader 8\bin\System.Memory.dll`
 
 ## Advance
 
