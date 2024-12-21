@@ -225,23 +225,9 @@ namespace NinjaTrader.NinjaScript.Strategies
                 SetConfigs();
                 SetMessagingConfigs();
 
-                // Validate TimeStart and TimeEnd
-                if (TimeStart.Length != 6 || TimeEnd.Length != 6 || !TimeStart.All(char.IsDigit) || !TimeEnd.All(char.IsDigit))
+                if (!ValidateTimeProperties())
                 {
-                    System.Windows.MessageBox.Show(
-                        "TimeStart and TimeEnd must each contain exactly 6 numeric characters HHMMSS.",
-                        "Invalid Time Configuration",
-                        System.Windows.MessageBoxButton.OK,
-                        System.Windows.MessageBoxImage.Warning
-                    );
-
-                    _servicesContainer.TradingService.HandleEnabledDisabledTriggered(false);
                     return;
-                }
-                else
-                {
-                    _parsedTimeStart = int.Parse(TimeStart);
-                    _parsedTimeEnd = int.Parse(TimeEnd);
                 }
 
                 // Data Series Index Mapping
@@ -503,6 +489,23 @@ namespace NinjaTrader.NinjaScript.Strategies
                     _userInterfaceEvents.DisableAllControls();
                 }
             }
+        }
+
+        private bool ValidateTimeProperties()
+        {
+            // Validate TimeStart and TimeEnd
+            if (TimeStart.Length != 6 || TimeEnd.Length != 6 || !TimeStart.All(char.IsDigit) || !TimeEnd.All(char.IsDigit))
+            {
+                System.Windows.MessageBox.Show(
+                    "TimeStart and TimeEnd must each contain exactly 6 numeric characters HHMMSS.",
+                    "Invalid Time Configuration",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Warning
+                );
+                _servicesContainer.TradingService.HandleEnabledDisabledTriggered(false);
+                return false;
+            }
+            return int.TryParse(TimeStart, out _parsedTimeStart) && int.TryParse(TimeEnd, out _parsedTimeEnd);
         }
 
         #endregion
