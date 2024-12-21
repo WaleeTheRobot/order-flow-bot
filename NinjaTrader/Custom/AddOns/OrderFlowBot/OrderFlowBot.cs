@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 #endregion
 
@@ -46,6 +47,8 @@ namespace NinjaTrader.NinjaScript.Strategies
         private bool _validTimeRange;
         private bool _timeStartChecked;
         private bool _timeEndChecked;
+        private int _parsedTimeStart;
+        private int _parsedTimeEnd;
 
         private Dictionary<string, int> _dataSeriesIndexMap;
 
@@ -78,11 +81,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 
         [NinjaScriptProperty]
         [Display(Name = "Time Start", Description = "The allowed time to enable OFB.", Order = 6, GroupName = GroupConstants.GROUP_NAME_GENERAL)]
-        public int TimeStart { get; set; }
+        public string TimeStart { get; set; }
 
         [NinjaScriptProperty]
         [Display(Name = "Time End", Description = "The allowed time to disable and close positions for OFB.", Order = 7, GroupName = GroupConstants.GROUP_NAME_GENERAL)]
-        public int TimeEnd { get; set; }
+        public string TimeEnd { get; set; }
 
         #endregion
 
@@ -195,8 +198,8 @@ namespace NinjaTrader.NinjaScript.Strategies
                 DailyLossEnabled = false;
                 DailyLoss = 1000;
                 TimeEnabled = false;
-                TimeStart = 093000;
-                TimeEnd = 155500;
+                TimeStart = "093000";
+                TimeEnd = "155500";
 
                 BacktestEnabled = false;
                 BacktestStrategyName = "Stacked Imbalances";
@@ -221,6 +224,25 @@ namespace NinjaTrader.NinjaScript.Strategies
             {
                 SetConfigs();
                 SetMessagingConfigs();
+
+                // Validate TimeStart and TimeEnd
+                if (TimeStart.Length != 6 || TimeEnd.Length != 6 || !TimeStart.All(char.IsDigit) || !TimeEnd.All(char.IsDigit))
+                {
+                    System.Windows.MessageBox.Show(
+                        "TimeStart and TimeEnd must each contain exactly 6 numeric characters HHMMSS.",
+                        "Invalid Time Configuration",
+                        System.Windows.MessageBoxButton.OK,
+                        System.Windows.MessageBoxImage.Warning
+                    );
+
+                    _servicesContainer.TradingService.HandleEnabledDisabledTriggered(false);
+                    return;
+                }
+                else
+                {
+                    _parsedTimeStart = int.Parse(TimeStart);
+                    _parsedTimeEnd = int.Parse(TimeEnd);
+                }
 
                 // Data Series Index Mapping
                 _dataSeriesIndexMap = new Dictionary<string, int>
@@ -264,6 +286,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
                 _eventsContainer.EventManager.OnPrintMessage += HandlePrintMessage;
 
+                SetInitialDefaults();
                 InitializeStrategyManager();
 
                 if (Category != Category.Backtest)
@@ -285,13 +308,9 @@ namespace NinjaTrader.NinjaScript.Strategies
         protected override void OnBarUpdate()
         {
             // Ensure we have defaults at the start of the session across multiple sessions
-            if (Bars.IsFirstBarOfSession)
+            if (BarsInProgress == 0 && Bars?.IsFirstBarOfSession == true)
             {
-                _tradingEvents.ResetTriggeredTradingState();
-                _eventsContainer.StrategiesEvents.ResetStrategyData();
-                _validTimeRange = false;
-                _timeStartChecked = false;
-                _timeEndChecked = false;
+                SetInitialDefaults();
             }
 
             if (BarsInProgress == 0 && CurrentBars[0] < BarsRequiredToTrade)
@@ -369,6 +388,15 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
         }
 
+        private void SetInitialDefaults()
+        {
+            _tradingEvents.ResetTriggeredTradingState();
+            _eventsContainer.StrategiesEvents.ResetStrategyData();
+            _validTimeRange = false;
+            _timeStartChecked = false;
+            _timeEndChecked = false;
+        }
+
         private void SetMessagingConfigs()
         {
             MessagingConfig.Instance.MarketEnvironment = MarketEnvironment;
@@ -433,7 +461,7 @@ namespace NinjaTrader.NinjaScript.Strategies
                 }
 
                 // Check if the end time is reached and disable the panel if needed
-                if (!_timeEndChecked && ToTime(Times[2][1]) >= TimeEnd)
+                if (!_timeEndChecked && ToTime(Times[2][1]) >= _parsedTimeEnd)
                 {
                     _timeEndChecked = true;
                     UpdateValidStartEndTimeUserInterface(false);
@@ -441,13 +469,8 @@ namespace NinjaTrader.NinjaScript.Strategies
             }
             else
             {
-                // If outside the valid range, ensure the panel is disabled
-                if (_timeStartChecked && !_timeEndChecked)
-                {
-                    _timeStartChecked = false;
-                    _timeEndChecked = true;
-                    UpdateValidStartEndTimeUserInterface(false);
-                }
+
+                UpdateValidStartEndTimeUserInterface(false);
             }
         }
 
@@ -460,7 +483,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
             var currentTime = ToTime(Times[2][1]);
 
-            return (currentTime >= TimeStart && currentTime <= TimeEnd);
+            return (currentTime >= _parsedTimeStart && currentTime <= _parsedTimeEnd);
         }
 
         private void UpdateValidStartEndTimeUserInterface(bool validStartEndTime)
