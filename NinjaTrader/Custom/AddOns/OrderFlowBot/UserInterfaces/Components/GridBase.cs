@@ -153,7 +153,7 @@ namespace NinjaTrader.Custom.AddOns.OrderFlowBot.UserInterfaces.Components
             else
             {
                 // Avoid blocking or potential recursion
-                Dispatcher.BeginInvoke(new Action(() => EnableControls(this)));
+                Dispatcher.BeginInvoke(new Action(() => DisableControls(this)));
             }
         }
 

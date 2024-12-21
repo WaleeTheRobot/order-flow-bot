@@ -34,6 +34,10 @@ You can find the latest release at https://github.com/WaleeTheRobot/order-flow-b
 
 Sometimes NinjaTrader will complain about an import failed. You can just open the zip file from the release and copy the OrderFlowBot directory into the Add On directory on your computer after removing the previous OrderFlowBot directory. It's normally located at: `C:\Users\<username>\Documents\NinjaTrader 8\bin\Custom\AddOns`. Afterwards, open NinjaTrader and click `New` > `NinjaScript Editor`. Click the NinjaScript Editor and press `F5`. It'll take a few seconds and you'll hear a sound. The icon at the bottom left corner of it will disappear when it's done compiling. Close the NinjaScript Editor and you should be good to go.
 
+### Important Issues
+
+There seems to be an issue with NT not entering the OnBarUpdate method when the Enabled is selected in the strategies tab around the accounts and orders tabs. Checking the Enabled while initially loading seems to be the current workaround. This is happening in 8.1.4.0 and seems to persist if you downgrade back to 8.1.3.1.
+
 # Development
 
 Install System.Text.Json from Nugget in your IDE.
@@ -41,6 +45,7 @@ Install System.Text.Json from Nugget in your IDE.
 I've noticed NT having issues between compile and runtime loading dlls if you copy them over to the `Custom` directory or reference it somewhere else. The ones in the NT directory below should work. Reference those in NinjaScript Editor.
 
 `C:\Program Files\NinjaTrader 8\bin\System.Text.Json.dll`
+
 `C:\Program Files\NinjaTrader 8\bin\System.Memory.dll`
 
 ## Advance
