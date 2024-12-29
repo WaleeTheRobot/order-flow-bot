@@ -42,7 +42,7 @@ There seems to be an issue with NT not entering the OnBarUpdate method when the 
 
 Install System.Text.Json from Nugget in your IDE.
 
-I've noticed NT having issues between compile and runtime loading dlls if you copy them over to the `Custom` directory or reference it somewhere else. The ones in the NT directory below should work. Reference those in NinjaScript Editor.
+I've noticed NT having issues between compile and runtime loading dlls if you copy them over to the `Custom` directory or reference it somewhere else. The ones in the NT directory below should work. Reference those in NinjaScript Editor. Refer to this if you don't know how to reference the assembly in NinjaTrader. https://ninjatrader.com/support/helpGuides/nt8/NT%20HelpGuide%20English.html?using_3rd_party_indicators.htm
 
 `C:\Program Files\NinjaTrader 8\bin\System.Text.Json.dll`
 
